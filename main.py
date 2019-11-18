@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore, uic
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, QTimer
 
-from PyQt5.QtWidgets import QApplication, QComboBox, QRadioButton, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QApplication, QComboBox, QRadioButton, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QPixmap, QImage
@@ -36,9 +36,9 @@ class UI(QtWidgets.QMainWindow):
         self.config = CONFIG(self, self.data, self.control, self.rov, self.controller)
         
         # FIND SCREEN SIZE
-        self.sizeObject = QtWidgets.QDesktopWidget().screenGeometry(-1)
-        self.data.screenHeight = self.sizeObject.height()
-        self.data.screenWidth = self.sizeObject.width()
+        self.data.sizeObject = QtWidgets.QDesktopWidget().screenGeometry(-1)
+        self.data.screenHeight = self.data.sizeObject.height()
+        self.data.screenWidth = self.data.sizeObject.width()
 
         # SET DEFAULT WIDGET SIZES
         self.con_panel_functions_widget.resize(self.data.screenWidth/6,self.con_panel_functions_widget.height())
@@ -74,7 +74,7 @@ class UI(QtWidgets.QMainWindow):
 
         if configFileStatus == True:
             # FACTORY RESET GUI CONFIGURATION
-            self.resetConfig()
+            self.resetConfig(False)
 
             root = configFile.getroot()
 
@@ -86,7 +86,9 @@ class UI(QtWidgets.QMainWindow):
                     for index, thruster in enumerate(child):
                         self.data.configThrusterPosition[index] = thruster.find("location").text
                         self.data.configThrusterReverse[index] = True if thruster.find("reversed").text == 'True' else False
-                        self.config.setROVThrusterSettings(None, index, 3)
+
+                    # UPDATE GUI WITH THRUSTER DATA
+                    self.config.setThrustersNumber(self.data.configThrusterNumber)
                         
                 ##############################
                 ### READ ACTUATOR SETTINGS ###
@@ -137,37 +139,32 @@ class UI(QtWidgets.QMainWindow):
                                 if camera.tag == 'quantity':
                                     self.config_cameras_number.setValue(int(camera.text))
                                 else:
-                                    self.data.configDefaultCameraList.append(int(camera.text))
+                                    self.data.configDefaultCameraList[index - 1] = int(camera.text)
 
-                        # UPDATE GUI WITH ANALOG CAMERA DATA
-                        self.config.setCamerasNumber(True)
+                            # UPDATE GUI WITH ANALOG CAMERA DATA
+                            self.config.setCamerasNumber(True)     
 
                         # DIGITAL CAMERAS
                         if cameraType.tag == 'digital':
                             pass
 
-    def resetConfig(self):
+    def resetConfig(self, resetStatus):
+        ###############################
         ### RESET THRUSTER SETTINGS ###
-        self.config_thruster1_position.setCurrentIndex(0)
-        self.config_thruster2_position.setCurrentIndex(0)
-        self.config_thruster3_position.setCurrentIndex(0)
-        self.config_thruster4_position.setCurrentIndex(0)
-        self.config_thruster5_position.setCurrentIndex(0)
-        self.config_thruster6_position.setCurrentIndex(0)
-        self.config_thruster7_position.setCurrentIndex(0)
-        self.config_thruster8_position.setCurrentIndex(0)
-        self.config_thruster1_reverse.setChecked(False)
-        self.config_thruster2_reverse.setChecked(False)
-        self.config_thruster3_reverse.setChecked(False)
-        self.config_thruster4_reverse.setChecked(False)
-        self.config_thruster5_reverse.setChecked(False)
-        self.config_thruster6_reverse.setChecked(False)
-        self.config_thruster7_reverse.setChecked(False)
-        self.config_thruster8_reverse.setChecked(False)
+        ###############################
+        for number in range(self.data.configThrusterNumber):
+            # REMOVE THRUSTERS FROM CONFIG TAB
+            self.config_thruster_form.removeRow(0)
+
         self.data.configThrusterPosition = ['None'] * 8
         self.data.configThrusterReverse = [False] * 8
 
+        if resetStatus == True:
+            self.config.setThrustersNumber(self.data.configThrusterNumber)
+
+        ###############################
         ### RESET ACTUATOR SETTINGS ###
+        ###############################
         self.data.configActuatorLabelList = []
         # DELETE PREVIOUS ACTUATORS FROM GUI
         for number in range(self.data.configActuatorNumber):
@@ -178,7 +175,10 @@ class UI(QtWidgets.QMainWindow):
         self.config_actuators_number.setValue(0)
         self.data.configActuatorNumber = 0
 
-        ### RESET SENSOR SETTINGS ###
+        ###############################
+        #### RESET SENSOR SETTINGS ####
+        ###############################
+        self.data.controlSensorLabelObjects = []
         self.data.configSensorSelectedType = []
         # DELETE PREVIOUS SENSORS FROM GUI
         for number in range(self.data.configSensorNumber):
@@ -189,7 +189,9 @@ class UI(QtWidgets.QMainWindow):
         self.config_sensors_number.setValue(0)
         self.data.configSensorNumber = 0
 
-        ### RESET CAMERA SETTINGS ###
+        ###############################
+        #### RESET CAMERA SETTINGS ####
+        ###############################
         self.data.configDefaultCameraList = [0] * 4
         self.data.configCameraList = []
         self.config_cameras_number.setValue(0)
@@ -221,44 +223,11 @@ class UI(QtWidgets.QMainWindow):
         self.config_cameras_number.editingFinished.connect(lambda: self.config.setCamerasNumber(False))
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
         self.config_load_settings.clicked.connect(self.config.loadSettings)
-        self.config_reset_settings.clicked.connect(self.resetConfig)
+        self.config_reset_settings.clicked.connect(lambda: self.resetConfig(True))
         self.config_save_settings.clicked.connect(self.config.saveSettings)
-
-        # ADD ROV THRUSTER POSITIONS TO DROP DOWN MENUS
-        self.config_thruster1_position.addItems(self.data.configThrusterPositionList)
-        self.config_thruster2_position.addItems(self.data.configThrusterPositionList)
-        self.config_thruster3_position.addItems(self.data.configThrusterPositionList)
-        self.config_thruster4_position.addItems(self.data.configThrusterPositionList)
-        self.config_thruster5_position.addItems(self.data.configThrusterPositionList)
-        self.config_thruster6_position.addItems(self.data.configThrusterPositionList)
-        self.config_thruster7_position.addItems(self.data.configThrusterPositionList)
-        self.config_thruster8_position.addItems(self.data.configThrusterPositionList)
-
-        # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
-        self.config_thruster1_position.activated.connect(lambda index, thruster = 0, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster2_position.activated.connect(lambda index, thruster = 1, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster3_position.activated.connect(lambda index, thruster = 2, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster4_position.activated.connect(lambda index, thruster = 3, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster5_position.activated.connect(lambda index, thruster = 4, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster6_position.activated.connect(lambda index, thruster = 5, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster7_position.activated.connect(lambda index, thruster = 6, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster8_position.activated.connect(lambda index, thruster = 7, setting = 0: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster1_reverse.toggled.connect(lambda index, thruster = 0, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster2_reverse.toggled.connect(lambda index, thruster = 1, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster3_reverse.toggled.connect(lambda index, thruster = 2, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster4_reverse.toggled.connect(lambda index, thruster = 3, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster5_reverse.toggled.connect(lambda index, thruster = 4, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster6_reverse.toggled.connect(lambda index, thruster = 5, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster7_reverse.toggled.connect(lambda index, thruster = 6, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster8_reverse.toggled.connect(lambda index, thruster = 7, setting = 1: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster1_test.toggled.connect(lambda index, thruster = 0, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster2_test.toggled.connect(lambda index, thruster = 1, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster3_test.toggled.connect(lambda index, thruster = 2, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster4_test.toggled.connect(lambda index, thruster = 3, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster5_test.toggled.connect(lambda index, thruster = 4, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster6_test.toggled.connect(lambda index, thruster = 5, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster7_test.toggled.connect(lambda index, thruster = 6, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
-        self.config_thruster8_test.toggled.connect(lambda index, thruster = 7, setting = 2: self.config.setROVThrusterSettings(index, thruster, setting))
+        
+        # ADD THRUSTER CONFIGURATION WIDGETS
+        self.config.setThrustersNumber(self.data.configThrusterNumber)
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MANU TO THE SAME SLOT, PASSING THE CAMERA ID AS 1,2,3,4 ETC.
         self.config_camera_1_list.activated.connect(lambda index, camera = 0: self.config.changeDefaultCameras(index, camera))
@@ -301,7 +270,7 @@ class CAMERA_FEED_1(QThread):
     cameraNewFrame = pyqtSignal(QImage)
 
     # URL of camera stream
-    channel = 0   
+    channel = 2   
     
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
@@ -329,7 +298,7 @@ class CAMERA_FEED_2(QThread):
     cameraNewFrame = pyqtSignal(QImage)
 
     # URL of camera stream
-    channel = 1   
+    channel = 1  
     
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
@@ -496,50 +465,58 @@ class CONFIG():
         self.rov = Object4
         self.controller = Object5
 
-    def setROVThrusterSettings(self, index, thruster, setting):
+    def setThrustersNumber(self, number):
+        for thruster in range(number):
+            # CREATE THRUSTER NUMBER LABEL
+            thrusterLabel = QLabel("Thruster {}".format(thruster + 1))
+            thrusterLabel.setStyleSheet("font-weight: bold;")
+            # CREATE ROV LOCATION DROP DOWN MENU AND ADD ITEMS
+            thrusterLocation = QComboBox()
+            thrusterLocation.addItems(self.data.configThrusterPositionList)           
+            thrusterLocation.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[thruster]))
+            # CREATE THRUSTER REVERSE CHECKBOX
+            thrusterReverse = QCheckBox()
+            thrusterReverse.setChecked(self.data.configThrusterReverse[thruster])
+            # CREATE THRUSTER TEST BUTTON
+            thrusterTest = QPushButton("Test")
+            
+            # CREATE GRID LAYOUT
+            layout = QGridLayout()
+            layout.addWidget(QLabel('ROV Location'),0,0)
+            layout.addWidget(thrusterLocation,0,1)
+            layout.addWidget(QLabel('Reversed'),1,0)
+            layout.addWidget(thrusterReverse,1,1)
+            layout.addWidget(thrusterTest,2,1)
+
+            # ADD TO CONFIG TAB FORM LAYOUT
+            self.ui.config_thruster_form.addRow(thrusterLabel, layout)
+
+            #thrusterLabel.setFixedWidth(self.ui.config_thruster_form.sizeHint().width()/3)
+
+            # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
+            thrusterLocation.activated.connect(lambda index, thruster = thruster, setting = 0, controlObject = None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
+            thrusterReverse.toggled.connect(lambda index, thruster = thruster, setting = 1, controlObject = thrusterReverse: self.setROVThrusterSettings(index, thruster, setting, controlObject))
+            thrusterTest.clicked.connect(lambda index, thruster = thruster, setting = 2, controlObject= None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
+
+    def setROVThrusterSettings(self, index, thruster, setting, controlObject):
         # THRUSTER POSITION
         if setting == 0:
             self.data.configThrusterPosition[thruster] = self.data.configThrusterPositionList[index]
 
         # THRUSTER REVERSE
         if setting == 1:
-            self.data.configThrusterReverse[0] = self.ui.config_thruster1_reverse.isChecked()
-            self.data.configThrusterReverse[1] = self.ui.config_thruster2_reverse.isChecked()
-            self.data.configThrusterReverse[2] = self.ui.config_thruster3_reverse.isChecked()
-            self.data.configThrusterReverse[3] = self.ui.config_thruster4_reverse.isChecked()
-            self.data.configThrusterReverse[4] = self.ui.config_thruster5_reverse.isChecked()
-            self.data.configThrusterReverse[5] = self.ui.config_thruster6_reverse.isChecked()
-            self.data.configThrusterReverse[6] = self.ui.config_thruster7_reverse.isChecked()
-            self.data.configThrusterReverse[7] = self.ui.config_thruster8_reverse.isChecked()
+            print(controlObject.isChecked())
+            self.data.configThrusterReverse[thruster] = controlObject.isChecked()
 
         # THRUSTER TEST
-
-        # CONFIG 
-        if setting == 3:
-            # SET LOCATION OF EACH THRUSTER
-            self.ui.config_thruster1_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[0]))
-            self.ui.config_thruster2_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[1]))
-            self.ui.config_thruster3_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[2]))
-            self.ui.config_thruster4_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[3]))
-            self.ui.config_thruster5_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[4]))
-            self.ui.config_thruster6_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[5]))
-            self.ui.config_thruster7_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[6]))
-            self.ui.config_thruster8_position.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[7]))
-            # SET REVERSE STATE
-            self.ui.config_thruster1_reverse.setChecked(self.data.configThrusterReverse[0])      
-            self.ui.config_thruster2_reverse.setChecked(self.data.configThrusterReverse[1]) 
-            self.ui.config_thruster3_reverse.setChecked(self.data.configThrusterReverse[2]) 
-            self.ui.config_thruster4_reverse.setChecked(self.data.configThrusterReverse[3]) 
-            self.ui.config_thruster5_reverse.setChecked(self.data.configThrusterReverse[4]) 
-            self.ui.config_thruster6_reverse.setChecked(self.data.configThrusterReverse[5]) 
-            self.ui.config_thruster7_reverse.setChecked(self.data.configThrusterReverse[6]) 
-            self.ui.config_thruster8_reverse.setChecked(self.data.configThrusterReverse[7])  
+        if setting == 2:
+            pass  
 
     def setActuatorsNumber(self, configStatus):
         oldNumber = self.data.configActuatorNumber
         newNumber = self.ui.config_actuators_number.value()
         self.data.configActuatorNumber = newNumber
-
+    
         # ADD ACTUATORS IF NEW NUMBER IS HIGHER
         if newNumber > oldNumber:
             # CALCULATE NUMBER OF ACTUATORS TO ADD ON TOP OF CURRENT NUMBER
@@ -560,6 +537,10 @@ class CONFIG():
                 actuatorLabel = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][0])
                 state1 = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][1])
                 state2 = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][2])
+
+                # CREATE ACTUATOR NUMBER LABEL
+                actuatorNumber = QLabel("Actuator {}".format((oldNumber + number + 1)))
+                actuatorNumber.setStyleSheet("font-weight: bold;")
                 
                 # CREATE ACTUATOR CONTROL BUTTON ON CONTROL PANEL
                 actuatorToggle = QPushButton(self.data.configActuatorLabelList[oldNumber + number][1])
@@ -581,9 +562,11 @@ class CONFIG():
                 actuatorToggle.setStyleSheet(self.data.greenStyle)
 
                 # ADD TO CONFIG TAB
-                self.ui.config_actuator_form.addRow(QLabel("Actuator {}".format((oldNumber + number + 1))), layout)
+                self.ui.config_actuator_form.addRow(actuatorNumber, layout)
                 # ADD TO CONTROL PANEL TAB
                 self.ui.control_panel_actuators.addRow(actuatorName, actuatorToggle)
+
+                #actuatorNumber.setFixedWidth(self.ui.config_actuator_form.sizeHint().width()/3)
 
                 # LINK CONFIG ACTUATOR TEXT FIELDS TO SLOT - PASS OBJECT, ACTUATOR NUMBER AND WHICH TEXT FIELD HAS BEEN EDITED
                 actuatorLabel.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 0, controlObject = actuatorName: self.changeActuatorType(text, actuator, label, controlObject))
@@ -695,6 +678,9 @@ class CONFIG():
         for number in range(self.data.configCameraNumber):
             self.data.configCameraList.append('Camera {}'.format(number + 1))
         # ADD LIST TO EACH DROP DOWN MENU
+
+        print(self.data.configDefaultCameraList)
+
         # CONTROL PANEL
         self.ui.control_camera_1_list.addItems(self.data.configCameraList)
         self.ui.control_camera_1_list.setCurrentIndex(self.data.configDefaultCameraList[0])
@@ -820,6 +806,7 @@ class DATABASE():
     fileName = 'config.xml'
 
     # STORES OPTIONS TO BE DISPLATED ON THRUSTER POSITION DROP DOWN MENU
+    configThrusterNumber = 8
     configThrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     configThrusterPosition = ['None'] * 8
     configThrusterReverse = [False] * 8
