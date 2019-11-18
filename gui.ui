@@ -666,6 +666,13 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
              <set>Qt::AlignCenter</set>
             </property>
             <layout class="QGridLayout" name="gridLayout_34">
+             <item row="0" column="0">
+              <widget class="QPushButton" name="pushButton_9">
+               <property name="text">
+                <string>Find COM Ports</string>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="0">
               <layout class="QFormLayout" name="formLayout_7">
                <item row="0" column="0">
@@ -690,17 +697,24 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                </item>
               </layout>
              </item>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pushButton_9">
+             <item row="4" column="0">
+              <widget class="QPushButton" name="config_save_settings">
                <property name="text">
-                <string>Find COM Ports</string>
+                <string>Save Configuration</string>
                </property>
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QPushButton" name="config_save_settings">
+              <widget class="QPushButton" name="config_load_settings">
                <property name="text">
-                <string>Save Configuration</string>
+                <string>Load Configuration File</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QPushButton" name="config_reset_settings">
+               <property name="text">
+                <string>Reset Configuration</string>
                </property>
               </widget>
              </item>
@@ -1231,7 +1245,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                   <x>0</x>
                   <y>0</y>
                   <width>251</width>
-                  <height>572</height>
+                  <height>567</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_20">
@@ -1309,7 +1323,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                   <x>0</x>
                   <y>0</y>
                   <width>251</width>
-                  <height>572</height>
+                  <height>567</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_23">

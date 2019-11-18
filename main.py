@@ -66,13 +66,16 @@ class UI(QtWidgets.QMainWindow):
 
     def configSetup(self):
         try:
-            configFile = xml.parse('config.xml')
+            configFile = xml.parse(self.data.fileName)
             configFileStatus = True
         except:
             print('Configuration file not found')
             configFileStatus = False
 
         if configFileStatus == True:
+            # FACTORY RESET GUI CONFIGURATION
+            self.resetConfig()
+
             root = configFile.getroot()
 
             for child in root:
@@ -89,9 +92,6 @@ class UI(QtWidgets.QMainWindow):
                 ### READ ACTUATOR SETTINGS ###
                 ##############################
                 if child.tag == 'actuators':
-                    # CREATE STORAGE ARRAY FOR ACTUATOR LABELS
-                    self.data.configActuators = []
-
                     for index1, actuator in enumerate(child):
                         # SET NUMBER OF ACTUATORS
                         if actuator.tag == 'quantity':
@@ -113,9 +113,6 @@ class UI(QtWidgets.QMainWindow):
                 #### READ SENSOR SETTINGS ####
                 ##############################
                 if child.tag == 'sensors':
-                    # CREATE STORAGE ARRAY FOR SENSOR TYPES
-                    self.data.configSensorSelectedType = []
-                    
                     for index, sensor in enumerate(child):
                         # SET NUMBER OF SENSORS AND SENSOR TYPE
                         if sensor.tag == 'quantity':
@@ -135,9 +132,6 @@ class UI(QtWidgets.QMainWindow):
                     for cameraType in child: 
                         # ANALOG CAMERAS
                         if cameraType.tag == 'analog':
-                            self.data.configDefaultCameraList = []
-                            self.data.configCameraList = []
-
                             for index, camera in enumerate(cameraType):
                                 # SET NUMBER OF SENSORS AND SENSOR TYPE
                                 if camera.tag == 'quantity':
@@ -148,9 +142,62 @@ class UI(QtWidgets.QMainWindow):
                         # UPDATE GUI WITH ANALOG CAMERA DATA
                         self.config.setCamerasNumber(True)
 
+                        # DIGITAL CAMERAS
                         if cameraType.tag == 'digital':
                             pass
-                        
+
+    def resetConfig(self):
+        ### RESET THRUSTER SETTINGS ###
+        self.config_thruster1_position.setCurrentIndex(0)
+        self.config_thruster2_position.setCurrentIndex(0)
+        self.config_thruster3_position.setCurrentIndex(0)
+        self.config_thruster4_position.setCurrentIndex(0)
+        self.config_thruster5_position.setCurrentIndex(0)
+        self.config_thruster6_position.setCurrentIndex(0)
+        self.config_thruster7_position.setCurrentIndex(0)
+        self.config_thruster8_position.setCurrentIndex(0)
+        self.config_thruster1_reverse.setChecked(False)
+        self.config_thruster2_reverse.setChecked(False)
+        self.config_thruster3_reverse.setChecked(False)
+        self.config_thruster4_reverse.setChecked(False)
+        self.config_thruster5_reverse.setChecked(False)
+        self.config_thruster6_reverse.setChecked(False)
+        self.config_thruster7_reverse.setChecked(False)
+        self.config_thruster8_reverse.setChecked(False)
+        self.data.configThrusterPosition = ['None'] * 8
+        self.data.configThrusterReverse = [False] * 8
+
+        ### RESET ACTUATOR SETTINGS ###
+        self.data.configActuatorLabelList = []
+        # DELETE PREVIOUS ACTUATORS FROM GUI
+        for number in range(self.data.configActuatorNumber):
+            # REMOVE ACTUATORS FROM CONFIG TAB
+            self.config_actuator_form.removeRow(1) 
+            # REMOVE ACTUATORS FROM CONTROL PANEL TAB
+            self.control_panel_actuators.removeRow(0)
+        self.config_actuators_number.setValue(0)
+        self.data.configActuatorNumber = 0
+
+        ### RESET SENSOR SETTINGS ###
+        self.data.configSensorSelectedType = []
+        # DELETE PREVIOUS SENSORS FROM GUI
+        for number in range(self.data.configSensorNumber):
+            # REMOVE SENSORS FROM CONFIG TAB
+            self.config_sensor_form.removeRow(2) 
+            # REMOVE SENSORS FROM CONTROL PANEL TAB
+            self.control_panel_sensors.removeRow(0)
+        self.config_sensors_number.setValue(0)
+        self.data.configSensorNumber = 0
+
+        ### RESET CAMERA SETTINGS ###
+        self.data.configDefaultCameraList = [0] * 4
+        self.data.configCameraList = []
+        self.config_cameras_number.setValue(0)
+        self.config_camera_1_list.clear()
+        self.config_camera_2_list.clear()
+        self.config_camera_3_list.clear()
+        self.config_camera_4_list.clear()
+
     def linkControlPanelWidgets(self):
         self.control_rov_connect.clicked.connect(self.control.rovConnect)
         self.control_rov_connect.setFixedHeight(50)
@@ -173,6 +220,8 @@ class UI(QtWidgets.QMainWindow):
         self.config_sensors_number.editingFinished.connect(lambda: self.config.setSensorsNumber(False))
         self.config_cameras_number.editingFinished.connect(lambda: self.config.setCamerasNumber(False))
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
+        self.config_load_settings.clicked.connect(self.config.loadSettings)
+        self.config_reset_settings.clicked.connect(self.resetConfig)
         self.config_save_settings.clicked.connect(self.config.saveSettings)
 
         # ADD ROV THRUSTER POSITIONS TO DROP DOWN MENUS
@@ -622,7 +671,6 @@ class CONFIG():
     def changeSensorType(self, index, sensor, sensorLabel):
         # SENSOR VARIABLE REPRESENTS WHICH SENSOR IS BEING MODIFIED
         # INDEX VARIABLE REPRESENTS THE MENU INDEX SELECTED
-        print('Sensor {} changed to {}'.format(sensor, self.data.configSensorTypeList[index]))
         sensorLabel.setText(self.data.configSensorTypeList[index])
         self.data.configSensorSelectedType[sensor - 1] = index
 
@@ -646,7 +694,6 @@ class CONFIG():
         # ADD CAMERAS TO LIST
         for number in range(self.data.configCameraNumber):
             self.data.configCameraList.append('Camera {}'.format(number + 1))
-
         # ADD LIST TO EACH DROP DOWN MENU
         # CONTROL PANEL
         self.ui.control_camera_1_list.addItems(self.data.configCameraList)
@@ -722,7 +769,16 @@ class CONFIG():
 
         # SAVE TO XML FILE                                                           
         tree = xml.ElementTree(root)
-        tree.write("config.xml",encoding='utf-8', xml_declaration=True)
+        tree.write(self.data.fileName,encoding='utf-8', xml_declaration=True)
+
+    def loadSettings(self):
+        # USER CHOOSES SEQUENCE FILE
+        self.data.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open File','./','XML File (*.xml)')
+        if self.data.fileName != '':
+            self.ui.configSetup()
+        else:
+            # SET BACK TO DEFAULT NAME IF USER DOES NOT SELECT A FILE
+            self.data.fileName = 'config.xml'
 
 class DATABASE():
     ###############################
@@ -759,6 +815,9 @@ class DATABASE():
     ###############################
     ######## CONFIGURATION ########
     ###############################
+
+    # DEFAULT CONFIG FILE NAME
+    fileName = 'config.xml'
 
     # STORES OPTIONS TO BE DISPLATED ON THRUSTER POSITION DROP DOWN MENU
     configThrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
