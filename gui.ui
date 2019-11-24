@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="control_panel_tab">
        <attribute name="title">
@@ -360,7 +360,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                         </size>
                        </property>
                        <property name="text">
-                        <string>Connect</string>
+                        <string>CONNECT</string>
                        </property>
                       </widget>
                      </item>
@@ -379,7 +379,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                         </size>
                        </property>
                        <property name="text">
-                        <string>Connect</string>
+                        <string>CONNECT</string>
                        </property>
                       </widget>
                      </item>

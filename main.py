@@ -1,12 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore, uic
-
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, QTimer
-
+from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer
 from PyQt5.QtWidgets import QApplication, QComboBox, QRadioButton, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox
-
-from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtCore import QObject, pyqtSignal
 
 import threading
 import time
@@ -17,13 +12,31 @@ import serial
 import xml.etree.ElementTree as xml
 import numpy
 
-# SAMS SERIAL LIBRARY
+# SERIAL LIBRARY
 from avalonComms import ROV
 from avalonComms import controller as CONTROLLER
 
 class UI(QtWidgets.QMainWindow):
+    """
+    PURPOSE
+
+    Handles everything to do with the GUI.
+    """
     # INITIAL SETUP
     def __init__(self):
+        """
+        PURPOSE
+
+        Initialises objects, loads GUI and runs initial setup functions.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         super(UI,self).__init__()
         # LOAD UI FILE
         uic.loadUi('gui.ui',self)
@@ -65,6 +78,20 @@ class UI(QtWidgets.QMainWindow):
         self.showMaximized()
 
     def configSetup(self):
+        """
+        PURPOSE
+
+        Reads the Config.xml file and configures the programs thruster, actuator, sensor, camera and controller settings.
+        If no Config.xml file is found, the program will open with default settings. 
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         try:
             configFile = xml.parse(self.data.fileName)
             configFileStatus = True
@@ -149,6 +176,19 @@ class UI(QtWidgets.QMainWindow):
                             pass
 
     def resetConfig(self, resetStatus):
+        """
+        PURPOSE
+
+        Resets the program to default settings (nothing unconfigured).
+        
+        INPUT
+
+        - resetStatus = true when called via the 'Reset Configuration' button.
+
+        RETURNS
+
+        NONE
+        """
         ###############################
         ### RESET THRUSTER SETTINGS ###
         ###############################
@@ -159,6 +199,7 @@ class UI(QtWidgets.QMainWindow):
         self.data.configThrusterPosition = ['None'] * 8
         self.data.configThrusterReverse = [False] * 8
 
+        # RETURN NUMBER OF THRUSTERS TO 8 IF RESET BUTTON IS PRESSED
         if resetStatus == True:
             self.config.setThrustersNumber(self.data.configThrusterNumber)
 
@@ -201,10 +242,25 @@ class UI(QtWidgets.QMainWindow):
         self.config_camera_4_list.clear()
 
     def linkControlPanelWidgets(self):
+        """
+        PURPOSE
+
+        Links widgets in the control panel tab to their respective functions.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         self.control_rov_connect.clicked.connect(self.control.rovConnect)
         self.control_rov_connect.setFixedHeight(50)
+        self.control_rov_connect.setStyleSheet(self.data.defaultBlue)
         self.control_controller_connect.clicked.connect(self.control.controllerConnect)
         self.control_controller_connect.setFixedHeight(50)
+        self.control_controller_connect.setStyleSheet(self.data.defaultBlue)
         self.control_timer_start.clicked.connect(self.control.toggleTimer)
         self.control_timer_start.setStyleSheet(self.data.greenStyle)
         self.control_timer_reset.clicked.connect(self.control.resetTimer)
@@ -219,6 +275,19 @@ class UI(QtWidgets.QMainWindow):
         self.control_camera_4_list.activated.connect(lambda index, camera = 3: self.control.changeExternalCameraFeed(index, camera))
 
     def linkConfigWidgets(self):
+        """
+        PURPOSE
+
+        Links widgets in the configuration tab to their respective functions.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         self.config_sensors_number.editingFinished.connect(lambda: self.config.setSensorsNumber(False))
         self.config_cameras_number.editingFinished.connect(lambda: self.config.setCamerasNumber(False))
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
@@ -236,11 +305,25 @@ class UI(QtWidgets.QMainWindow):
         self.config_camera_4_list.activated.connect(lambda index, camera = 3: self.config.changeDefaultCameras(index, camera))
 
     def initiateCameraFeed(self):
+        """
+        PURPOSE
+
+        Starts each camera feed in a new thread.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        pass
         # INITIATE CAMERAS IN SEPERATE THREADS
         # PRIMARY CAMERA
-        camThread1 = CAMERA_FEED_1(self)
-        camThread1.cameraNewFrame.connect(self.updateCamera1Feed)
-        camThread1.start()
+        #camThread1 = CAMERA_FEED_1(self)
+        #camThread1.cameraNewFrame.connect(self.updateCamera1Feed)
+        #camThread1.start()
         # SECONDARY CAMERA 1
         #camThread2 = CAMERA_FEED_2(self)
         #camThread2.cameraNewFrame.connect(self.updateCamera2Feed)
@@ -252,16 +335,55 @@ class UI(QtWidgets.QMainWindow):
 
     @pyqtSlot(QImage)
     def updateCamera1Feed(self, frame):
+        """
+        PURPOSE
+
+        Refreshes camera feed 1 with a new frame.
+
+        INPUT
+
+        - frame = QImage containing the new frame captures from the camera.
+
+        RETURNS
+
+        NONE
+        """
         # DISPLAY NEW FRAME ON CAMERA FEED
         self.primary_camera.setPixmap(QPixmap.fromImage(frame))
 
     @pyqtSlot(QImage)
     def updateCamera2Feed(self, frame):
+        """
+        PURPOSE
+
+        Refreshes camera feed 2 with a new frame.
+
+        INPUT
+
+        - frame = QImage containing the new frame captures from the camera.
+
+        RETURNS
+
+        NONE
+        """
         # DISPLAY NEW FRAME ON CAMERA FEED
         self.secondary_camera_1.setPixmap(QPixmap.fromImage(frame))
 
     @pyqtSlot(QImage)
     def updateCamera3Feed(self, frame):
+        """
+        PURPOSE
+
+        Refreshes camera feed 3 with a new frame.
+
+        INPUT
+
+        - frame = QImage containing the new frame captures from the camera.
+
+        RETURNS
+
+        NONE
+        """
         # DISPLAY NEW FRAME ON CAMERA FEED
         self.secondary_camera_2.setPixmap(QPixmap.fromImage(frame))
 
@@ -270,7 +392,7 @@ class CAMERA_FEED_1(QThread):
     cameraNewFrame = pyqtSignal(QImage)
 
     # URL of camera stream
-    channel = 2   
+    channel = 0  
     
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
@@ -349,8 +471,29 @@ class CAMERA_FEED_3(QThread):
                 self.cameraNewFrame.emit(cameraFrame)
 
 class CONTROL_PANEL():
+    """
+    PURPOSE
+
+    Handles everything that happens on the Control Panel tab.
+    """
     # CONSTUCTOR
     def __init__(self, Object1, Object2, Object3, Object4):
+        """
+        PURPOSE
+
+        Initialises objects.
+
+        INPUT
+
+        - Object1 = 'UI' class
+        - Object2 = 'DATABASE' class
+        - Object3 = 'ROV' clsss
+        - Object4 = 'CONTROLLER' class
+
+        RETURNS
+
+        NONE
+        """
         # CREATE OBJECTS
         self.ui = Object1
         self.data = Object2
@@ -358,30 +501,70 @@ class CONTROL_PANEL():
         self.controller = Object4
 
     def rovConnect(self):
+        """
+        PURPOSE
+
+        Initialises serial communication with the ROV and starts sensor reading requests.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         if self.data.controlROVCommsStatus == False:
             self.data.controlROVCommsStatus = True
-            self.ui.control_rov_connect.setText('Disconnect')
+            self.ui.control_rov_connect.setText('DISCONNECT')
             self.ui.control_rov_connect.setStyleSheet(self.data.blueStyle)
             self.rov.initialiseConnection('AVALON',self.data.rovCOMPort, 115200)
+            # START FETCHING SENSOR READINGS
             self.getSensorReadings()
         else:
             self.data.controlROVCommsStatus = False
-            self.ui.control_rov_connect.setText('Connect')
-            self.ui.control_rov_connect.setStyleSheet('')
+            self.ui.control_rov_connect.setText('CONNECT')
+            self.ui.control_rov_connect.setStyleSheet(self.data.defaultBlue)
             self.rov.disconnect()
 
     def controllerConnect(self):
+        """
+        PURPOSE
+
+        Initialises bluetooth communication with the XBOX controller.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         if self.data.controlControllerCommsStatus == False:
             self.data.controlControllerCommsStatus = True
-            self.ui.control_controller_connect.setText('Disconnect')
+            self.ui.control_controller_connect.setText('DISCONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.blueStyle)
             self.controller.initialiseConnection(self.data.controllerCOMPort)
         else:
             self.data.controlControllerCommsStatus = False
-            self.ui.control_controller_connect.setText('Connect')
-            self.ui.control_controller_connect.setStyleSheet('')       
+            self.ui.control_controller_connect.setText('CONNECT')
+            self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue)       
 
     def getSensorReadings(self):
+        """
+        PURPOSE
+
+        Requests sensor readings from ROV and updates GUI.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         # READ SENSORS EVERY 1 SECOND
         thread = threading.Timer(0.5, self.getSensorReadings)
         thread.daemon = True                 
@@ -393,14 +576,43 @@ class CONTROL_PANEL():
             for index in range(0,len(self.data.controlSensorValues)):
                 self.data.controlSensorLabelObjects[index].setText(str(self.data.controlSensorValues[index]))
 
-    def changeExternalCameraFeed(self, index, camera):
+    def changeExternalCameraFeed(self, camera, display):
+        """
+        PURPOSE
+
+        Changes which analog camera is displayed on the camera feed.
+
+        INPUT
+
+        - camera = the camera number to be displayed.
+        - display = the screen quadrant to display the camera feed on.
+
+        RETURNS
+
+        NONE
+        """
         # CAMERA VARIABLE REPRESENTS WHICH CAMERA FEED IS BEING MODIFIED (0,1,2,3)
         # INDEX VARIABLE REPRESENTS THE MENU INDEX SELECTED
 
         # STORE WHICH CAMERA HAS BEEN SELECTED FOR EACH FEED
-        self.data.controlCameraViewList[camera] = index
+        self.data.controlCameraViewList[display] = camera
 
     def toggleActuator(self, _, actuator, buttonObject):
+        """
+        PURPOSE
+
+        Sends commmand to ROV when an actuator has been toggled.
+
+        INPUT
+
+        - _ = Not used.
+        - actuator = the actuator being toggled.
+        - buttonObject = pointer to the button widget (Allowed appearance to be modified)
+
+        RETURNS
+
+        NONE
+        """
         if self.data.controlActuatorStates[actuator] == False:
             buttonObject.setText(self.data.configActuatorLabelList[actuator][2])
             buttonObject.setStyleSheet(self.data.redStyle)
@@ -414,6 +626,19 @@ class CONTROL_PANEL():
             self.rov.setActuators(actuator, False)
     
     def toggleTimer(self):
+        """
+        PURPOSE
+
+        Starts/Stops the timer.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         if self.data.controlTimerEnabled == False:
             self.data.controlTimerEnabled = True
             self.ui.control_timer_start.setText('Stop')
@@ -427,11 +652,37 @@ class CONTROL_PANEL():
             self.ui.control_timer_start.setStyleSheet(self.data.greenStyle)
     
     def resetTimer(self):
+        """
+        PURPOSE
+
+        Resets the timer back to zero if the timer is stopped.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         if self.data.controlTimerEnabled == False:
             self.data.controlTimerMem = 0
             self.updateTimer(0)
 
     def readSystemTime(self):
+        """
+        PURPOSE
+
+        Reads the system time in a new thread and calculates the number of seconds elapsed since the timer was started.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         # CALCULATE SECONDS ELAPSED SINCE TIMER STARTED 
         currentTime = datetime.datetime.now()
         currentSeconds = (currentTime - self.startTime).total_seconds() + self.data.controlTimerMem
@@ -448,6 +699,19 @@ class CONTROL_PANEL():
             self.data.controlTimerMem = currentSeconds
 
     def updateTimer(self, currentSeconds):
+        """
+        PURPOSE
+
+        Converts seconds into DD:HH:MM::SS format and updates the timer widget on the GUI.
+
+        INPUT
+
+        - currentSeconds = the number of seconds since the timer was started.
+
+        RETURNS
+
+        NONE
+        """
         # CONVERT SECONDS TO DD:HH:MM:SS
         minutes, seconds = divmod(currentSeconds,60)
         hours, minutes = divmod(minutes, 60)
@@ -456,8 +720,30 @@ class CONTROL_PANEL():
         self.ui.control_timer.display('%02d:%02d:%02d:%02d' % (days, hours, minutes, seconds))
 
 class CONFIG():
+    """
+    PURPOSE
+
+    Handles everything that happens on the Configuration tab.
+    """
     # CONSTUCTOR
     def __init__(self, Object1, Object2, Object3, Object4, Object5):
+        """
+        PURPOSE
+
+        Initialises objects.
+
+        INPUT
+
+        - Object1 = 'UI' class
+        - Object2 = 'DATABASE' class
+        - Object3 = 'CONTROL_PANEL' class
+        - Object4 = 'ROV' clsss
+        - Object5 = 'CONTROLLER' class
+
+        RETURNS
+
+        NONE
+        """
         # CREATE OBJECTS
         self.ui = Object1
         self.data = Object2
@@ -466,6 +752,19 @@ class CONFIG():
         self.controller = Object5
 
     def setThrustersNumber(self, number):
+        """
+        PURPOSE
+
+        Adds specific number of thrusters to the GUI configration tab, with a ROV location menu, reverse checkbox and a test button.
+
+        INPUT
+
+        - number = the number of thrusters to add.
+
+        RETURNS
+
+        NONE
+        """
         for thruster in range(number):
             # CREATE THRUSTER NUMBER LABEL
             thrusterLabel = QLabel("Thruster {}".format(thruster + 1))
@@ -499,13 +798,28 @@ class CONFIG():
             thrusterTest.clicked.connect(lambda index, thruster = thruster, setting = 2, controlObject= None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
 
     def setROVThrusterSettings(self, index, thruster, setting, controlObject):
+        """
+        PURPOSE
+
+        Stores thruster settings such as ROV position, reverse state and sends command to ROV to test thruster.
+
+        INPUT
+
+        - index = menu index of the ROV location selected.
+        - thruster = teh thruster being modified.
+        - setting = the thruster setting that has been modified (0 = position, 1 = reverse state, 2 = test).
+        - controlObject = pointer to the checkbox object.
+
+        RETURNS
+
+        NONE
+        """
         # THRUSTER POSITION
         if setting == 0:
             self.data.configThrusterPosition[thruster] = self.data.configThrusterPositionList[index]
 
         # THRUSTER REVERSE
         if setting == 1:
-            print(controlObject.isChecked())
             self.data.configThrusterReverse[thruster] = controlObject.isChecked()
 
         # THRUSTER TEST
@@ -513,6 +827,19 @@ class CONFIG():
             pass  
 
     def setActuatorsNumber(self, configStatus):
+        """
+        PURPOSE
+
+        Adds specific number of actuators to the GUI configration tab, with textfields to modify the name and off/on state labels.
+
+        INPUT
+
+        - configStatus = true if function is called by the configSetup function.
+
+        RETURNS
+
+        NONE
+        """
         oldNumber = self.data.configActuatorNumber
         newNumber = self.ui.config_actuators_number.value()
         self.data.configActuatorNumber = newNumber
@@ -586,6 +913,22 @@ class CONFIG():
                 self.ui.control_panel_actuators.removeRow(oldNumber - number - 1)
 
     def changeActuatorType(self, text, actuator, label, controlObject):
+        """
+        PURPOSE
+
+        Changes the name label and button text on the actuator buttons.
+
+        INPUT
+
+        - text = the text entered by the user.
+        - actuator = the actuator being modified.
+        - label = the label being modified (0 = name, 1 = default state, 2 = actuated state).
+        - controlObject = pointer to the object that is being modified.
+
+        RETURNS
+
+        NONE
+        """
         # STORE NEW LABEL
         self.data.configActuatorLabelList[actuator][label] = text
 
@@ -607,6 +950,19 @@ class CONFIG():
                 controlObject.setText(text)  
 
     def setSensorsNumber(self, configStatus):
+        """
+        PURPOSE
+
+        Adds specific number of sensors to the GUI configration tab, with a drop down menu containing the sensor types.
+
+        INPUT
+
+        - configStatus = true if function is called by the configSetup function.
+
+        RETURNS
+
+        NONE
+        """
         oldNumber = self.data.configSensorNumber
         newNumber = self.ui.config_sensors_number.value()
         self.data.configSensorNumber = newNumber
@@ -616,7 +972,7 @@ class CONFIG():
             # CALCULATE NUMBER OF SENSORS TO ADD ON TOP OF CURRENT NUMBER
             delta = newNumber - oldNumber
             for number in range(delta):
-                # CREATE SENSOR TYPE STORAGE ARRAY IF NO CONFIG FILE FOUND
+                # CREATE SENSOR TYPE STORAGE ARRAY IF NO CONFIG FILE IS FOUND
                 if configStatus == False:
                     self.data.configSensorSelectedType.append(0)
                 # CREATE SENSOR TYPE DROP DOWN MENU AND ADD ITEMS
@@ -652,12 +1008,39 @@ class CONFIG():
                 del self.data.configSensorSelectedType[oldNumber - number - 1]
                       
     def changeSensorType(self, index, sensor, sensorLabel):
+        """
+        PURPOSE
+
+        Changes the type and label of a sensor.
+
+        INPUT
+
+        - index = menu index of the sensor type selected.
+        - sensor = the sensor being modified.
+
+        RETURNS
+
+        NONE
+        """
         # SENSOR VARIABLE REPRESENTS WHICH SENSOR IS BEING MODIFIED
         # INDEX VARIABLE REPRESENTS THE MENU INDEX SELECTED
         sensorLabel.setText(self.data.configSensorTypeList[index])
         self.data.configSensorSelectedType[sensor - 1] = index
 
     def setCamerasNumber(self, configStatus):
+        """
+        PURPOSE
+
+        Adds specific number of cameras to drop down menu for each analog camera feed.
+
+        INPUT
+
+        - configStatus = true if function is called by the configSetup function.
+
+        RETURNS
+
+        NONE
+        """
         newNumber = self.ui.config_cameras_number.value()
         self.data.configCameraNumber = newNumber
         # ERASE LIST
@@ -678,8 +1061,6 @@ class CONFIG():
         for number in range(self.data.configCameraNumber):
             self.data.configCameraList.append('Camera {}'.format(number + 1))
         # ADD LIST TO EACH DROP DOWN MENU
-
-        print(self.data.configDefaultCameraList)
 
         # CONTROL PANEL
         self.ui.control_camera_1_list.addItems(self.data.configCameraList)
@@ -702,6 +1083,20 @@ class CONFIG():
         self.ui.config_camera_4_list.setCurrentIndex(self.data.configDefaultCameraList[3])
 
     def changeDefaultCameras(self, index, camera):
+        """
+        PURPOSE
+
+        Changes which four cameras are shown on the feed upon program startup.
+
+        INPUT
+
+        - index = menu index of the camera selected.
+        - camera = the camera feed being modified.
+
+        RETURNS
+
+        NONE
+        """
         # CAMERA VARIABLE REPRESENTS WHICH CAMERA FEED IS BEING MODIFIED (0,1,2,3)
         # INDEX VARIABLE REPRESENTS THE MENU INDEX SELECTED
         self.data.configDefaultCameraList[camera] = index  
@@ -716,16 +1111,33 @@ class CONFIG():
             self.ui.control_camera_4_list.setCurrentIndex(self.data.configDefaultCameraList[3]) 
 
     def saveSettings(self):
+        """
+        PURPOSE
+
+        Saves the current program configuration to the Config.xml file.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         root = xml.Element("root")
 
-        # CONFIGURATION FOR THRUSTERS
+        ###################################
+        ### CONFIGURATION FOR THRUSTERS ###
+        ###################################
         thrusters = xml.SubElement(root, "thrusters")
         for index in range(8):
             thruster = xml.SubElement(thrusters, "thruster{}".format(index))
             xml.SubElement(thruster, "location").text = self.data.configThrusterPosition[index]
             xml.SubElement(thruster, "reversed").text = str(self.data.configThrusterReverse[index])
         
-        # CONFIGURATION FOR ACTUATORS
+        ###################################
+        ### CONFIGURATION FOR ACTUATORS ###
+        ###################################
         actuators = xml.SubElement(root, "actuators")
         xml.SubElement(actuators, "quantity").text = str(self.data.configActuatorNumber)
         
@@ -735,7 +1147,9 @@ class CONFIG():
             xml.SubElement(actuator, "offLabel").text = self.data.configActuatorLabelList[index][1]
             xml.SubElement(actuator, "onLabel").text = self.data.configActuatorLabelList[index][2]
 
-        # CONFIGURATION FOR SENSORS
+        ###################################
+        #### CONFIGURATION FOR SENSORS ####
+        ###################################
         sensors = xml.SubElement(root, "sensors")
         xml.SubElement(sensors, "quantity").text = str(self.data.configSensorNumber)
         
@@ -743,7 +1157,9 @@ class CONFIG():
             sensor = xml.SubElement(sensors, "sensor{}".format(index))
             xml.SubElement(sensor, "type").text = str(self.data.configSensorSelectedType[index])
 
-        # CONFIGURATION FOR CAMERAS
+        ###################################
+        #### CONFIGURATION FOR CAMERAS ####
+        ###################################
         cameras = xml.SubElement(root, "cameras")
         analog = xml.SubElement(cameras, "analog")
         digital = xml.SubElement(cameras, "digital")
@@ -758,6 +1174,19 @@ class CONFIG():
         tree.write(self.data.fileName,encoding='utf-8', xml_declaration=True)
 
     def loadSettings(self):
+        """
+        PURPOSE
+
+        Opens a window that allows user to select a configuration xml file to set up the program.
+
+        INPUTS
+
+        NONE
+
+        RETURNS 
+
+        NONE
+        """
         # USER CHOOSES SEQUENCE FILE
         self.data.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open File','./','XML File (*.xml)')
         if self.data.fileName != '':
@@ -790,9 +1219,11 @@ class DATABASE():
     # STORES THE SELECTED CAMERA FEEDS
     controlCameraViewList = [None] * 4
     
+    # APPEARANGE STYLESHEETS
     greenStyle = 'background-color: #679e37'
     redStyle = 'background-color: #f44336'
-    blueStyle = 'background-color: #0D47A1; color: white;'
+    blueStyle = 'background-color: #0D47A1; color: white; font-weight: bold;'
+    defaultBlue = 'color: #0D47A1; font-weight: bold;'
 
     controlTimerEnabled = False
     controlTimerNew = True
@@ -805,7 +1236,7 @@ class DATABASE():
     # DEFAULT CONFIG FILE NAME
     fileName = 'config.xml'
 
-    # STORES OPTIONS TO BE DISPLATED ON THRUSTER POSITION DROP DOWN MENU
+    # STORES OPTIONS TO BE DISPLAYED ON THRUSTER POSITION DROP DOWN MENU
     configThrusterNumber = 8
     configThrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     configThrusterPosition = ['None'] * 8
@@ -839,7 +1270,17 @@ class DATABASE():
 
 def guiInitiate(): 
     """
-    ### Input:
+    PURPOSE
+
+    Launches program and selects font.
+
+    INPUTS
+
+    NONE
+
+    RETURNS
+
+    NONE
     """
     # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
     app = QApplication(sys.argv)
