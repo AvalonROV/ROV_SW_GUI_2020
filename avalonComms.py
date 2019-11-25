@@ -15,6 +15,8 @@ VERSION DATE: N/A
 #MODULES
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 import numpy
+import logger
+import serial
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------
 #DEFINITIONS
@@ -45,6 +47,8 @@ class ROV():
         NONE
         """
         print("INITIALISING THE ROV CLASS")
+        
+        self.logFile = logger.LogFile("ROV Log File")        #Creating a new log file to record communications activity
     
     def findROVs(self, rovID):
         """CURRENTLY A MOCK METHOD!
@@ -156,7 +160,7 @@ class ROV():
         """
         print('SENDING THRUSTER VALUES')
 
-class controller():
+class Controller():
     """CURRENTLY A MOCK CLASS!
     PURPOSE
     
@@ -241,3 +245,29 @@ class controller():
         buttonStates = numpy.random.randint(0, high = 2, size = 10)
         
         return buttonStates
+
+class SerialInterface():
+    """
+    PURPOSE
+    
+    Acts as a general serial interface for communicating with devices across USB.
+    """
+    def __init__(self, port, baudRate = 115200, bytesize = serial.Serial.EIGHTBITS, parity = serial.Serial.PARITY_NONE, stopbits = serial.Serial.STOPBITS_ONE, timeout = 2.0):
+        #Creating a new Serial Adapter
+        self.serialAdapter = serial.Serial(port, baudrate = baudRate, bytesize = bytesize, parity = parity, stopbits = stopbits, timeout = timeout)
+        
+        #Attempting to open the Serial Port and Close it as a brief test
+        try:
+            self.serialAdapter.open()
+            self.serialAdapter.close()
+            
+        except serial.SerialException:
+            print("Could not open specified Serial Port {}, please ensure you have entered the port name correctly".format(port))
+        
+        #Saving the information for the port
+        self.port = port
+        self.baudRate = baudRate
+        self.bytesize = bytesize
+        self.parity = parity
+        self.stopbits = stopbits
+        self.timeout = timeout
