@@ -1,21 +1,24 @@
 var indexSectionsWithContent =
 {
-  0: "_cdfgirs",
-  1: "cr",
-  2: "_dfgis"
+  0: "_cdfgilrstu",
+  1: "cdru",
+  2: "_cdfgilrstu",
+  3: "cfs"
 };
 
 var indexSectionNames =
 {
   0: "all",
   1: "classes",
-  2: "functions"
+  2: "functions",
+  3: "variables"
 };
 
 var indexSectionLabels =
 {
   0: "All",
   1: "Classes",
-  2: "Functions"
+  2: "Functions",
+  3: "Variables"
 };
 

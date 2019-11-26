@@ -261,6 +261,12 @@ class UI(QtWidgets.QMainWindow):
         self.control_controller_connect.clicked.connect(self.control.controllerConnect)
         self.control_controller_connect.setFixedHeight(50)
         self.control_controller_connect.setStyleSheet(self.data.defaultBlue)
+        self.control_switch_direction.setIcon(QtGui.QIcon('graphics/switch_direction.png'))
+        self.control_switch_direction.clicked.connect(self.control.switchControlDirection)
+        self.control_switch_direction.setFixedHeight(50)
+        self.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
+        self.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
+        self.control_switch_direction.setIconSize(QtCore.QSize(50,50))
         self.control_timer_start.clicked.connect(self.control.toggleTimer)
         self.control_timer_start.setStyleSheet(self.data.greenStyle)
         self.control_timer_reset.clicked.connect(self.control.resetTimer)
@@ -321,9 +327,9 @@ class UI(QtWidgets.QMainWindow):
         pass
         # INITIATE CAMERAS IN SEPERATE THREADS
         # PRIMARY CAMERA
-        #camThread1 = CAMERA_FEED_1(self)
-        #camThread1.cameraNewFrame.connect(self.updateCamera1Feed)
-        #camThread1.start()
+        camThread1 = CAMERA_FEED_1(self)
+        camThread1.cameraNewFrame.connect(self.updateCamera1Feed)
+        camThread1.start()
         # SECONDARY CAMERA 1
         #camThread2 = CAMERA_FEED_2(self)
         #camThread2.cameraNewFrame.connect(self.updateCamera2Feed)
@@ -392,7 +398,7 @@ class CAMERA_FEED_1(QThread):
     cameraNewFrame = pyqtSignal(QImage)
 
     # URL of camera stream
-    channel = 0  
+    channel = 0
     
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
@@ -651,6 +657,29 @@ class CONTROL_PANEL():
             self.ui.control_timer_start.setText('Start')
             self.ui.control_timer_start.setStyleSheet(self.data.greenStyle)
     
+    def switchControlDirection(self):
+        """
+        PURPOSE
+
+        Changes the control orientation of the ROV, to allow easy maneuvering in reverse.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        if self.data.controlControlDirection == True:
+            self.data.controlControlDirection = False
+            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textDisabledStyle)
+            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textGreenStyle)
+        else:
+            self.data.controlControlDirection = True
+            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
+            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
+
     def resetTimer(self):
         """
         PURPOSE
@@ -1224,6 +1253,11 @@ class DATABASE():
     redStyle = 'background-color: #f44336'
     blueStyle = 'background-color: #0D47A1; color: white; font-weight: bold;'
     defaultBlue = 'color: #0D47A1; font-weight: bold;'
+    textGreenStyle = 'color: #679e37; font-weight: bold;'
+    textDisabledStyle = 'color: rgba(0,0,0,25%);'
+
+    # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
+    controlControlDirection = True
 
     controlTimerEnabled = False
     controlTimerNew = True
