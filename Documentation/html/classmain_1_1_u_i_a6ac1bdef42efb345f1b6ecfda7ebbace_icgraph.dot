@@ -10,6 +10,6 @@ digraph "main.UI.resetConfig"
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node3 [label="main.UI.__init__",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a7b46457344594a97b4937d424584b21a",tooltip=" "];
   Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="main.UI.linkConfigWidgets",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#ab2fbdb605bc71c5e7fc26e79697b3bb1",tooltip=" "];
+  Node4 [label="main.UI.linkToolbarWidgets",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a1d81665f596706acf8f462008896d6d4",tooltip=" "];
   Node4 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
 }

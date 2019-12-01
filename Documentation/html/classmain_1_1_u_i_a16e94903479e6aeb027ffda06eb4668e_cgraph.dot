@@ -7,4 +7,6 @@ digraph "main.UI.initiateCameraFeed"
   Node1 [label="main.UI.initiateCameraFeed",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node2 [label="main.UI.updateCamera1Feed",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a9c8058338101feba3ac37f114bea0cf9",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.UI.updateCamera2Feed",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a6c7c52a952943f59bab586b955c5b648",tooltip=" "];
 }

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['linkconfigwidgets_73',['linkConfigWidgets',['../classmain_1_1_u_i.html#ab2fbdb605bc71c5e7fc26e79697b3bb1',1,'main::UI']]],
-  ['linkcontrolpanelwidgets_74',['linkControlPanelWidgets',['../classmain_1_1_u_i.html#a8933f6b028ca8b28e2d7cd6289b8e6fb',1,'main::UI']]],
-  ['loadsettings_75',['loadSettings',['../classmain_1_1_c_o_n_f_i_g.html#a312b2e42afd7732ed7c453863cc955d9',1,'main::CONFIG']]]
+  ['initialiseconnection_90',['initialiseConnection',['../classavalon_comms_1_1_r_o_v.html#a63391770c14da06226c5934841ae499a',1,'avalonComms.ROV.initialiseConnection()'],['../classavalon_comms_1_1controller.html#a1bf58f70d75f5d6e2c7e3a7079689be3',1,'avalonComms.controller.initialiseConnection()']]],
+  ['initiatecamerafeed_91',['initiateCameraFeed',['../classmain_1_1_u_i.html#a16e94903479e6aeb027ffda06eb4668e',1,'main::UI']]],
+  ['initiatecontroller_92',['initiateController',['../classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a2de8bc150469394c68c71424896ae691',1,'main::CONTROL_PANEL']]]
 ];

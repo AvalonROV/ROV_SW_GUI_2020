@@ -8,6 +8,7 @@ var hierarchy =
       [ "main.UI", "classmain_1_1_u_i.html", null ]
     ] ],
     [ "avalonComms.ROV", "classavalon_comms_1_1_r_o_v.html", null ],
+    [ "main.TOOLBAR", "classmain_1_1_t_o_o_l_b_a_r.html", null ],
     [ "QThread", null, [
       [ "main.CAMERA_FEED_1", "classmain_1_1_c_a_m_e_r_a___f_e_e_d__1.html", null ],
       [ "main.CAMERA_FEED_2", "classmain_1_1_c_a_m_e_r_a___f_e_e_d__2.html", null ],

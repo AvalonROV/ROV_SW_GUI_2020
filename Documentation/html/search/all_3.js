@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['filename_16',['fileName',['../classmain_1_1_d_a_t_a_b_a_s_e.html#a142ffe79cb8705a8e65c2e623d20e4e3',1,'main::DATABASE']]],
-  ['findrovs_17',['findROVs',['../classavalon_comms_1_1_r_o_v.html#ab6b6f77fa6804b78d12282f317b467ca',1,'avalonComms::ROV']]]
+  ['database_16',['DATABASE',['../classmain_1_1_d_a_t_a_b_a_s_e.html',1,'main']]],
+  ['disconnect_17',['disconnect',['../classavalon_comms_1_1_r_o_v.html#a5773d8f33d4f45128008443d5cf0cc79',1,'avalonComms.ROV.disconnect()'],['../classavalon_comms_1_1controller.html#a0faba37513b3201c4afd91f92a57cc2b',1,'avalonComms.controller.disconnect()']]]
 ];
