@@ -1,25 +1,29 @@
-from PyQt5 import QtWidgets, QtGui, QtCore, uic
-from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer
-from PyQt5.QtWidgets import QApplication, QComboBox, QRadioButton, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox
-from PyQt5.QtGui import QPixmap, QImage
+#########################
+######## IMPORTS ########
+#########################
 
-import threading
-import time
-import datetime
+# PYQT5 MODULES FOR GUI
+from PyQt5 import uic
+from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
+from PyQt5.QtWidgets import QMainWindow, QApplication, QComboBox, QRadioButton, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog
+from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont
+
+# ADDITIONAL MODULES
 import sys
-import cv2
-import serial
-import xml.etree.ElementTree as xml
-import numpy
-import subprocess
-import webbrowser
+from threading import Thread, Timer
+from datetime import datetime
+from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW
+from xml.etree.ElementTree import parse, Element, SubElement, ElementTree
 import pygame
+from subprocess import call
+from webbrowser import open
+import serial
 
 # SERIAL LIBRARY
 from avalonComms import ROV
 from avalonComms import controller as CONTROLLER
 
-class UI(QtWidgets.QMainWindow):
+class UI(QMainWindow):
     """
     PURPOSE
 
@@ -53,7 +57,7 @@ class UI(QtWidgets.QMainWindow):
         self.toolbar = TOOLBAR(self, self.data)
         
         # FIND SCREEN SIZE
-        self.data.sizeObject = QtWidgets.QDesktopWidget().screenGeometry(-1)
+        self.data.sizeObject = QDesktopWidget().screenGeometry(-1)
         self.data.screenHeight = self.data.sizeObject.height()
         self.data.screenWidth = self.data.sizeObject.width()
 
@@ -61,9 +65,18 @@ class UI(QtWidgets.QMainWindow):
         self.con_panel_functions_widget.resize(self.data.screenWidth/6,self.con_panel_functions_widget.height())
 
         # ADD AVALON LOGO
-        pixmap = QPixmap("logo.png")
-        pixmap = pixmap.scaledToWidth(250)
-        self.avalon_logo.setPixmap(pixmap)
+        avalonPixmap = QPixmap('logo.png')
+        avalonPixmap = avalonPixmap.scaledToWidth(250)
+        self.avalon_logo.setPixmap(avalonPixmap)
+
+        # SET CAMERA FEED PLACE HOLDER
+        cameraPixmap = QPixmap('no_signal.png')
+        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
+        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
+        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
+        self.primary_camera.setPixmap(primaryCameraPixmap)
+        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
+        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
 
         # LINK GUI BUTTONS TO METHODS
         self.linkToolbarWidgets()
@@ -76,46 +89,72 @@ class UI(QtWidgets.QMainWindow):
         # SEND OUT ID REQUEST TO EACH COM PORT TO AUTOMATICALLY FIND ROV
         self.data.comPorts = self.rov.findROVs(self.data.rovID)
 
-        # LOAD SETTING FROM CONFIG FILE
+        # LOAD SETTINGS FROM CONFIG FILE
         self.configSetup()
 
         # RESIZE CAMERA FEEDS WHEN WINDOW IS RESIZED
-        #self.resizeEvent(QtGui.QResizeEvent(self.size(), QtCore.QSize()))
+        self.resizeEvent(QResizeEvent(self.size(), QSize()))
 
         # INITIALISE UI
         self.showMaximized()
 
-    #def resizeEvent(self, event):
-        #self.data.windowSizeObject = self.size()
-        #self.data.windowHeight = self.data.windowSizeObject.height()
-        #self.data.windowWidth = self.data.windowSizeObject.width()
+    def resizeEvent(self, event):
+        self.data.windowSizeObject = self.size()
+        self.data.windowHeight = self.data.windowSizeObject.height()
+        self.data.windowWidth = self.data.windowSizeObject.width()
 
-        #self.primary_camera.setFixedHeight(self.data.windowHeight*2/3)
-        #QtWidgets.QMainWindow.resizeEvent(self, event)
+        cameraPixmap = QPixmap('no_signal.png')
+        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
+        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
+        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
+        self.primary_camera.setPixmap(primaryCameraPixmap)
+        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
+        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
+
+        QMainWindow.resizeEvent(self, event)
     
-    def configSetup(self):
+    def readConfigFile(self, fileName, 
+                        thrusterPosition, 
+                        thrusterReverse, 
+                        actuatorLabelList, 
+                        sensorSelectedType, 
+                        defaultCameraList, 
+                        keyBindings):
         """
         PURPOSE
 
-        Reads the Config.xml file and configures the programs thruster, actuator, sensor, camera and controller settings.
-        If no Config.xml file is found, the program will open with default settings. 
+        Reads a specified .xml configuration file that contains all the programs desired settings.
 
         INPUT
 
-        NONE
+        - fileName = directory of the configuration file.
+        - thrusterPosition = array for the default thruster positions on the ROV.
+        - thrusterReverse = array for the default direction of the thrusters.
+        - actuatorLabelList = array for the default name, off and on state labels for the actuators.
+        - sensorSelectedType = array for the default sensor types.
+        - defaultCameraList = array for the default selection of cameras on the four feeds.
+        - keyBindings = array for the default controller keybindings for the actuators.
 
         RETURNS
 
-        NONE
+        - thrusterPosition = modified array for the thruster positions on the ROV.
+        - thrusterReverse = modified array for the default direction of the thrusters.
+        - actuatorLabelList = modified array for the default name, off and on state labels for the actuators.
+        - sensorSelectedType = modified array for the default sensor types.
+        - defaultCameraList = modified array for the default selection of cameras on the four feeds.
+        - keyBindings = modified array for the default controller keybindings for the actuators.
         """
+        # TRY TO FIND THE FILE SPECIFIED
         try:
-            configFile = xml.parse(self.data.fileName)
+            configFile = parse(fileName)
             configFileStatus = True
         except:
             print('Configuration file not found')
             configFileStatus = False
 
+        # IF CONFIGURATION FILE IS FOUND
         if configFileStatus == True:
+            
             # FACTORY RESET GUI CONFIGURATION
             self.resetConfig(False)
 
@@ -127,8 +166,8 @@ class UI(QtWidgets.QMainWindow):
                 ##############################
                 if child.tag == 'thrusters':
                     for index, thruster in enumerate(child):
-                        self.data.configThrusterPosition[index] = thruster.find("location").text
-                        self.data.configThrusterReverse[index] = True if thruster.find("reversed").text == 'True' else False
+                        thrusterPosition[index] = thruster.find("location").text
+                        thrusterReverse[index] = True if thruster.find("reversed").text == 'True' else False
        
                 ##############################
                 ### READ ACTUATOR SETTINGS ###
@@ -140,13 +179,13 @@ class UI(QtWidgets.QMainWindow):
                             self.config_actuators_number.setValue(int(actuator.text))
                         # SET ACTUATOR LABELS
                         else:
-                            self.data.configActuatorLabelList.append([])
-                            self.data.configActuatorLabelList[index1 - 1].append('')
-                            self.data.configActuatorLabelList[index1 - 1].append('')
-                            self.data.configActuatorLabelList[index1 - 1].append('')
+                            actuatorLabelList.append([])
+                            actuatorLabelList[index1 - 1].append('')
+                            actuatorLabelList[index1 - 1].append('')
+                            actuatorLabelList[index1 - 1].append('')
 
                             for index2, label in enumerate(actuator):
-                                self.data.configActuatorLabelList[index1 - 1][index2] = label.text
+                                actuatorLabelList[index1 - 1][index2] = label.text
 
                 ##############################
                 #### READ SENSOR SETTINGS ####
@@ -157,9 +196,9 @@ class UI(QtWidgets.QMainWindow):
                         if sensor.tag == 'quantity':
                             self.config_sensors_number.setValue(int(sensor.text))
                         else:
-                            self.data.configSensorSelectedType.append(0)
+                            sensorSelectedType.append(0)
                             for sensorType in sensor:
-                                self.data.configSensorSelectedType[index - 1] = int(sensorType.text)
+                                sensorSelectedType[index - 1] = int(sensorType.text)
                     
                 ##############################
                 #### READ CAMERA SETTINGS ####
@@ -173,43 +212,86 @@ class UI(QtWidgets.QMainWindow):
                                 if camera.tag == 'quantity':
                                     self.config_cameras_number.setValue(int(camera.text))
                                 else:
-                                    self.data.configDefaultCameraList[index - 1] = int(camera.text)
+                                    defaultCameraList[index - 1] = int(camera.text)
 
                         # DIGITAL CAMERAS
                         if cameraType.tag == 'digital':
                             pass
 
                 ##############################
-                #### READ CONFIG SETTINGS ####
+                ## READ KEYBINDING SETTINGS ##
                 ##############################
                 if child.tag == 'keybindings':
                     for control in child:
-                        self.data.configKeyBindings.append(self.data.configKeyBindingsList.index(control.text))     
+                        keyBindings.append(self.data.configKeyBindingsList.index(control.text))     
 
-            ###############################
-            #### APPLY SETTINGS TO GUI ####
-            ###############################
-            
-            # ADD KEYBINDING FOR SWITCHING CONTROL ORIENTATION
-            self.config.addKeyBinding("Switch Orientation", 0, True)
-            # UPDATE GUI WITH THRUSTER DATA
-            self.config.setThrustersNumber(self.data.configThrusterNumber)
-            # UPDATE GUI WITH ACTUATOR DATA
-            self.config.setActuatorsNumber(True)  
-            # UPDATE GUI WITH SENSOR DATA
-            self.config.setSensorsNumber(True) 
-            # UPDATE GUI WITH ANALOG CAMERA DATA
-            self.config.setCamerasNumber(True)                        
+            #############################
+            ######## RETURN DATA ########
+            #############################
+
+            return (thrusterPosition,
+                    thrusterReverse, 
+                    actuatorLabelList,
+                    sensorSelectedType,
+                    defaultCameraList,
+                    keyBindings)
+
+    def configSetup(self):
+        """
+        PURPOSE
+
+        Calls functino to read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
+        If no configuration file is found, the program will open with default settings. 
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # GET CONFIGURATION SETTINGS FROM CONFIG FILE
+        
+        (self.data.configThrusterPosition,
+            self.data.configThrusterReverse, 
+            self.data.configActuatorLabelList,
+            self.data.configSensorSelectedType,
+            self.data.configDefaultCameraList,
+            self.data.configKeyBindings) = self.readConfigFile(self.data.fileName, 
+                                                                self.data.configThrusterPosition,
+                                                                self.data.configThrusterReverse, 
+                                                                self.data.configActuatorLabelList,
+                                                                self.data.configSensorSelectedType,
+                                                                self.data.configDefaultCameraList,
+                                                                self.data.configKeyBindings)       
+        
+        # APPLY SETTINGS TO GUI 
+
+        # ADD KEYBINDING FOR SWITCHING CONTROL ORIENTATION
+        self.config.addKeyBinding("Switch Orientation", 0, True)
+        # UPDATE GUI WITH THRUSTER DATA
+        self.config.setThrustersNumber(self.data.configThrusterNumber, 
+                                        self.config_thruster_form,
+                                        self.data.configThrusterPosition,
+                                        self.data.configThrusterPositionList,
+                                        self.data.configThrusterReverse)
+        # UPDATE GUI WITH ACTUATOR DATA
+        self.config.setActuatorsNumber(True)  
+        # UPDATE GUI WITH SENSOR DATA
+        self.config.setSensorsNumber(True) 
+        # UPDATE GUI WITH ANALOG CAMERA DATA
+        self.config.setCamerasNumber(True)                        
 
     def resetConfig(self, resetStatus):
         """
         PURPOSE
 
-        Resets the program to default settings (nothing unconfigured).
+        Resets the program to default settings (nothing configured).
         
         INPUT
 
-        - resetStatus = true when called via the 'Reset Configuration' button.
+        - resetStatus = true when called via the 'Reset Configuration' (so that number of thruster automatically resets).
 
         RETURNS
 
@@ -227,7 +309,11 @@ class UI(QtWidgets.QMainWindow):
 
         # RETURN NUMBER OF THRUSTERS TO 8 IF RESET BUTTON IS PRESSED
         if resetStatus == True:
-            self.config.setThrustersNumber(self.data.configThrusterNumber)
+            self.config.setThrustersNumber(self.data.configThrusterNumber, 
+                                            self.config_thruster_form,
+                                            self.data.configThrusterPosition,
+                                            self.data.configThrusterPositionList,
+                                            self.data.configThrusterReverse)
 
         ###############################
         ### RESET ACTUATOR SETTINGS ###
@@ -298,12 +384,12 @@ class UI(QtWidgets.QMainWindow):
         self.control_controller_connect.clicked.connect(self.control.controllerConnect)
         self.control_controller_connect.setFixedHeight(self.control_controller_connect.geometry().height() * 1.5)
         self.control_controller_connect.setStyleSheet(self.data.defaultBlue)
-        self.control_switch_direction.setIcon(QtGui.QIcon('graphics/switch_direction.png'))
+        self.control_switch_direction.setIcon(QIcon('graphics/switch_direction.png'))
         self.control_switch_direction.clicked.connect(self.control.switchControlDirection)
         self.control_switch_direction.setFixedHeight(self.control_switch_direction.geometry().height() * 1.5)
         self.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
         self.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
-        self.control_switch_direction.setIconSize(QtCore.QSize(50,50))
+        self.control_switch_direction.setIconSize(QSize(50,50))
         self.control_timer_start.clicked.connect(self.control.toggleTimer)
         self.control_timer_start.setStyleSheet(self.data.greenStyle)
         self.control_timer_reset.clicked.connect(self.control.resetTimer)
@@ -356,7 +442,11 @@ class UI(QtWidgets.QMainWindow):
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
         
         # ADD THRUSTER CONFIGURATION WIDGETS
-        self.config.setThrustersNumber(self.data.configThrusterNumber)
+        self.config.setThrustersNumber(self.data.configThrusterNumber, 
+                                        self.config_thruster_form,
+                                        self.data.configThrusterPosition,
+                                        self.data.configThrusterPositionList,
+                                        self.data.configThrusterReverse)
 
         # CREATE KEYBINDING FOR ACTUATOR
         self.config.addKeyBinding("Switch Orientation", 0, False)
@@ -414,10 +504,9 @@ class UI(QtWidgets.QMainWindow):
 
         NONE
         """
-        # SET SIZE
-        #frame = frame.scaled(self.primary_camera.size().width(), self.primary_camera.size().height(), QtCore.Qt.KeepAspectRatio)
-        # DISPLAY NEW FRAME ON CAMERA FEED
-        self.primary_camera.setPixmap(QPixmap.fromImage(frame))
+        pixmap = QPixmap.fromImage(frame)
+        pixmap = pixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
+        self.primary_camera.setPixmap(pixmap)
 
     @pyqtSlot(QImage)
     def updateCamera2Feed(self, frame):
@@ -434,8 +523,9 @@ class UI(QtWidgets.QMainWindow):
 
         NONE
         """
-        # DISPLAY NEW FRAME ON CAMERA FEED
-        self.secondary_camera_1.setPixmap(QPixmap.fromImage(frame))
+        pixmap = QPixmap.fromImage(frame)
+        pixmap = pixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
+        self.secondary_camera_1.setPixmap(pixmap)
 
     @pyqtSlot(QImage)
     def updateCamera3Feed(self, frame):
@@ -452,8 +542,9 @@ class UI(QtWidgets.QMainWindow):
 
         NONE
         """
-        # DISPLAY NEW FRAME ON CAMERA FEED
-        self.secondary_camera_2.setPixmap(QPixmap.fromImage(frame))
+        pixmap = QPixmap.fromImage(frame)
+        pixmap = pixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
+        self.secondary_camera_2.setPixmap(pixmap)
 
 class CAMERA_FEED_1(QThread):
     # CREATE SIGNAL
@@ -464,35 +555,41 @@ class CAMERA_FEED_1(QThread):
     
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
-        cameraFeed = cv2.VideoCapture(self.channel)
+        cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
+        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
+        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
         
         while True:
             # CAPTURE FRAME
             ret, frame = cameraFeed.read()
             # IF FRAME IS SUCCESSFULLY CAPTURED            
             if ret:
+                
                 # CONVERT TO RGB COLOUR
-                cameraFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
                 # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
                 height, width, _ = cameraFrame.shape
                 # CONVERT TO QIMAGE
-                cameraFrame = QtGui.QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QtGui.QImage.Format_RGB888)
-                # SET SIZE
-                cameraFrame = cameraFrame.scaled(1920, 1080, QtCore.Qt.KeepAspectRatio)
+                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
                 # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
                 self.cameraNewFrame.emit(cameraFrame)
                 QThread.msleep(40)
+            
+            else:
+                self.cameraNewFrame.emit(QImage("no_signal.png"))
 
 class CAMERA_FEED_2(QThread):
     # CREATE SIGNAL
     cameraNewFrame = pyqtSignal(QImage)
 
     # URL of camera stream
-    channel = 1 
+    channel = 1
     
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
-        cameraFeed = cv2.VideoCapture(self.channel)
+        cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
+        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
+        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
         
         while True:
             # CAPTURE FRAME
@@ -500,16 +597,17 @@ class CAMERA_FEED_2(QThread):
             # IF FRAME IS SUCCESSFULLY CAPTURED            
             if ret:
                 # CONVERT TO RGB COLOUR
-                cameraFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
                 # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
                 height, width, _ = cameraFrame.shape
                 # CONVERT TO QIMAGE
-                cameraFrame = QtGui.QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QtGui.QImage.Format_RGB888)
-                # SET SIZE
-                cameraFrame = cameraFrame.scaled(400, 400, QtCore.Qt.KeepAspectRatio)
+                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
                 # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
                 self.cameraNewFrame.emit(cameraFrame)
                 QThread.msleep(40)
+            
+            else:
+                self.cameraNewFrame.emit(QImage("no_signal.png"))
 
 class CAMERA_FEED_3(QThread):
     # CREATE SIGNAL
@@ -520,7 +618,9 @@ class CAMERA_FEED_3(QThread):
     
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
-        cameraFeed = cv2.VideoCapture(self.channel)
+        cameraFeed = VideoCapture(self.channel)
+        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
+        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
         
         while True:
             # CAPTURE FRAME
@@ -528,15 +628,16 @@ class CAMERA_FEED_3(QThread):
             # IF FRAME IS SUCCESSFULLY CAPTURED            
             if ret:
                 # CONVERT TO RGB COLOUR
-                cameraFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
                 # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
                 height, width, _ = cameraFrame.shape
                 # CONVERT TO QIMAGE
-                cameraFrame = QtGui.QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QtGui.QImage.Format_RGB888)
-                # SET SIZE
-                cameraFrame = cameraFrame.scaled(500, 500, QtCore.Qt.KeepAspectRatio)
+                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
                 # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
                 self.cameraNewFrame.emit(cameraFrame)
+
+            else:
+                self.cameraNewFrame.emit(QImage("no_signal.png"))
 
 class CONTROL_PANEL():
     """
@@ -599,7 +700,7 @@ class CONTROL_PANEL():
         """
         PURPOSE
 
-        Initialises bluetooth communication with the XBOX controller.
+        Initialises communication with the XBOX controller.
 
         INPUT
 
@@ -610,17 +711,23 @@ class CONTROL_PANEL():
         NONE
         """
         if self.data.controlControllerCommsStatus == False:
+            # UPDATE BUTTON STYLE
             self.data.controlControllerCommsStatus = True
             self.ui.control_controller_connect.setText('DISCONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.blueStyle)
+            # INITIATE COMMUNICATION WITH THE CONTROLLER
             self.controller.initialiseConnection(self.data.controllerCOMPort)
-            self.initiateController()
+            (connectionStatus, controllerNumber) = self.initiateController()
+            
+            if connectionStatus == True:
+                # READ CONTROLLER INPUTS IN A TIMED THREAD
+                self.controllerEventLoop(controllerNumber)
+            else:
+                self.controllerConnect()
         else:
             self.data.controlControllerCommsStatus = False
             self.ui.control_controller_connect.setText('CONNECT')
-            self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue) 
-            # NEED TO FIND A BETTER SOLUTION TO DISCONNECT THE XBOX CONTROLLER   
-            #pygame.joystick.quit()   
+            self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue)  
 
     def initiateController(self):
         """
@@ -634,12 +741,15 @@ class CONTROL_PANEL():
 
         RETURNS
 
-        NONE
+        - connectionStatus = true if the correct controller is found.
+        - controllerNumber = index of the connected controller from the list of available controllers.
         """
+
+        connectionStatus = False
+        controllerNumber = 0
+
         # INITIALISE PYGAME MODULE
         pygame.init()
-
-        self.done = False
 
         # INITIALISE JOYSICKS
         pygame.joystick.init()
@@ -647,9 +757,10 @@ class CONTROL_PANEL():
         # GET NUMBER OF JOYSTICKS CONNECTED
         joystick_count = pygame.joystick.get_count()
 
+        # THROW ERROR IS NO CONTROLLERS ARE DETECTED
         if joystick_count < 1:
-            print('Joystick not found')
-            self.controllerConnect()
+            print('No Controllers Found...')
+            connectionStatus = False
             pygame.quit()
 
         else:
@@ -659,11 +770,13 @@ class CONTROL_PANEL():
                 # GET NAME OF CONTROLLER/JOYSTICK FROM OS
                 name = joystick.get_name()
             
-            # ONLY ACCEPT XBOX CONTROLLER
-            if name == 'Controller (Xbox One For Windows)':
-                print('Connected to controller')
-                # READ CONTROLLER INPUTS IN A TIMED THREAD
-                self.controllerEventLoop()
+                # ONLY ACCEPT XBOX ONE CONTROLLER
+                if name == 'Controller (Xbox One For Windows)':
+                    connectionStatus = True
+                    controllerNumber = i
+                    print('Connected to controller')
+
+        return connectionStatus, controllerNumber
 
     def processButtons(self, buttonStates):
         """
@@ -680,6 +793,10 @@ class CONTROL_PANEL():
 
         NONE
         """
+
+        # STORE BUTTON STATES IN DATABASE FOR ACCESS BY OTHER FUNCTIONS
+        self.data.configButtonStates = buttonStates
+
         for index, button in enumerate(buttonStates):
             # IF BUTTON IS PRESSED
             if button == 1:
@@ -739,7 +856,7 @@ class CONTROL_PANEL():
 
         return(joystickValues)
         
-    def controllerEventLoop(self):
+    def controllerEventLoop(self, controllerNumber):
         """
         PURPOSE
 
@@ -748,14 +865,14 @@ class CONTROL_PANEL():
 
         INPUT
 
-        NONE
+        - controllerNumber = index of the connected controller from the list of available controllers.
 
         RETURNS
 
         NONE
         """
-        # TAKE SINGLE READINGS OF CONTROLLER STATES
-        buttonStates, joystickValues = self.getControllerInputs(self.data.controlControllerCommsStatus)
+        # TAKE SINGLE READING OF CONTROLLER VALUES
+        buttonStates, joystickValues = self.getControllerInputs(self.data.controlControllerCommsStatus, controllerNumber)
 
         # PROCESS BUTTON STATES
         self.processButtons(buttonStates)
@@ -767,11 +884,11 @@ class CONTROL_PANEL():
         self.updateControllerValuesDisplay(buttonStates, filteredJoystickValues)
 
         # UPDATE CONTROLLER INPUTS AT A RATE OF 30FPS TO REDUCE CPU USAGE
-        thread = threading.Timer(1/30,self.controllerEventLoop)
+        thread = Timer(1/60,lambda controllerNumber = controllerNumber: self.controllerEventLoop(controllerNumber))
         thread.daemon = True                            
         thread.start()
 
-    def getControllerInputs(self, connectStatus):
+    def getControllerInputs(self, connectionStatus, controllerNumber):
         """
         PURPOSE
 
@@ -779,7 +896,8 @@ class CONTROL_PANEL():
 
         INPUT
 
-        connectStatus = False to disconnect the controller and close the thread.
+        - connectionStatus = False to disconnect the controller and close the thread.
+        - controllerNumber = index of the connected controller from the list of available controllers.
 
         RETURNS
 
@@ -791,17 +909,17 @@ class CONTROL_PANEL():
         # STORES THE VALUES OF EACH JOYSTICK
         joystickValues = []
 
-        # EVENT PROCESSING STEP
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.done = True
-        
-        # GET NUMBER OF JOYSTICKS CONNECTED
-        joystick_count = pygame.joystick.get_count()
+        if connectionStatus == True:
+            # EVENT PROCESSING STEP
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.done = True
+            
+            # GET NUMBER OF JOYSTICKS CONNECTED
+            joystick_count = pygame.joystick.get_count()
 
-        # INITIATE EACH JOYSTICK (ONLY 1 FOR THIS PROGRAM)
-        for i in range(joystick_count):
-            joystick = pygame.joystick.Joystick(i)
+            # INITIATE CONNECTED CONTROLLER
+            joystick = pygame.joystick.Joystick(controllerNumber)
             joystick.init()
 
             # GET NUMBER OF VARIABLE JOYSTICK AXES
@@ -811,7 +929,7 @@ class CONTROL_PANEL():
             for i in range(axes):
                 axis = joystick.get_axis(i)
                 joystickValues.append(axis)
-    
+
             # GET NUMBER OF BUTTONS
             buttons = joystick.get_numbuttons()
 
@@ -819,17 +937,17 @@ class CONTROL_PANEL():
             for i in range(buttons):
                 button = joystick.get_button(i)
                 buttonStates.append(button)
-                           
+                            
             # GET NUMBER OF ARROW BUTTONS
             hats = joystick.get_numhats()
-    
-             # GET STATE OF EACH ARROW BUTTONS
+
+                # GET STATE OF EACH ARROW BUTTONS
             for i in range(hats):
                 hat = joystick.get_hat(i)
 
         # DISCONNECT CONTROLLER AND EXIT THREAD IF DISCONNECT BUTTON HAS BEEN PRESSED
-        if connectStatus == False:
-            print('QUIT CONTROLLER')
+        if connectionStatus == False:
+            print('Controller Disconnected')
             pygame.quit()
             exit()
 
@@ -893,7 +1011,7 @@ class CONTROL_PANEL():
         NONE
         """
         # READ SENSORS EVERY 1 SECOND
-        thread = threading.Timer(0.5, self.getSensorReadings)
+        thread = Timer(0.5, self.getSensorReadings)
         thread.daemon = True                 
         thread.start()
         if self.data.controlROVCommsStatus == False:
@@ -970,7 +1088,7 @@ class CONTROL_PANEL():
             self.data.controlTimerEnabled = True
             self.ui.control_timer_start.setText('Stop')
             self.ui.control_timer_start.setStyleSheet(self.data.redStyle)
-            self.startTime = datetime.datetime.now()
+            self.startTime = datetime.now()
             # START TIMER
             self.readSystemTime()
         else:
@@ -1034,12 +1152,12 @@ class CONTROL_PANEL():
         NONE
         """
         # CALCULATE SECONDS ELAPSED SINCE TIMER STARTED 
-        currentTime = datetime.datetime.now()
+        currentTime = datetime.now()
         currentSeconds = (currentTime - self.startTime).total_seconds() + self.data.controlTimerMem
         self.updateTimer(currentSeconds)
     
         # READ SYSTEM TIME EVERY 1 SECOND (TO REDUCE CPU USAGE)
-        thread = threading.Timer(0.5,self.readSystemTime)
+        thread = Timer(0.5,self.readSystemTime)
         thread.daemon = True                            
         thread.start()
         
@@ -1101,7 +1219,7 @@ class CONFIG():
         self.rov = Object4
         self.controller = Object5
 
-    def setThrustersNumber(self, number):
+    def setThrustersNumber(self, thrusterNumber, thrusterLayout, thrusterPosition, thrusterPositionList, thrusterReverse):
         """
         PURPOSE
 
@@ -1109,45 +1227,49 @@ class CONFIG():
 
         INPUT
 
-        - number = the number of thrusters to add.
+        - thrusterNumber = the number of thrusters to add.
+        - thrusterLayout = the form layout widget to add the widgets to.
+        - thrusterPosition = array containing the ROV position of each thruster.
+        - thusterPosition = array containing all the possible ROV thruster locaitons.
+        - thrusterReverse = array containing the direction of each thruster.
 
         RETURNS
 
         NONE
         """
-        for thruster in range(number):
+        for thruster in range(thrusterNumber):
             # CREATE THRUSTER NUMBER LABEL
             thrusterLabel = QLabel("Thruster {}".format(thruster + 1))
             thrusterLabel.setStyleSheet("font-weight: bold;")
-            thrusterLabel.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+            thrusterLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             # CREATE ROV LOCATION DROP DOWN MENU AND ADD ITEMS
             thrusterLocation = QComboBox()
-            thrusterLocation.addItems(self.data.configThrusterPositionList)           
-            thrusterLocation.setCurrentIndex(self.data.configThrusterPositionList.index(self.data.configThrusterPosition[thruster]))
+            thrusterLocation.addItems(thrusterPositionList)           
+            thrusterLocation.setCurrentIndex(thrusterPositionList.index(thrusterPosition[thruster]))
             # CREATE THRUSTER REVERSE CHECKBOX
-            thrusterReverse = QCheckBox()
-            thrusterReverse.setChecked(self.data.configThrusterReverse[thruster])
+            thrusterReverseCheck = QCheckBox()
+            thrusterReverseCheck.setChecked(thrusterReverse[thruster])
             # CREATE THRUSTER TEST BUTTON
             thrusterTest = QPushButton("Test")
             
             # CREATE GRID LAYOUT
             layout = QGridLayout()
             label1 = QLabel('ROV Location')
-            label1.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+            label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             layout.addWidget(label1,0,0)
             layout.addWidget(thrusterLocation,0,1)
             label2 = QLabel('Reversed')
-            label2.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+            label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             layout.addWidget(label2,1,0)
-            layout.addWidget(thrusterReverse,1,1)
+            layout.addWidget(thrusterReverseCheck,1,1)
             layout.addWidget(thrusterTest,2,1)
 
             # ADD TO CONFIG TAB FORM LAYOUT
-            self.ui.config_thruster_form.addRow(thrusterLabel, layout)
+            thrusterLayout.addRow(thrusterLabel, layout)
 
             # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
             thrusterLocation.activated.connect(lambda index, thruster = thruster, setting = 0, controlObject = None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
-            thrusterReverse.toggled.connect(lambda index, thruster = thruster, setting = 1, controlObject = thrusterReverse: self.setROVThrusterSettings(index, thruster, setting, controlObject))
+            thrusterReverseCheck.toggled.connect(lambda index, thruster = thruster, setting = 1, controlObject = thrusterReverse: self.setROVThrusterSettings(index, thruster, setting, controlObject))
             thrusterTest.clicked.connect(lambda index, thruster = thruster, setting = 2, controlObject= None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
 
     def setControllerValuesDisplay(self):
@@ -1173,10 +1295,10 @@ class CONFIG():
             # CREATE JOYSTICK LABEL
             label = QLabel(joystickLabels[index])
             label.setStyleSheet("font-weight: bold;")
-            label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             # CREATE TEXT BOX TO DISPLAY VALUE
             value = QLineEdit()
-            value.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+            value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
             value.setReadOnly(True)
 
             # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
@@ -1190,10 +1312,10 @@ class CONFIG():
             # CREATE BUTTON LABEL
             label = QLabel(buttonLabels[index])
             label.setStyleSheet("font-weight: bold;")
-            label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             # CREATE TEXT BOX TO DISPLAY VALUE
             value = QLineEdit()
-            value.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+            value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
             value.setReadOnly(True)
 
             # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
@@ -1269,7 +1391,7 @@ class CONFIG():
                 # CREATE CONFIG TAB ACTUATOR WIDGETS
                 actuatorNumber = QLabel("Actuator {}".format((oldNumber + number + 1)))
                 actuatorNumber.setStyleSheet("font-weight: bold;")
-                actuatorNumber.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+                actuatorNumber.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                 actuatorLabel = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][0])
                 state1 = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][1])
                 state2 = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][2])
@@ -1283,15 +1405,15 @@ class CONFIG():
                 # CREATE CONFIG TAB ACTUATORS LAYOUT
                 actuatorLayout = QGridLayout()
                 label1 = QLabel('Actuator Name')
-                label1.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+                label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 actuatorLayout.addWidget(label1,0,0)
                 actuatorLayout.addWidget(actuatorLabel,0,1)
                 label2 = QLabel('Default State')
-                label2.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+                label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 actuatorLayout.addWidget(label2,1,0)
                 actuatorLayout.addWidget(state1,1,1)
                 label3 = QLabel('Actuated State')
-                label3.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
+                label3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 actuatorLayout.addWidget(label3,2,0)
                 actuatorLayout.addWidget(state2,2,1)
 
@@ -1547,7 +1669,7 @@ class CONFIG():
         # CREATE CONFIG TAB KEYBINDING WIDGETS
         keybindingLabel = QLabel(label)
         keybindingLabel.setStyleSheet("font-weight: bold;")
-        keybindingLabel.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        keybindingLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         currentBinding = QComboBox()
         currentBinding.addItems(self.data.configKeyBindingsList)
         currentBinding.setCurrentIndex(self.data.configKeyBindings[index])
@@ -1562,8 +1684,12 @@ class CONFIG():
         self.ui.config_keybindings_form.addRow(keybindingLabel, keybindingLayout)
 
         # LINK KEYBINDING WIDGETS TO SLOT - PASS LAYOUT INDEX NUMBER, THE OBJECT, AND AN INDENTIFIER
-        currentBinding.activated.connect(lambda binding, index = index, controlObject = currentBinding, identifier = 0: self.setKeyBindings(binding, index, controlObject, identifier))
-        setBinding.clicked.connect(lambda binding, index = index, controlObject = setBinding, identifier = 1: self.setKeyBindings(binding, index, controlObject, identifier))
+        currentBinding.activated.connect(lambda binding, index = index: self.setKeyBindings(binding, index))
+        setBinding.clicked.connect(lambda bindingFound = False, 
+                                            binding = None, index = index, 
+                                            buttonObject = setBinding, 
+                                            menuObject = currentBinding: 
+                                            self.autoKeyBinding(bindingFound, binding, index, buttonObject, menuObject))
 
     def removeKeyBinding(self, index):
         """
@@ -1584,7 +1710,72 @@ class CONFIG():
         del self.data.configKeyBindings[index]
         print(self.data.configKeyBindings)
 
-    def setKeyBindings(self, binding, index, controlObject, identifier):
+    def autoKeyBinding(self, bindingFound, binding, index, buttonObject, menuObject):
+        """
+        PURPOSE
+
+        Initiates a thread that waits for a button to be pressed. 
+        When a key binding has been found, the key binding is set.
+
+        INPUT
+
+        - bindingFound = True if a key binding has been found.
+        - binding = the index in the array of button states that has been changed.
+        - index = which key binding is being changed.
+        - buttonObject = pointer to the button widget.
+        - menuObject = pointer to the keybinding menu widget.
+
+        RETURNS
+
+        NONE
+        """
+
+        if bindingFound == False:
+            # CHANGE BUTTON STYLE
+            buttonObject.setStyleSheet(self.data.blueStyle)
+            # INITIATE SEARCH FOR PRESSED BUTTON
+            self.findKeyBinding(index, buttonObject, menuObject)
+        
+        else:
+            # SET KEY BINDING
+            self.setKeyBindings(binding + 1, index)
+            menuObject.setCurrentIndex(binding + 1)
+            # REVERT BUTTON STYLE
+            buttonObject.setStyleSheet('')
+
+    def findKeyBinding(self, index, buttonObject, menuObject):
+        """
+        PURPOSE
+
+        Looks at the button states in a seperate thread and detects which button has been pressed on the controller.
+
+        INPUT
+
+        - index = which key binding is being changed.
+        - buttonObject = pointer to the auto binding button widget.
+        - menuObject = pointer to the key bindings menu widget.
+        
+        RETURNS
+
+        NONE
+        """
+        buttonStates = self.data.configButtonStates
+
+        # FIND WHICH BUTTON HAS BEEN PRESSED
+        for i in range(len(buttonStates)):
+            if buttonStates[i] == 1:
+                keyBinding = i
+                # SET THE KEY BINDING
+                self.autoKeyBinding(True, keyBinding, index, buttonObject, menuObject)
+                # EXIT THREAD
+                exit()
+        
+        # FIND BUTTON CHANGES AT A RATE OF 60FPS TO REDUCE CPU USAGE
+        thread = Timer(1/60, lambda index = index, buttonObject = buttonObject, menuObject = menuObject: self.findKeyBinding(index, buttonObject, menuObject))
+        thread.daemon = True                            
+        thread.start()
+
+    def setKeyBindings(self, binding, index):
         """
         PURPOSE
 
@@ -1595,16 +1786,12 @@ class CONFIG():
          
         binding = menu index selected.
         index = the ROV control having its key binding changed.
-        controlObject = pointer to the widget that has been activated.
-        identifier = 0 if the keybinding menu has been activated, 1 if the change binding button has been clicked.
-        """
-        # KEYBINDING CHANGED VIA DROP DOWN MENU
-        if identifier == 0:
-            self.data.configKeyBindings[index] = binding
-            print(self.data.configKeyBindings)
 
-        # KEYBINDING CHANGED VIA DETECTION BUTTON
-        pass
+        RETURNS 
+
+        NONE
+        """
+        self.data.configKeyBindings[index] = binding
 
 class TOOLBAR():
     """
@@ -1620,75 +1807,121 @@ class TOOLBAR():
         """
         PURPOSE
 
-        Saves the current program configuration to the Config.xml file.
+        Saves the current program configuration.
 
         INPUT
-
+        
         NONE
 
         RETURNS
 
         NONE
         """
-        root = xml.Element("root")
+        # WRITE CURRENT PROGRAM CONFIGURATION TO XML FILE.
+        self.writeConfig(self.data.configThrusterPosition,
+                            self.data.configThrusterReverse, 
+                            self.data.configActuatorLabelList,
+                            self.data.configActuatorNumber,
+                            self.data.configSensorSelectedType,
+                            self.data.configSensorNumber,
+                            self.data.configDefaultCameraList,
+                            self.data.configCameraNumber,
+                            self.data.configKeyBindings,
+                            self.data.configKeyBindingsList)
+
+        print('Program Settings Saved')
+
+    def writeConfig(self, thrusterPosition, 
+                        thrusterReverse, 
+                        actuatorLabelList,
+                        actuatorNumber, 
+                        sensorSelectedType,
+                        sensorNumber, 
+                        defaultCameraList,
+                        cameraNumber,
+                        keyBindings,
+                        keyBindingsList):
+        """
+        PURPOSE
+
+        Writes current program configuration to Config.xml file.
+
+        INPUT
+
+        - thrusterPosition = array containing the thruster positions on the ROV.
+        - thrusterReverse = array containing the direction of the thrusters.
+        - actuatorLabelList = array containing the name, off and on state labels for the actuators.
+        - actuatorNumber = the number of actuators.
+        - sensorSelectedType = array containing the sensor types.
+        - sensorNumber = the number of sensors.
+        - defaultCameraList = array containing the selection of cameras on the four feeds.
+        - cameraNuber = the number of analog cameras.
+        - keyBindings = array containing the controller keybindings for the actuators.
+        - keyBindingsList = array containing the name of each button on the controller.
+
+        RETURNS
+
+        NONE
+        """
+        root = Element("root")
 
         ###################################
         ### CONFIGURATION FOR THRUSTERS ###
         ###################################
-        thrusters = xml.SubElement(root, "thrusters")
+        thrusters = SubElement(root, "thrusters")
         for index in range(8):
-            thruster = xml.SubElement(thrusters, "thruster{}".format(index))
-            xml.SubElement(thruster, "location").text = self.data.configThrusterPosition[index]
-            xml.SubElement(thruster, "reversed").text = str(self.data.configThrusterReverse[index])
+            thruster = SubElement(thrusters, "thruster{}".format(index))
+            SubElement(thruster, "location").text = thrusterPosition[index]
+            SubElement(thruster, "reversed").text = thrusterReverse[index]
         
         ###################################
         ### CONFIGURATION FOR ACTUATORS ###
         ###################################
-        actuators = xml.SubElement(root, "actuators")
-        xml.SubElement(actuators, "quantity").text = str(self.data.configActuatorNumber)
+        actuators = SubElement(root, "actuators")
+        SubElement(actuators, "quantity").text = str(actuatorNumber)
         
         for index in range(self.data.configActuatorNumber):
-            actuator = xml.SubElement(actuators, "actuator{}".format(index))
-            xml.SubElement(actuator, "nameLabel").text = self.data.configActuatorLabelList[index][0]
-            xml.SubElement(actuator, "offLabel").text = self.data.configActuatorLabelList[index][1]
-            xml.SubElement(actuator, "onLabel").text = self.data.configActuatorLabelList[index][2]
+            actuator = SubElement(actuators, "actuator{}".format(index))
+            SubElement(actuator, "nameLabel").text = actuatorLabelList[index][0]
+            SubElement(actuator, "offLabel").text = actuatorLabelList[index][1]
+            SubElement(actuator, "onLabel").text = actuatorLabelList[index][2]
 
         ###################################
         #### CONFIGURATION FOR SENSORS ####
         ###################################
-        sensors = xml.SubElement(root, "sensors")
-        xml.SubElement(sensors, "quantity").text = str(self.data.configSensorNumber)
+        sensors = SubElement(root, "sensors")
+        SubElement(sensors, "quantity").text = str(sensorNumber)
         
-        for index in range(self.data.configSensorNumber):
-            sensor = xml.SubElement(sensors, "sensor{}".format(index))
-            xml.SubElement(sensor, "type").text = str(self.data.configSensorSelectedType[index])
+        for index in range(sensorNumber):
+            sensor = SubElement(sensors, "sensor{}".format(index))
+            SubElement(sensor, "type").text = str(sensorSelectedType[index])
 
         ###################################
         #### CONFIGURATION FOR CAMERAS ####
         ###################################
-        cameras = xml.SubElement(root, "cameras")
-        analog = xml.SubElement(cameras, "analog")
-        digital = xml.SubElement(cameras, "digital")
+        cameras = SubElement(root, "cameras")
+        analog = SubElement(cameras, "analog")
+        digital = SubElement(cameras, "digital")
 
         # ANALOG CAMERAS
-        xml.SubElement(analog, "quantity").text = str(self.data.configCameraNumber)
+        SubElement(analog, "quantity").text = str(cameraNumber)
         for index in range(4):
-            xml.SubElement(analog, "defaultfeed{}".format(index)).text = str(self.data.configDefaultCameraList[index])
+            SubElement(analog, "defaultfeed{}".format(index)).text = str(defaultCameraList[index])
 
         ###################################
         ## CONFIGURATION FOR KEYBINDINGS ##
         ###################################
-        keybindings = xml.SubElement(root, "keybindings")
+        keybindings = SubElement(root, "keybindings")
 
         # KEYBINDING TO SWITCH ROV CONTROL ORIENTATION
-        xml.SubElement(keybindings, "switch_control_direction".format(index)).text = str(self.data.configKeyBindingsList[self.data.configKeyBindings[0]])
+        SubElement(keybindings, "switch_control_direction".format(index)).text = str(keyBindingsList[keyBindings[0]])
         
         # KEYBINDINGS TO ACTUATE EACH ACTUATOR
-        for index in range(self.data.configActuatorNumber):
-            xml.SubElement(keybindings, "actuator{}".format(index)).text = str(self.data.configKeyBindingsList[self.data.configKeyBindings[index + 1]])
+        for index in range(actuatorNumber):
+            SubElement(keybindings, "actuator{}".format(index)).text = str(keyBindingsList[keyBindings[index + 1]])
 
         # SAVE TO XML FILE                                                           
-        tree = xml.ElementTree(root)
+        tree = ElementTree(root)
         tree.write(self.data.fileName,encoding='utf-8', xml_declaration=True)
 
     def loadSettings(self):
@@ -1706,7 +1939,7 @@ class TOOLBAR():
         NONE
         """
         # USER CHOOSES SEQUENCE FILE
-        self.data.fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self.ui, 'Open File','./','XML File (*.xml)')
+        self.data.fileName, _ = QFileDialog.getOpenFileName(self.ui, 'Open File','./','XML File (*.xml)')
         if self.data.fileName != '':
             self.ui.configSetup()
         else:
@@ -1727,7 +1960,7 @@ class TOOLBAR():
 
         NONE
         """
-        subprocess.call(['Documentation.bat'])
+        call(['Documentation.bat'])
 
     def openGitHub(self):
         """
@@ -1744,7 +1977,7 @@ class TOOLBAR():
         NONE
         """
         # OPEN AVALON GITHUB PAGE IN BROWSER
-        webbrowser.open('https://github.com/AvalonROV')
+        open('https://github.com/AvalonROV')
 
 class DATABASE():
     ###############################
@@ -1825,6 +2058,8 @@ class DATABASE():
     configControllerButtonReleased = [True] * 10
     # STORES SELECTED BINDINGS
     configKeyBindings = []
+    # STORES CONTROLLER BUTTON STATES
+    configButtonStates = []
 
     # STORES CONTROLLER LABEL OBJECTS
     configControllerLabelObjects = []
@@ -1852,7 +2087,7 @@ def guiInitiate():
     """
     # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
     app = QApplication(sys.argv)
-    app.setFont(QtGui.QFont("Bahnschrift Light", 10))
+    app.setFont(QFont("Bahnschrift Light", 10))
     app.setStyle("Fusion")
     UI()
     # START EVENT LOOP
