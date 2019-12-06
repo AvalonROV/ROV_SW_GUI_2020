@@ -104,6 +104,8 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self, Ob
 <tr class="separator:ac63a50d842deb45cb85201b9ab047ab8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6f976c44269e6b48d9ec9998f4201c1"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_t_o_o_l_b_a_r.html#ad6f976c44269e6b48d9ec9998f4201c1">saveSettings</a> (self)</td></tr>
 <tr class="separator:ad6f976c44269e6b48d9ec9998f4201c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02691ea32fe6410ee97beaec90584f47"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_t_o_o_l_b_a_r.html#a02691ea32fe6410ee97beaec90584f47">writeConfig</a> (self, thrusterPosition, thrusterReverse, actuatorLabelList, actuatorNumber, sensorSelectedType, sensorNumber, defaultCameraList, cameraNumber, keyBindings, keyBindingsList)</td></tr>
+<tr class="separator:a02691ea32fe6410ee97beaec90584f47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3de0b2b773b3c5cfd834a487b9e4298f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_t_o_o_l_b_a_r.html#a3de0b2b773b3c5cfd834a487b9e4298f">loadSettings</a> (self)</td></tr>
 <tr class="separator:a3de0b2b773b3c5cfd834a487b9e4298f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a2324610b0b0a7dc8b20b94028bd111"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_t_o_o_l_b_a_r.html#a9a2324610b0b0a7dc8b20b94028bd111">openDocumentation</a> (self)</td></tr>
@@ -229,7 +231,7 @@ NONE
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
-Saves the current program configuration to the Config.xml file.
+Saves the current program configuration.
 
 INPUT
 
@@ -238,7 +240,119 @@ NONE
 RETURNS
 
 NONE
-</pre> 
+</pre> <div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_t_o_o_l_b_a_r_ad6f976c44269e6b48d9ec9998f4201c1_cgraph.png" border="0" usemap="#classmain_1_1_t_o_o_l_b_a_r_ad6f976c44269e6b48d9ec9998f4201c1_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a02691ea32fe6410ee97beaec90584f47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02691ea32fe6410ee97beaec90584f47">&#9670;&nbsp;</a></span>writeConfig()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.TOOLBAR.writeConfig </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thrusterPosition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thrusterReverse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>actuatorLabelList</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>actuatorNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>sensorSelectedType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>sensorNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>defaultCameraList</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>cameraNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>keyBindings</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>keyBindingsList</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Writes current program configuration to Config.xml file.
+
+INPUT
+
+- thrusterPosition = array containing the thruster positions on the ROV.
+- thrusterReverse = array containing the direction of the thrusters.
+- actuatorLabelList = array containing the name, off and on state labels for the actuators.
+- actuatorNumber = the number of actuators.
+- sensorSelectedType = array containing the sensor types.
+- sensorNumber = the number of sensors.
+- defaultCameraList = array containing the selection of cameras on the four feeds.
+- cameraNuber = the number of analog cameras.
+- keyBindings = array containing the controller keybindings for the actuators.
+- keyBindingsList = array containing the name of each button on the controller.
+
+RETURNS
+
+NONE
+</pre> <div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_t_o_o_l_b_a_r_a02691ea32fe6410ee97beaec90584f47_icgraph.png" border="0" usemap="#classmain_1_1_t_o_o_l_b_a_r_a02691ea32fe6410ee97beaec90584f47_icgraph" alt=""/></div>
+</div>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

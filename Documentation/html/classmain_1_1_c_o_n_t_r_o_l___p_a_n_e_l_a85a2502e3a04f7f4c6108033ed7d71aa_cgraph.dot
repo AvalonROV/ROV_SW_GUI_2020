@@ -1,0 +1,23 @@
+digraph "main.CONTROL_PANEL.controllerEventLoop"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="main.CONTROL_PANEL.controller\lEventLoop",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node1 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="main.CONTROL_PANEL.getController\lInputs",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#acccf25d5740c7f8593c785dbe61365e8",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.CONTROL_PANEL.process\lButtons",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ad79a7e7a5f34701cb824b405b7fd3245",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="main.CONTROL_PANEL.switch\lControlDirection",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a913dbccde53830bd855254a3d3b2339e",tooltip=" "];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="main.CONTROL_PANEL.toggle\lActuator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aa0f6871aeb0d42e79a52dd9b1378c8ac",tooltip=" "];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="main.CONTROL_PANEL.process\lJoysticks",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aeb2e3f837c68ab700e88ba437dfa69ee",tooltip=" "];
+  Node6 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="main.CONTROL_PANEL.thruster\lVectorAlgorithm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a011dd14f8db54987af4d025afbfdcdbc",tooltip=" "];
+  Node1 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="main.CONTROL_PANEL.update\lControllerValuesDisplay",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ae33ba42e85954cb8f8b8cd12b41e5543",tooltip=" "];
+}

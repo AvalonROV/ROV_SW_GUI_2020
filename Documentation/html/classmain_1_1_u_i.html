@@ -111,6 +111,11 @@ Collaboration diagram for main.UI:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7b46457344594a97b4937d424584b21a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_u_i.html#a7b46457344594a97b4937d424584b21a">__init__</a> (self)</td></tr>
 <tr class="separator:a7b46457344594a97b4937d424584b21a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b2f9c62c2f3c690426e5f40b86d0554"><td class="memItemLeft" align="right" valign="top"><a id="a3b2f9c62c2f3c690426e5f40b86d0554"></a>
+def&#160;</td><td class="memItemRight" valign="bottom"><b>resizeEvent</b> (self, event)</td></tr>
+<tr class="separator:a3b2f9c62c2f3c690426e5f40b86d0554"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a43094d189f573deac56fee1bf1aab0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_u_i.html#a7a43094d189f573deac56fee1bf1aab0">readConfigFile</a> (self, fileName, thrusterPosition, thrusterReverse, actuatorLabelList, sensorSelectedType, defaultCameraList, keyBindings)</td></tr>
+<tr class="separator:a7a43094d189f573deac56fee1bf1aab0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add9307a7f11ba93aa6e7a074a5514a7a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_u_i.html#add9307a7f11ba93aa6e7a074a5514a7a">configSetup</a> (self)</td></tr>
 <tr class="separator:add9307a7f11ba93aa6e7a074a5514a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ac1bdef42efb345f1b6ecfda7ebbace"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_u_i.html#a6ac1bdef42efb345f1b6ecfda7ebbace">resetConfig</a> (self, resetStatus)</td></tr>
@@ -208,8 +213,8 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
-Reads the Config.xml file and configures the programs thruster, actuator, sensor, camera and controller settings.
-If no Config.xml file is found, the program will open with default settings. 
+Calls functino to read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
+If no configuration file is found, the program will open with default settings. 
 
 INPUT
 
@@ -258,11 +263,6 @@ RETURNS
 
 NONE
 </pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_u_i_a16e94903479e6aeb027ffda06eb4668e_cgraph.png" border="0" usemap="#classmain_1_1_u_i_a16e94903479e6aeb027ffda06eb4668e_cgraph" alt=""/></div>
-</div>
-<div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classmain_1_1_u_i_a16e94903479e6aeb027ffda06eb4668e_icgraph.png" border="0" usemap="#classmain_1_1_u_i_a16e94903479e6aeb027ffda06eb4668e_icgraph" alt=""/></div>
@@ -377,6 +377,102 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
+<a id="a7a43094d189f573deac56fee1bf1aab0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a43094d189f573deac56fee1bf1aab0">&#9670;&nbsp;</a></span>readConfigFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.UI.readConfigFile </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>fileName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thrusterPosition</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>thrusterReverse</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>actuatorLabelList</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>sensorSelectedType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>defaultCameraList</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>keyBindings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Reads a specified .xml configuration file that contains all the programs desired settings.
+
+INPUT
+
+- fileName = directory of the configuration file.
+- thrusterPosition = array for the default thruster positions on the ROV.
+- thrusterReverse = array for the default direction of the thrusters.
+- actuatorLabelList = array for the default name, off and on state labels for the actuators.
+- sensorSelectedType = array for the default sensor types.
+- defaultCameraList = array for the default selection of cameras on the four feeds.
+- keyBindings = array for the default controller keybindings for the actuators.
+
+RETURNS
+
+- thrusterPosition = modified array for the thruster positions on the ROV.
+- thrusterReverse = modified array for the default direction of the thrusters.
+- actuatorLabelList = modified array for the default name, off and on state labels for the actuators.
+- sensorSelectedType = modified array for the default sensor types.
+- defaultCameraList = modified array for the default selection of cameras on the four feeds.
+- keyBindings = modified array for the default controller keybindings for the actuators.
+</pre> <div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_u_i_a7a43094d189f573deac56fee1bf1aab0_cgraph.png" border="0" usemap="#classmain_1_1_u_i_a7a43094d189f573deac56fee1bf1aab0_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_u_i_a7a43094d189f573deac56fee1bf1aab0_icgraph.png" border="0" usemap="#classmain_1_1_u_i_a7a43094d189f573deac56fee1bf1aab0_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
 <a id="a6ac1bdef42efb345f1b6ecfda7ebbace"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6ac1bdef42efb345f1b6ecfda7ebbace">&#9670;&nbsp;</a></span>resetConfig()</h2>
 
@@ -404,11 +500,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
-Resets the program to default settings (nothing unconfigured).
+Resets the program to default settings (nothing configured).
 
 INPUT
 
-- resetStatus = true when called via the 'Reset Configuration' button.
+- resetStatus = true when called via the 'Reset Configuration' (so that number of thruster automatically resets).
 
 RETURNS
 
@@ -457,12 +553,7 @@ INPUT
 RETURNS
 
 NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_u_i_a9c8058338101feba3ac37f114bea0cf9_icgraph.png" border="0" usemap="#classmain_1_1_u_i_a9c8058338101feba3ac37f114bea0cf9_icgraph" alt=""/></div>
-</div>
-
+</pre> 
 </div>
 </div>
 <a id="a6c7c52a952943f59bab586b955c5b648"></a>
@@ -501,12 +592,7 @@ INPUT
 RETURNS
 
 NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_u_i_a6c7c52a952943f59bab586b955c5b648_icgraph.png" border="0" usemap="#classmain_1_1_u_i_a6c7c52a952943f59bab586b955c5b648_icgraph" alt=""/></div>
-</div>
-
+</pre> 
 </div>
 </div>
 <a id="a1f3e90ec187802a603d2d7303315cb40"></a>

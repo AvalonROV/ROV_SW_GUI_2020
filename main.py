@@ -5,7 +5,7 @@
 # PYQT5 MODULES FOR GUI
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
-from PyQt5.QtWidgets import QMainWindow, QApplication, QComboBox, QRadioButton, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont
 
 # ADDITIONAL MODULES
@@ -14,10 +14,22 @@ from threading import Thread, Timer
 from datetime import datetime
 from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW
 from xml.etree.ElementTree import parse, Element, SubElement, ElementTree
-import pygame
 from subprocess import call
 from webbrowser import open
+from pygame import init
+from pygame.joystick import quit, Joystick, get_count
+from pygame.event import Event, get
 import serial
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+import matplotlib.patches as patches
+from matplotlib.backends.backend_qt5agg import FigureCanvas
+from matplotlib.backends.backend_qt5agg import (
+        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+
+import numpy as np
 
 # SERIAL LIBRARY
 from avalonComms import ROV
@@ -65,12 +77,12 @@ class UI(QMainWindow):
         self.con_panel_functions_widget.resize(self.data.screenWidth/6,self.con_panel_functions_widget.height())
 
         # ADD AVALON LOGO
-        avalonPixmap = QPixmap('logo.png')
+        avalonPixmap = QPixmap('graphics/logo.png')
         avalonPixmap = avalonPixmap.scaledToWidth(250)
         self.avalon_logo.setPixmap(avalonPixmap)
 
         # SET CAMERA FEED PLACE HOLDER
-        cameraPixmap = QPixmap('no_signal.png')
+        cameraPixmap = QPixmap('graphics/no_signal.png')
         primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
         secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
         secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
@@ -95,6 +107,9 @@ class UI(QMainWindow):
         # RESIZE CAMERA FEEDS WHEN WINDOW IS RESIZED
         self.resizeEvent(QResizeEvent(self.size(), QSize()))
 
+        # INITIATE SIMULATION GRAPH
+        self.config.setupGraph()
+
         # INITIALISE UI
         self.showMaximized()
 
@@ -103,7 +118,7 @@ class UI(QMainWindow):
         self.data.windowHeight = self.data.windowSizeObject.height()
         self.data.windowWidth = self.data.windowSizeObject.width()
 
-        cameraPixmap = QPixmap('no_signal.png')
+        cameraPixmap = QPixmap('graphics/no_signal.png')
         primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
         secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
         secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
@@ -477,13 +492,13 @@ class UI(QMainWindow):
         pass
         # INITIATE CAMERAS IN SEPERATE THREADS
         # PRIMARY CAMERA
-        camThread1 = CAMERA_FEED_1(self)
-        camThread1.cameraNewFrame.connect(self.updateCamera1Feed)
-        camThread1.start()
+        #camThread1 = CAMERA_FEED_1(self)
+        #camThread1.cameraNewFrame.connect(self.updateCamera1Feed)
+        #camThread1.start()
         # SECONDARY CAMERA 1
-        camThread2 = CAMERA_FEED_2(self)
-        camThread2.cameraNewFrame.connect(self.updateCamera2Feed)
-        camThread2.start()
+        #camThread2 = CAMERA_FEED_2(self)
+        #camThread2.cameraNewFrame.connect(self.updateCamera2Feed)
+        #camThread2.start()
         # SECONDARY CAMERA 2
         #camThread3 = CAMERA_FEED_3(self)
         #camThread3.cameraNewFrame.connect(self.updateCamera3Feed)
@@ -556,15 +571,15 @@ class CAMERA_FEED_1(QThread):
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
         cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
+        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1280)
+        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 720)
         
         while True:
             # CAPTURE FRAME
             ret, frame = cameraFeed.read()
+        
             # IF FRAME IS SUCCESSFULLY CAPTURED            
             if ret:
-                
                 # CONVERT TO RGB COLOUR
                 cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
                 # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
@@ -573,10 +588,9 @@ class CAMERA_FEED_1(QThread):
                 cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
                 # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
                 self.cameraNewFrame.emit(cameraFrame)
-                QThread.msleep(40)
             
             else:
-                self.cameraNewFrame.emit(QImage("no_signal.png"))
+                self.cameraNewFrame.emit(QImage("graphics/no_signal.png"))
 
 class CAMERA_FEED_2(QThread):
     # CREATE SIGNAL
@@ -588,8 +602,8 @@ class CAMERA_FEED_2(QThread):
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
         cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
+        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1280)
+        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 720)
         
         while True:
             # CAPTURE FRAME
@@ -604,10 +618,9 @@ class CAMERA_FEED_2(QThread):
                 cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
                 # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
                 self.cameraNewFrame.emit(cameraFrame)
-                QThread.msleep(40)
             
             else:
-                self.cameraNewFrame.emit(QImage("no_signal.png"))
+                self.cameraNewFrame.emit(QImage("graphics/no_signal.png"))
 
 class CAMERA_FEED_3(QThread):
     # CREATE SIGNAL
@@ -619,8 +632,8 @@ class CAMERA_FEED_3(QThread):
     def run(self):
         # INITIATE SECONDARY 1 CAMERA
         cameraFeed = VideoCapture(self.channel)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
+        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1280)
+        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 720)
         
         while True:
             # CAPTURE FRAME
@@ -637,7 +650,7 @@ class CAMERA_FEED_3(QThread):
                 self.cameraNewFrame.emit(cameraFrame)
 
             else:
-                self.cameraNewFrame.emit(QImage("no_signal.png"))
+                self.cameraNewFrame.emit(QImage("graphics/no_signal.png"))
 
 class CONTROL_PANEL():
     """
@@ -688,6 +701,10 @@ class CONTROL_PANEL():
             self.ui.control_rov_connect.setText('DISCONNECT')
             self.ui.control_rov_connect.setStyleSheet(self.data.blueStyle)
             self.rov.initialiseConnection('AVALON',self.data.rovCOMPort, 115200)
+            
+            # TEST
+            self.serialConnect()
+
             # START FETCHING SENSOR READINGS
             self.getSensorReadings()
         else:
@@ -748,24 +765,21 @@ class CONTROL_PANEL():
         connectionStatus = False
         controllerNumber = 0
 
-        # INITIALISE PYGAME MODULE
-        pygame.init()
-
-        # INITIALISE JOYSICKS
-        pygame.joystick.init()
+        # INITIALISE PYGAME MODULE (JOYSTICK IS AUTOMATICALLY INITIATED)
+        init()
 
         # GET NUMBER OF JOYSTICKS CONNECTED
-        joystick_count = pygame.joystick.get_count()
+        joystick_count = get_count()
 
         # THROW ERROR IS NO CONTROLLERS ARE DETECTED
         if joystick_count < 1:
             print('No Controllers Found...')
             connectionStatus = False
-            pygame.quit()
+            quit()
 
         else:
             for i in range(joystick_count):
-                joystick = pygame.joystick.Joystick(i)
+                joystick = Joystick(i)
                 joystick.init()
                 # GET NAME OF CONTROLLER/JOYSTICK FROM OS
                 name = joystick.get_name()
@@ -778,7 +792,7 @@ class CONTROL_PANEL():
 
         return connectionStatus, controllerNumber
 
-    def processButtons(self, buttonStates):
+    def processButtons(self, buttonStates, arrowStates):
         """
         PURPOSE
 
@@ -788,11 +802,27 @@ class CONTROL_PANEL():
         INPUT
 
         - buttonStates = an array containing the states of all the controller buttons (0 or 1).
+        - arrowSTates = and array containing the states of the arrow buttons (-1, 0 or 1).
 
         RETURNS
 
+        -filteredButtonStates = an array containing the button states with the arrow button states added onto the end.
+
         NONE
         """
+        # APPEND ARROW BUTTONS ONTO THE END OF BUTTONSTATES ARRAY
+        for i in arrowStates:
+            if i == -1:
+                # LEFT OR DOWN PRESSED
+                buttonStates.append(1)
+                buttonStates.append(0)
+            elif i == 1:
+                # RIGHT OR UP PRESSED
+                buttonStates.append(0)
+                buttonStates.append(1)
+            else:
+                buttonStates.append(0)
+                buttonStates.append(0)
 
         # STORE BUTTON STATES IN DATABASE FOR ACCESS BY OTHER FUNCTIONS
         self.data.configButtonStates = buttonStates
@@ -830,6 +860,8 @@ class CONTROL_PANEL():
             # WAIT FOR BUTTON TO BE RELEASED
             else:
                 self.data.configControllerButtonReleased[index] = True
+
+        return buttonStates
 
     def processJoysticks(self, joystickValues):
         """
@@ -872,19 +904,19 @@ class CONTROL_PANEL():
         NONE
         """
         # TAKE SINGLE READING OF CONTROLLER VALUES
-        buttonStates, joystickValues = self.getControllerInputs(self.data.controlControllerCommsStatus, controllerNumber)
+        buttonStates, arrowStates, joystickValues = self.getControllerInputs(self.data.controlControllerCommsStatus, controllerNumber)
 
         # PROCESS BUTTON STATES
-        self.processButtons(buttonStates)
+        filteredButtonStates = self.processButtons(buttonStates, arrowStates)
         
         # PROCESS JOYSTICK VALUES
         filteredJoystickValues = self.processJoysticks(joystickValues)
 
         # UPDATE GUI
-        self.updateControllerValuesDisplay(buttonStates, filteredJoystickValues)
+        self.updateControllerValuesDisplay(filteredButtonStates, filteredJoystickValues)
 
         # UPDATE CONTROLLER INPUTS AT A RATE OF 30FPS TO REDUCE CPU USAGE
-        thread = Timer(1/60,lambda controllerNumber = controllerNumber: self.controllerEventLoop(controllerNumber))
+        thread = Timer(1/120,lambda controllerNumber = controllerNumber: self.controllerEventLoop(controllerNumber))
         thread.daemon = True                            
         thread.start()
 
@@ -911,15 +943,16 @@ class CONTROL_PANEL():
 
         if connectionStatus == True:
             # EVENT PROCESSING STEP
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.done = True
+            for event in get():
+                pass
+                #if event.type == pygame.QUIT:
+                    #self.done = True
             
             # GET NUMBER OF JOYSTICKS CONNECTED
-            joystick_count = pygame.joystick.get_count()
+            joystick_count = get_count()
 
             # INITIATE CONNECTED CONTROLLER
-            joystick = pygame.joystick.Joystick(controllerNumber)
+            joystick = Joystick(controllerNumber)
             joystick.init()
 
             # GET NUMBER OF VARIABLE JOYSTICK AXES
@@ -939,20 +972,20 @@ class CONTROL_PANEL():
                 buttonStates.append(button)
                             
             # GET NUMBER OF ARROW BUTTONS
-            hats = joystick.get_numhats()
+            arrows = joystick.get_numhats()
 
                 # GET STATE OF EACH ARROW BUTTONS
-            for i in range(hats):
-                hat = joystick.get_hat(i)
+            for i in range(arrows):
+                arrowStates = joystick.get_hat(i)
 
         # DISCONNECT CONTROLLER AND EXIT THREAD IF DISCONNECT BUTTON HAS BEEN PRESSED
         if connectionStatus == False:
             print('Controller Disconnected')
-            pygame.quit()
+            quit()
             exit()
 
         # RETURN ARRAY OF BUTTON STATES AND JOYSTICK VALUES
-        return(buttonStates, joystickValues)
+        return(buttonStates, arrowStates, joystickValues)
 
     def thrusterVectorAlgorithm(self, joystickValues):
         """
@@ -983,18 +1016,13 @@ class CONTROL_PANEL():
         
         NONE
         """
-        #print(buttonStates)
         # UPDATE JOYSTICK VALUES
         for index in range(5):
             self.data.configControllerLabelObjects[index].setText(str(joystickValues[index]))
 
         # UPDATE BUTTON STATES
-        for index in range(5,13):
-            # AVOID THE UNUSED BUTTON STATES
-            if index > 10:
-                self.data.configControllerLabelObjects[index].setText(str(buttonStates[index - 3]))
-            else:
-                self.data.configControllerLabelObjects[index].setText(str(buttonStates[index - 5]))
+        for index in range(5,19):
+            self.data.configControllerLabelObjects[index].setText(str(buttonStates[index - 5]))
 
     def getSensorReadings(self):
         """
@@ -1020,6 +1048,8 @@ class CONTROL_PANEL():
         if len(self.data.controlSensorLabelObjects) > 0:
             for index in range(0,len(self.data.controlSensorValues)):
                 self.data.controlSensorLabelObjects[index].setText(str(self.data.controlSensorValues[index]))
+
+        #self.getSensors()
 
     def changeExternalCameraFeed(self, camera, display):
         """
@@ -1069,6 +1099,9 @@ class CONTROL_PANEL():
             buttonObject.setStyleSheet(self.data.greenStyle)
             self.data.controlActuatorStates[actuator] = False
             self.rov.setActuators(actuator, False)
+
+        # SEND COMMANDS TO ROV
+        self.setActuators(self.data.controlActuatorStates)
 
     def toggleTimer(self):
         """
@@ -1187,6 +1220,37 @@ class CONTROL_PANEL():
         # DISPLAY TIME SINCE MEASUREMENT START
         self.ui.control_timer.display('%02d:%02d:%02d:%02d' % (days, hours, minutes, seconds))
 
+    ##############################
+    #### SERIAL LIBRARY MOCKS ####
+    ##############################
+    def serialConnect(self):
+        self.comms = serial.Serial('COM4',115200)
+
+    def setActuators(self, actuatorStates):
+        # COMMAND INITIALISATION  
+        transmitActuatorStates = '?RA'
+        # ADD ACTUATOR STATES IN ORDER ON THE END OF STRING
+        for state in actuatorStates:
+            # CONVERT TRUE/FALSE TO '1'/'0'
+            transmitActuatorStates += ('1' if state == True else '0')
+        # COMMAND TERMINATION
+        transmitActuatorStates += '\n'
+        
+        self.serialSend(transmitActuatorStates)
+
+    def getSensors(self):
+        command = "?RS"
+        self.serialSend(command)
+        self.serialReceive()
+
+    def serialSend(self, command):
+        print(command)
+        self.comms.write(command.encode('ascii'))
+
+    def serialReceive(self):
+        received = self.comms.readline().decode('ascii')
+        print(received)
+
 class CONFIG():
     """
     PURPOSE
@@ -1288,7 +1352,7 @@ class CONFIG():
         """
         # NAMES OF JOYSTICK AXES
         joystickLabels = ['Left X', 'Left Y','Triggers', 'Right Y', 'Right X']
-        buttonLabels = ['A','B','X','Y','LB','RB','LT','RT']
+        buttonLabels = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
         
         # CREATE DISPLAY FOR JOYSTICKS
         for index in range(5):
@@ -1308,7 +1372,7 @@ class CONFIG():
             self.ui.config_controller_form.addRow(label, value)
 
         # CREATE DISPLAY FOR BUTTONS
-        for index in range(8):
+        for index in range(14):
             # CREATE BUTTON LABEL
             label = QLabel(buttonLabels[index])
             label.setStyleSheet("font-weight: bold;")
@@ -1333,7 +1397,7 @@ class CONFIG():
         INPUT
 
         - index = menu index of the ROV location selected.
-        - thruster = teh thruster being modified.
+        - thruster = the thruster being modified.
         - setting = the thruster setting that has been modified (0 = position, 1 = reverse state, 2 = test).
         - controlObject = pointer to the checkbox object.
 
@@ -1344,6 +1408,17 @@ class CONFIG():
         # THRUSTER POSITION
         if setting == 0:
             self.data.configThrusterPosition[thruster] = self.data.configThrusterPositionList[index]
+
+            # PREVENT MULTIPLE THRUSTERS PER ROV LOCATION
+            for i, item in enumerate(self.data.configThrusterPosition):
+                if item == self.data.configThrusterPosition[thruster] and i != thruster:
+                    # SET BINDING TO NONE
+                    self.data.configThrusterPosition[i] = self.data.configThrusterPositionList[0]
+                    # FIND BINDING MENU WIDGET
+                    layout = self.ui.config_thruster_form.itemAt((2 * i) + 1).layout()
+                    widget = layout.itemAt(1).widget()
+                    # SET TO NONE
+                    widget.setCurrentIndex(0)
 
         # THRUSTER REVERSE
         if setting == 1:
@@ -1708,7 +1783,6 @@ class CONFIG():
         # REMOVE ACTUATOR KEYBINDINGS FROM CONFIG TAB
         self.ui.config_keybindings_form.removeRow(index)
         del self.data.configKeyBindings[index]
-        print(self.data.configKeyBindings)
 
     def autoKeyBinding(self, bindingFound, binding, index, buttonObject, menuObject):
         """
@@ -1792,6 +1866,83 @@ class CONFIG():
         NONE
         """
         self.data.configKeyBindings[index] = binding
+
+        # PREVENT BINDING BEING ASSOCIATED WITH MULTIPLE CONTROLS
+        for i, item in enumerate(self.data.configKeyBindings):
+            # CHECK IF BINDING ALREADY EXISTS
+            if item == binding and i != index:
+                # SET BINDING TO NONE
+                self.data.configKeyBindings[index] = self.data.configKeyBindingsList[0]
+                # FIND BINDING MENU WIDGET
+                layout = self.ui.config_keybindings_form.itemAt((2 * i) + 1).layout()
+                widget = layout.itemAt(0).widget()
+                # SET SELECTED MENU ITEM TO NONE
+                widget.setCurrentIndex(0)
+
+    def setupGraph(self):
+        # CREATE FIGURE
+        figure = plt.figure()
+        figure.set_facecolor('none')
+        # CREATE CANVAS TO PLOT GRAPH ON
+        plotWidget = FigureCanvas(figure)
+        plotWidget.setStyleSheet('background-color: transparent;')
+        # DEFINE A LAYOUT TO BE USED FOR PLOTTING
+        layout = QVBoxLayout(self.ui.config_simulation_graph) 
+        layout.setContentsMargins(0, 0, 0, 0) 
+        # DEFINE FIGURE AS 3-DIMENSIONAL
+        axes = figure.add_subplot(111, projection='3d')
+        axes.set_facecolor('none')
+        axes.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+        axes.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+        axes.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+        # ADD GRAPH TO CANVAS    
+        layout.addWidget(plotWidget)
+
+        # START PLOTTING ON THE GRAPH IN A SEPERATE THREAD
+        self.updateGraph(axes, plotWidget)
+    
+    def getCylinderCoordinates(self, xCentre, yCentre, radius, zStart, zHeight):
+        z = np.linspace(zStart, zStart + zHeight, 50)
+        theta = np.linspace(0, 2 * np.pi, 50)
+        theta_grid, z_grid = np.meshgrid(theta, z)
+        x_grid = radius * np.cos(theta_grid) + xCentre
+        y_grid = radius * np.sin(theta_grid) + yCentre
+        return(x_grid, y_grid, z_grid)
+
+    def updateGraph(self, axes, plotWidget):
+
+        axes.clear()
+
+        # ROV BODY
+        x, y, z = np.indices((1, 1, 1))
+        cube = (x<1) & (y<1) & (z<1)
+        axes.voxels(cube, facecolors='#3F7FBF10', edgecolors='gray')
+
+        # TOP THRUSTERS
+        x, y, z = self.getCylinderCoordinates(0.2, 0.2, 0.15, 0.9, 0.1)
+        axes.plot_surface(x, y, z, alpha = 0.2)
+        x, y, z = self.getCylinderCoordinates(0.8, 0.8, 0.15, 0.9, 0.1)
+        axes.plot_surface(x, y, z, alpha = 0.2)
+        x, y, z = self.getCylinderCoordinates(0.2, 0.8, 0.15, 0.9, 0.1)
+        axes.plot_surface(x, y, z, alpha = 0.2)
+        x, y, z = self.getCylinderCoordinates(0.8, 0.2, 0.15, 0.9, 0.1)
+        axes.plot_surface(x, y, z, alpha = 0.2)
+
+        
+        axes.plot([0.2,0.2], [0.2,0.2], [1,1.5]
+            , marker = 'o', markersize = 10, markerfacecolor = 'b', markeredgecolor = 'b', color = 'g', linewidth = 10)
+        axes.plot([0.2,0.2], [0.2,0.2], [1,0.5]
+            , marker = 'o', markersize = 10, markerfacecolor = 'b', markeredgecolor = 'b', color = 'r', linewidth = 10)
+
+        # DRAW ONTO GRAPH
+        self.drawGraph(plotWidget)
+
+        thread = Timer(1/60, lambda axes = axes, plotWidget = plotWidget: self.updateGraph(axes, plotWidget))
+        thread.daemon = True
+        thread.start()
+
+    def drawGraph(self, plotWidget):
+        plotWidget.draw()
 
 class TOOLBAR():
     """
@@ -2051,11 +2202,11 @@ class DATABASE():
     configDefaultCameraList = [0] * 4
 
     # STORES LIST OF CONTROLLER KEY BINDINGS FOR THE ACTUATORS
-    configKeyBindingsList = ['None','A','B','X','Y','LB','RB','LT','RT','LEFT','RIGHT','UP','DOWN']
+    configKeyBindingsList = ['None','A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
     # STORES THE ORDER THAT BUTTONS APPEAR IN THE CONTROLLER RETURN ARRAY
-    configControllerButtons = ['A','B','X','Y','LB','RB','None','None','LT','RT']
+    configControllerButtons = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
     # USED FOR DEBOUNCING CONTROLLER BUTTONS
-    configControllerButtonReleased = [True] * 10
+    configControllerButtonReleased = [True] * 14
     # STORES SELECTED BINDINGS
     configKeyBindings = []
     # STORES CONTROLLER BUTTON STATES

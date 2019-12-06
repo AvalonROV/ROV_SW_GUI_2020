@@ -8,9 +8,22 @@ digraph "main.CONFIG.setActuatorsNumber"
   Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node2 [label="main.CONFIG.addKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#ab528b500be6f789374a123cad2528be4",tooltip=" "];
   Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node3 [label="main.CONFIG.setKeyBindings",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a593bb41ba73dbde8d962865d25aa94c5",tooltip=" "];
-  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="main.CONFIG.changeActuatorType",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a30dd8bb0a7d4ed632e615b0b81aa11ed",tooltip=" "];
-  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node5 [label="main.CONFIG.removeKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#afc3094d4998174f19321a18143116ab8",tooltip=" "];
+  Node3 [label="main.CONFIG.autoKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a834773b877828f908fe9bad26d3ac63a",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="main.CONFIG.findKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a88ce7e888dafe7aef2e0bf28b5332157",tooltip=" "];
+  Node4 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="main.CONFIG.setKeyBindings",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a874214db27ad7967916224ec2e7433ef",tooltip=" "];
+  Node5 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="main.CONFIG.drawGraph",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#aaf1b5df967017dd81b0f0d9382385e59",tooltip=" "];
+  Node5 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="main.CONFIG.getCylinderCoordinates",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a6bf15aba19516db204e744846f06366e",tooltip=" "];
+  Node5 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="main.CONFIG.updateGraph",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#ab09bb80f04d07173193f820170fd8ec0",tooltip=" "];
+  Node2 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="main.CONFIG.changeActuatorType",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a30dd8bb0a7d4ed632e615b0b81aa11ed",tooltip=" "];
+  Node1 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="main.CONFIG.removeKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#afc3094d4998174f19321a18143116ab8",tooltip=" "];
 }
