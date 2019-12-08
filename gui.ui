@@ -330,8 +330,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>271</width>
-                 <height>1487</height>
+                 <width>243</width>
+                 <height>1477</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -722,56 +722,13 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>2470</width>
-             <height>1503</height>
+             <width>2462</width>
+             <height>1497</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_26">
             <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_9" rowstretch="1,1" columnstretch="1,1,1,1,1" columnminimumwidth="0,0,0,0,0">
-              <item row="0" column="0">
-               <widget class="QGroupBox" name="groupBox_10">
-                <property name="title">
-                 <string>Communication Configuration</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_34">
-                 <item row="0" column="0">
-                  <widget class="QPushButton" name="pushButton_9">
-                   <property name="text">
-                    <string>Find COM Ports</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <layout class="QFormLayout" name="formLayout_7">
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="cOMPortLabel">
-                     <property name="text">
-                      <string>COM Port</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QComboBox" name="cOMPortComboBox"/>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="baudRateLabel">
-                     <property name="text">
-                      <string>Baud Rate</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QComboBox" name="baudRateComboBox"/>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </widget>
-              </item>
+             <layout class="QGridLayout" name="gridLayout_9" rowstretch="1,1" columnstretch="1,1,1,1,1">
               <item row="0" column="2">
                <widget class="QGroupBox" name="groupBox_15">
                 <property name="title">
@@ -808,8 +765,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>464</width>
-                      <height>694</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_23">
@@ -940,8 +897,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>463</width>
-                      <height>694</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_20">
@@ -1001,8 +958,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>463</width>
-                      <height>694</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_15">
@@ -1041,8 +998,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>463</width>
-                      <height>693</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_27">
@@ -1052,6 +1009,21 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                     </layout>
                    </widget>
                   </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QGroupBox" name="groupBox_17">
+                <property name="title">
+                 <string>ROV Visualisation</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_31">
+                 <item row="0" column="0">
+                  <widget class="QWidget" name="config_simulation_graph" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -1081,8 +1053,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>463</width>
-                      <height>693</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_17">
@@ -1096,17 +1068,97 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 </layout>
                </widget>
               </item>
-              <item row="1" column="2">
-               <widget class="QGroupBox" name="groupBox_17">
+              <item row="0" column="0">
+               <widget class="QGroupBox" name="groupBox_10">
                 <property name="title">
-                 <string>ROV Visualisation</string>
+                 <string>Communication Configuration</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_31">
+                <layout class="QGridLayout" name="gridLayout_34">
                  <item row="0" column="0">
-                  <widget class="QWidget" name="config_simulation_graph" native="true"/>
+                  <layout class="QGridLayout" name="gridLayout_33">
+                   <item row="1" column="1">
+                    <widget class="QPushButton" name="config_controller_connect">
+                     <property name="text">
+                      <string>CONNECT</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QPushButton" name="config_rov_connect">
+                     <property name="text">
+                      <string>CONNECT</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_10">
+                     <property name="text">
+                      <string>ROV</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_11">
+                     <property name="text">
+                      <string>Controller</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="1" column="0">
+                  <layout class="QFormLayout" name="formLayout_7">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="cOMPortLabel">
+                     <property name="text">
+                      <string>COM Port</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="baudRateLabel">
+                     <property name="text">
+                      <string>Baud Rate</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="config_baud_rate_list"/>
+                   </item>
+                   <item row="0" column="1">
+                    <layout class="QGridLayout" name="gridLayout_32">
+                     <item row="0" column="0">
+                      <widget class="QComboBox" name="config_com_port_list"/>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QPushButton" name="config_find_com_ports">
+                       <property name="text">
+                        <string>Find COM Ports</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLineEdit" name="config_terminal_send"/>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QPlainTextEdit" name="config_terminal">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -1129,7 +1181,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
      <x>0</x>
      <y>0</y>
      <width>2514</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

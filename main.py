@@ -5,8 +5,8 @@
 # PYQT5 MODULES FOR GUI
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
-from PyQt5.QtWidgets import QMainWindow, QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog
-from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont
+from PyQt5.QtWidgets import QMainWindow, QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect
+from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor
 
 # ADDITIONAL MODULES
 import sys
@@ -95,6 +95,11 @@ class UI(QMainWindow):
         self.linkControlPanelWidgets()
         self.linkConfigWidgets()
 
+        # INITIAL STARTUP MESSAGE
+        self.printTerminal("Welcome to the Avalon ROV control interface.")
+        self.printTerminal("Click 'Help' on the taskbar to access the user manual.")
+        self.printTerminal("Connect to the ROV and CONTROLLER to get started.")
+
         # INITIATE CAMERA FEEDS
         self.initiateCameraFeed()
 
@@ -112,6 +117,7 @@ class UI(QMainWindow):
 
         # INITIALISE UI
         self.showMaximized()
+        #self.show()
 
     def resizeEvent(self, event):
         self.data.windowSizeObject = self.size()
@@ -164,7 +170,6 @@ class UI(QMainWindow):
             configFile = parse(fileName)
             configFileStatus = True
         except:
-            print('Configuration file not found')
             configFileStatus = False
 
         # IF CONFIGURATION FILE IS FOUND
@@ -240,22 +245,23 @@ class UI(QMainWindow):
                     for control in child:
                         keyBindings.append(self.data.configKeyBindingsList.index(control.text))     
 
-            #############################
-            ######## RETURN DATA ########
-            #############################
+        #############################
+        ######## RETURN DATA ########
+        #############################
 
-            return (thrusterPosition,
-                    thrusterReverse, 
-                    actuatorLabelList,
-                    sensorSelectedType,
-                    defaultCameraList,
-                    keyBindings)
+        return (configFileStatus,
+                thrusterPosition,
+                thrusterReverse, 
+                actuatorLabelList,
+                sensorSelectedType,
+                defaultCameraList,
+                keyBindings)
 
     def configSetup(self):
         """
         PURPOSE
 
-        Calls functino to read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
+        Calls function to read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
         If no configuration file is found, the program will open with default settings. 
 
         INPUT
@@ -268,7 +274,8 @@ class UI(QMainWindow):
         """
         # GET CONFIGURATION SETTINGS FROM CONFIG FILE
         
-        (self.data.configThrusterPosition,
+        (configFileStatus,
+            self.data.configThrusterPosition,
             self.data.configThrusterReverse, 
             self.data.configActuatorLabelList,
             self.data.configSensorSelectedType,
@@ -280,6 +287,11 @@ class UI(QMainWindow):
                                                                 self.data.configSensorSelectedType,
                                                                 self.data.configDefaultCameraList,
                                                                 self.data.configKeyBindings)       
+        
+        if configFileStatus == False:
+            self.printTerminal('Configuration file not found')
+        else:
+            self.printTerminal('Configuration file settings applied!')
         
         # APPLY SETTINGS TO GUI 
 
@@ -379,6 +391,44 @@ class UI(QMainWindow):
         if resetStatus == True:
             self.config.addKeyBinding("Switch Orientation", 0, False)
         
+    def applyGlow(self, widget, color, blurRadius):
+        """
+        PURPOSE
+
+        Applies a subtle underglow effect to a widget.
+
+        INPUT
+
+        - widget = pointer to the widget to apply the glow to.
+        - color = color to apply to the glow (HEX format)
+        - blueRadius = radius of the glow.
+
+        RETURNS
+
+        NONE
+        """
+        shadowEffect = QGraphicsDropShadowEffect()
+        shadowEffect.setBlurRadius(blurRadius)
+        shadowEffect.setColor(QColor(color))
+        shadowEffect.setXOffset(0)
+        shadowEffect.setYOffset(0)
+        # APPLY GLOW TO WIDGET
+        widget.setGraphicsEffect(shadowEffect)
+
+    def printTerminal(self, text):
+        """
+        PURPOSE
+
+        Prints text to the serial terminal on the configuration tab.
+
+        INPUT
+        
+        - text = the text to display on the serial terminal
+        """
+        time = datetime.now().strftime("%H:%M:%S")
+        string = time + " -> " + str(text)
+        self.config_terminal.appendPlainText(str(string))
+
     def linkControlPanelWidgets(self):
         """
         PURPOSE
@@ -393,18 +443,25 @@ class UI(QMainWindow):
 
         NONE
         """
+        # ROV CONNECT BUTTON
         self.control_rov_connect.clicked.connect(self.control.rovConnect)
+        self.applyGlow(self.control_rov_connect, "#0D47A1", 10)
         self.control_rov_connect.setFixedHeight(self.control_rov_connect.geometry().height() * 1.5)
         self.control_rov_connect.setStyleSheet(self.data.defaultBlue)
+        # CONTROLLER CONNECT BUTTON
         self.control_controller_connect.clicked.connect(self.control.controllerConnect)
+        self.applyGlow(self.control_controller_connect, "#0D47A1", 10)
         self.control_controller_connect.setFixedHeight(self.control_controller_connect.geometry().height() * 1.5)
         self.control_controller_connect.setStyleSheet(self.data.defaultBlue)
+        # SWITCH CONTROL DIRECTION BUTTON
         self.control_switch_direction.setIcon(QIcon('graphics/switch_direction.png'))
         self.control_switch_direction.clicked.connect(self.control.switchControlDirection)
         self.control_switch_direction.setFixedHeight(self.control_switch_direction.geometry().height() * 1.5)
+        self.control_switch_direction.setIconSize(QSize(50,50))
+        self.applyGlow(self.control_switch_direction, "#679e37", 10)
         self.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
         self.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
-        self.control_switch_direction.setIconSize(QSize(50,50))
+        # TIMER CONTROL BUTTONS
         self.control_timer_start.clicked.connect(self.control.toggleTimer)
         self.control_timer_start.setStyleSheet(self.data.greenStyle)
         self.control_timer_reset.clicked.connect(self.control.resetTimer)
@@ -417,26 +474,6 @@ class UI(QMainWindow):
         self.control_camera_2_list.activated.connect(lambda index, camera = 1: self.control.changeExternalCameraFeed(index, camera))
         self.control_camera_3_list.activated.connect(lambda index, camera = 2: self.control.changeExternalCameraFeed(index, camera))
         self.control_camera_4_list.activated.connect(lambda index, camera = 3: self.control.changeExternalCameraFeed(index, camera))
-
-    def linkToolbarWidgets(self):
-        """
-        PURPOSE
-
-        Links widgets in the toolbar to their respective functions.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        self.toolbar_load_settings.triggered.connect(self.toolbar.loadSettings)
-        self.toolbar_reset_settings.triggered.connect(lambda: self.resetConfig(True))
-        self.toolbar_save_settings.triggered.connect(self.toolbar.saveSettings)
-        self.toolbar_open_documentation.triggered.connect(self.toolbar.openDocumentation)
-        self.toolbar_open_github.triggered.connect(self.toolbar.openGitHub)
 
     def linkConfigWidgets(self):
         """
@@ -452,6 +489,17 @@ class UI(QMainWindow):
 
         NONE
         """
+        # ROV CONNECT BUTTON
+        self.config_rov_connect.clicked.connect(self.control.rovConnect)
+        self.applyGlow(self.config_rov_connect, "#0D47A1", 10)
+        self.config_rov_connect.setFixedHeight(self.config_rov_connect.geometry().height() * 1.5)
+        self.config_rov_connect.setStyleSheet(self.data.defaultBlue)
+        # CONTROLLER CONNECT BUTTON
+        self.config_controller_connect.clicked.connect(self.control.controllerConnect)
+        self.applyGlow(self.config_controller_connect, "#0D47A1", 10)
+        self.config_controller_connect.setFixedHeight(self.config_controller_connect.geometry().height() * 1.5)
+        self.config_controller_connect.setStyleSheet(self.data.defaultBlue)
+
         self.config_sensors_number.editingFinished.connect(lambda: self.config.setSensorsNumber(False))
         self.config_cameras_number.editingFinished.connect(lambda: self.config.setCamerasNumber(False))
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
@@ -474,6 +522,26 @@ class UI(QMainWindow):
         self.config_camera_2_list.activated.connect(lambda index, camera = 1: self.config.changeDefaultCameras(index, camera))
         self.config_camera_3_list.activated.connect(lambda index, camera = 2: self.config.changeDefaultCameras(index, camera))
         self.config_camera_4_list.activated.connect(lambda index, camera = 3: self.config.changeDefaultCameras(index, camera))
+
+    def linkToolbarWidgets(self):
+        """
+        PURPOSE
+
+        Links widgets in the toolbar to their respective functions.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        self.toolbar_load_settings.triggered.connect(self.toolbar.loadSettings)
+        self.toolbar_reset_settings.triggered.connect(lambda: self.resetConfig(True))
+        self.toolbar_save_settings.triggered.connect(self.toolbar.saveSettings)
+        self.toolbar_open_documentation.triggered.connect(self.toolbar.openDocumentation)
+        self.toolbar_open_github.triggered.connect(self.toolbar.openGitHub)
 
     def initiateCameraFeed(self):
         """
@@ -682,6 +750,8 @@ class CONTROL_PANEL():
         self.rov = Object3
         self.controller = Object4
 
+        self.comms = None
+
     def rovConnect(self):
         """
         PURPOSE
@@ -699,18 +769,30 @@ class CONTROL_PANEL():
         if self.data.controlROVCommsStatus == False:
             self.data.controlROVCommsStatus = True
             self.ui.control_rov_connect.setText('DISCONNECT')
+            self.ui.config_rov_connect.setText('DISCONNECT')
             self.ui.control_rov_connect.setStyleSheet(self.data.blueStyle)
+            self.ui.config_rov_connect.setStyleSheet(self.data.blueStyle)
             self.rov.initialiseConnection('AVALON',self.data.rovCOMPort, 115200)
             
-            # TEST
-            self.serialConnect()
+            # FIND ALL AVAILABLE COM PORTS
+            self.ui.printTerminal('Searching for available COM ports...')
+            availableComPorts, rovComPort, identity = self.findComPorts(self.ui.config_com_port_list, self.data.controlROVCommsStatus, 115200, 'AVALONROV')
+            self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts)))
+            self.ui.printTerminal('Device Identity: {}'.format(identity))
+            
+            # CONNECT TO ROV COM PORT
+            self.serialConnect("COM4", 115200)
 
             # START FETCHING SENSOR READINGS
-            self.getSensorReadings()
+            #self.getSensorReadings()
         else:
             self.data.controlROVCommsStatus = False
             self.ui.control_rov_connect.setText('CONNECT')
+            self.ui.config_rov_connect.setText('CONNECT')
             self.ui.control_rov_connect.setStyleSheet(self.data.defaultBlue)
+            self.ui.config_rov_connect.setStyleSheet(self.data.defaultBlue)
+            # CLOSE COM PORT
+            self.comms.close()
             self.rov.disconnect()
 
     def controllerConnect(self):
@@ -731,7 +813,9 @@ class CONTROL_PANEL():
             # UPDATE BUTTON STYLE
             self.data.controlControllerCommsStatus = True
             self.ui.control_controller_connect.setText('DISCONNECT')
+            self.ui.config_controller_connect.setText('DISCONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.blueStyle)
+            self.ui.config_controller_connect.setStyleSheet(self.data.blueStyle)
             # INITIATE COMMUNICATION WITH THE CONTROLLER
             self.controller.initialiseConnection(self.data.controllerCOMPort)
             (connectionStatus, controllerNumber) = self.initiateController()
@@ -744,7 +828,9 @@ class CONTROL_PANEL():
         else:
             self.data.controlControllerCommsStatus = False
             self.ui.control_controller_connect.setText('CONNECT')
+            self.ui.config_controller_connect.setText('CONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue)  
+            self.ui.config_controller_connect.setStyleSheet(self.data.defaultBlue)  
 
     def initiateController(self):
         """
@@ -773,7 +859,7 @@ class CONTROL_PANEL():
 
         # THROW ERROR IS NO CONTROLLERS ARE DETECTED
         if joystick_count < 1:
-            print('No Controllers Found...')
+            self.ui.printTerminal('No Controllers Found...')
             connectionStatus = False
             quit()
 
@@ -788,7 +874,7 @@ class CONTROL_PANEL():
                 if name == 'Controller (Xbox One For Windows)':
                     connectionStatus = True
                     controllerNumber = i
-                    print('Connected to controller')
+                    self.ui.printTerminal('Connected to controller')
 
         return connectionStatus, controllerNumber
 
@@ -839,7 +925,7 @@ class CONTROL_PANEL():
                     whichControl = self.data.configKeyBindings.index(whichMenuIndex)
                     buttonExists = True
                 except:
-                    print('Button not assigned')
+                    self.ui.printTerminal('Button not assigned')
                     buttonExists = False
 
                 # IF BUTTON IS ASSIGNED IN THE PROGRAM AND HAS PREVIOUSLY BEEN RELEASED
@@ -942,14 +1028,8 @@ class CONTROL_PANEL():
         joystickValues = []
 
         if connectionStatus == True:
-            # EVENT PROCESSING STEP
-            for event in get():
-                pass
-                #if event.type == pygame.QUIT:
-                    #self.done = True
-            
-            # GET NUMBER OF JOYSTICKS CONNECTED
-            joystick_count = get_count()
+            # GET CONTROLLER EVENTS
+            get()
 
             # INITIATE CONNECTED CONTROLLER
             joystick = Joystick(controllerNumber)
@@ -980,7 +1060,7 @@ class CONTROL_PANEL():
 
         # DISCONNECT CONTROLLER AND EXIT THREAD IF DISCONNECT BUTTON HAS BEEN PRESSED
         if connectionStatus == False:
-            print('Controller Disconnected')
+            self.ui.printTerminal('Controller Disconnected')
             quit()
             exit()
 
@@ -1223,33 +1303,114 @@ class CONTROL_PANEL():
     ##############################
     #### SERIAL LIBRARY MOCKS ####
     ##############################
-    def serialConnect(self):
-        self.comms = serial.Serial('COM4',115200)
+    def serialConnect(self, rovComPort, baudRate):
+        """
+        PURPOSE
+
+        Initialises the serial interface if the correct device identity is received.
+
+        INPUT
+
+        - rovComPort = the COM port of the ROV.
+        - baudRate = the baud rate of the serial interface.
+
+        RETURNS
+
+        NONE
+        """
+        if rovComPort != None:
+            try:
+                self.comms = serial.Serial(rovComPort, baudRate, timeout = 0.2)
+                self.ui.printTerminal("Connection to ROV successful.")
+            except:
+                self.ui.printTerminal("Failed to connect to {}.".format(rovComPort))
+                # DISCONNECT ROV
+                self.rovConnect()
+        else:
+            self.ui.printTerminal("Failed to recognise device identity.")
+            # DISCONNECT ROV
+            self.rovConnect()
+
+    def findComPorts(self, menuObject, commsStatus, baudRate, rovIdentity):
+        """
+        PURPOSE
+
+        Find all available COM ports and adds them to drop down menu.
+
+        INPUT
+
+        - menuObject = pointer to the drop down menu to display the available COM ports.
+        - commsStatus = current ROV communication status (True/False).
+        - baudRate = baud rate of the serial interface.
+        - rovIdentity = string containing the required device identity to connect to the ROV.
+
+        RETURNS
+
+        - availableComPorts = list of all the available COM ports.
+        - rovComPort = the COM port that belongs to the ROV.
+        - identity = the devices response from an identity request.
+        """
+        # DISCONNECTED FROM CURRENT COM PORT IF ALREADY CONNECTED
+        #if commsStatus == True:
+            #self.comms.close()
+
+        # CREATE LIST OF ALL POSSIBLE COM PORTS
+        ports = ['COM%s' % (i + 1) for i in range(256)] 
+
+        # CLEAR CURRENT MENU LIST
+        menuObject.clear()
+
+        # CHECK WHICH COM PORTS ARE AVAILABLE
+        availableComPorts = []
+        for port in ports:
+            try:
+                comms = serial.Serial(port)
+                comms.close()
+
+                # ADD AVAILABLE COM PORTS TO MENU LIST
+                availableComPorts.append(port)
+                menuObject.addItem(port)
+            
+            # SKIP COM PORT IF UNAVAILABLE
+            except (OSError, serial.SerialException):
+                pass
+        
+        # REQUEST IDENTITY FROM EACH AVALIABLE COME PORT
+        identity = "Unknown"
+        for port in availableComPorts:
+            comms = serial.Serial(port, baudRate, timeout = 0.2)
+            self.serialSend("?I", comms)
+            identity = comms.readline().decode('ascii')
+            comms.close()
+            rovComPort = None
+            # FIND WHICH COM PORT IS THE ROV
+            if identity == rovIdentity:
+                rovComPort = port
+                break
+
+        return availableComPorts, rovComPort, identity
 
     def setActuators(self, actuatorStates):
         # COMMAND INITIALISATION  
         transmitActuatorStates = '?RA'
-        # ADD ACTUATOR STATES IN ORDER ON THE END OF STRING
+        # ADD ACTUATOR STATES ONTO THE END OF STRING
         for state in actuatorStates:
             # CONVERT TRUE/FALSE TO '1'/'0'
             transmitActuatorStates += ('1' if state == True else '0')
-        # COMMAND TERMINATION
-        transmitActuatorStates += '\n'
-        
-        self.serialSend(transmitActuatorStates)
+        self.serialSend(transmitActuatorStates, self.comms)
 
     def getSensors(self):
         command = "?RS"
-        self.serialSend(command)
+        self.serialSend(command, self.comms)
         self.serialReceive()
 
-    def serialSend(self, command):
-        print(command)
-        self.comms.write(command.encode('ascii'))
+    def serialSend(self, command, serialInterface):
+        if self.data.controlROVCommsStatus:
+            serialInterface.write((command + '\n').encode('ascii'))
 
     def serialReceive(self):
+        received = 'Unknown'
         received = self.comms.readline().decode('ascii')
-        print(received)
 
 class CONFIG():
     """
@@ -1879,6 +2040,7 @@ class CONFIG():
                 # SET SELECTED MENU ITEM TO NONE
                 widget.setCurrentIndex(0)
 
+    # MATPLOTLIB ROV SIMULATION STUFF
     def setupGraph(self):
         # CREATE FIGURE
         figure = plt.figure()
@@ -1937,9 +2099,9 @@ class CONFIG():
         # DRAW ONTO GRAPH
         self.drawGraph(plotWidget)
 
-        thread = Timer(1/60, lambda axes = axes, plotWidget = plotWidget: self.updateGraph(axes, plotWidget))
-        thread.daemon = True
-        thread.start()
+        #thread = Timer(1/60, lambda axes = axes, plotWidget = plotWidget: self.updateGraph(axes, plotWidget))
+        #thread.daemon = True
+        #thread.start()
 
     def drawGraph(self, plotWidget):
         plotWidget.draw()
@@ -1980,7 +2142,7 @@ class TOOLBAR():
                             self.data.configKeyBindings,
                             self.data.configKeyBindingsList)
 
-        print('Program Settings Saved')
+        self.ui.printTerminal('Program Settings Saved')
 
     def writeConfig(self, thrusterPosition, 
                         thrusterReverse, 
@@ -2096,6 +2258,22 @@ class TOOLBAR():
         else:
             # SET BACK TO DEFAULT NAME IF USER DOES NOT SELECT A FILE
             self.data.fileName = 'config.xml'
+
+    def openUserManual(self):
+        """
+        PURPOSE
+
+        Opens user manual that demonstrates how to use the program.
+
+        INPUT 
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        pass
 
     def openDocumentation(self):
         """
