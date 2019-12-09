@@ -20,6 +20,7 @@ from pygame import init
 from pygame.joystick import quit, Joystick, get_count
 from pygame.event import Event, get
 import serial
+import time
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -111,9 +112,6 @@ class UI(QMainWindow):
 
         # RESIZE CAMERA FEEDS WHEN WINDOW IS RESIZED
         self.resizeEvent(QResizeEvent(self.size(), QSize()))
-
-        # INITIATE SIMULATION GRAPH
-        self.config.setupGraph()
 
         # INITIALISE UI
         self.showMaximized()
@@ -289,9 +287,9 @@ class UI(QMainWindow):
                                                                 self.data.configKeyBindings)       
         
         if configFileStatus == False:
-            self.printTerminal('Configuration file not found')
+            self.printTerminal('Configuration file not found.')
         else:
-            self.printTerminal('Configuration file settings applied!')
+            self.printTerminal('Configuration file settings applied.')
         
         # APPLY SETTINGS TO GUI 
 
@@ -499,7 +497,9 @@ class UI(QMainWindow):
         self.applyGlow(self.config_controller_connect, "#0D47A1", 10)
         self.config_controller_connect.setFixedHeight(self.config_controller_connect.geometry().height() * 1.5)
         self.config_controller_connect.setStyleSheet(self.data.defaultBlue)
-
+            
+        self.config_com_port_list.activated.connect(self.config.changeComPort) 
+        self.config_find_com_ports.clicked.connect(self.config.refreshComPorts)   
         self.config_sensors_number.editingFinished.connect(lambda: self.config.setSensorsNumber(False))
         self.config_cameras_number.editingFinished.connect(lambda: self.config.setCamerasNumber(False))
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
@@ -766,34 +766,49 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.controlROVCommsStatus == False:
-            self.data.controlROVCommsStatus = True
+        if self.data.rovConnectButtonStatus == False:
+            self.data.rovConnectButtonStatus = True
+            # MODIFY BUTTON STYLE
             self.ui.control_rov_connect.setText('DISCONNECT')
             self.ui.config_rov_connect.setText('DISCONNECT')
             self.ui.control_rov_connect.setStyleSheet(self.data.blueStyle)
             self.ui.config_rov_connect.setStyleSheet(self.data.blueStyle)
-            self.rov.initialiseConnection('AVALON',self.data.rovCOMPort, 115200)
+            
+            # ROV SERIAL LIBRARY
+            #self.rov.initialiseConnection('AVALON',self.data.rovComPort, 115200)
             
             # FIND ALL AVAILABLE COM PORTS
             self.ui.printTerminal('Searching for available COM ports...')
-            availableComPorts, rovComPort, identity = self.findComPorts(self.ui.config_com_port_list, self.data.controlROVCommsStatus, 115200, 'AVALONROV')
+            availableComPorts, rovComPort, identity = self.findComPorts(self.ui.config_com_port_list, self.data.rovCommsStatus, 115200, self.data.rovID)
             self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts)))
             self.ui.printTerminal('Device Identity: {}'.format(identity))
             
-            # CONNECT TO ROV COM PORT
-            self.serialConnect("COM4", 115200)
+            self.data.rovComPort = rovComPort
+            
+            # ATTEMPT CONNECTION TO ROV COM PORT
+            status, message = self.serialConnect(rovComPort, 115200)
+            self.ui.printTerminal(message)
+
+            if status == True:
+                self.data.rovCommsStatus = True
+            else:
+                # DISCONNECT ROV
+                self.rovConnect()       
 
             # START FETCHING SENSOR READINGS
             #self.getSensorReadings()
         else:
-            self.data.controlROVCommsStatus = False
+            self.data.rovConnectButtonStatus = False
             self.ui.control_rov_connect.setText('CONNECT')
             self.ui.config_rov_connect.setText('CONNECT')
             self.ui.control_rov_connect.setStyleSheet(self.data.defaultBlue)
             self.ui.config_rov_connect.setStyleSheet(self.data.defaultBlue)
             # CLOSE COM PORT
-            self.comms.close()
-            self.rov.disconnect()
+            if self.data.rovCommsStatus:
+                self.ui.printTerminal("Disconnected from {}".format(self.data.rovComPort))
+                self.comms.close()
+                self.rov.disconnect()
+            self.data.rovCommsStatus = False
 
     def controllerConnect(self):
         """
@@ -809,16 +824,20 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.controlControllerCommsStatus == False:
+        if self.data.controllerCommsStatus == False:
             # UPDATE BUTTON STYLE
-            self.data.controlControllerCommsStatus = True
+            self.data.controllerCommsStatus = True
             self.ui.control_controller_connect.setText('DISCONNECT')
             self.ui.config_controller_connect.setText('DISCONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.blueStyle)
             self.ui.config_controller_connect.setStyleSheet(self.data.blueStyle)
             # INITIATE COMMUNICATION WITH THE CONTROLLER
+            
+            # SERIAL LIBRARY
             self.controller.initialiseConnection(self.data.controllerCOMPort)
-            (connectionStatus, controllerNumber) = self.initiateController()
+            
+            connectionStatus, controllerNumber, message = self.initiateController()
+            self.ui.printTerminal(message)
             
             if connectionStatus == True:
                 # READ CONTROLLER INPUTS IN A TIMED THREAD
@@ -826,7 +845,7 @@ class CONTROL_PANEL():
             else:
                 self.controllerConnect()
         else:
-            self.data.controlControllerCommsStatus = False
+            self.data.controllerCommsStatus = False
             self.ui.control_controller_connect.setText('CONNECT')
             self.ui.config_controller_connect.setText('CONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue)  
@@ -846,6 +865,7 @@ class CONTROL_PANEL():
 
         - connectionStatus = true if the correct controller is found.
         - controllerNumber = index of the connected controller from the list of available controllers.
+        - message = status message
         """
 
         connectionStatus = False
@@ -859,7 +879,7 @@ class CONTROL_PANEL():
 
         # THROW ERROR IS NO CONTROLLERS ARE DETECTED
         if joystick_count < 1:
-            self.ui.printTerminal('No Controllers Found...')
+            message = 'No Controllers Found.'
             connectionStatus = False
             quit()
 
@@ -874,9 +894,9 @@ class CONTROL_PANEL():
                 if name == 'Controller (Xbox One For Windows)':
                     connectionStatus = True
                     controllerNumber = i
-                    self.ui.printTerminal('Connected to controller')
+                    message = 'Connected to controller.'
 
-        return connectionStatus, controllerNumber
+        return connectionStatus, controllerNumber, message
 
     def processButtons(self, buttonStates, arrowStates):
         """
@@ -925,7 +945,6 @@ class CONTROL_PANEL():
                     whichControl = self.data.configKeyBindings.index(whichMenuIndex)
                     buttonExists = True
                 except:
-                    self.ui.printTerminal('Button not assigned')
                     buttonExists = False
 
                 # IF BUTTON IS ASSIGNED IN THE PROGRAM AND HAS PREVIOUSLY BEEN RELEASED
@@ -990,7 +1009,7 @@ class CONTROL_PANEL():
         NONE
         """
         # TAKE SINGLE READING OF CONTROLLER VALUES
-        buttonStates, arrowStates, joystickValues = self.getControllerInputs(self.data.controlControllerCommsStatus, controllerNumber)
+        buttonStates, arrowStates, joystickValues = self.getControllerInputs(self.data.controllerCommsStatus, controllerNumber)
 
         # PROCESS BUTTON STATES
         filteredButtonStates = self.processButtons(buttonStates, arrowStates)
@@ -1001,8 +1020,8 @@ class CONTROL_PANEL():
         # UPDATE GUI
         self.updateControllerValuesDisplay(filteredButtonStates, filteredJoystickValues)
 
-        # UPDATE CONTROLLER INPUTS AT A RATE OF 30FPS TO REDUCE CPU USAGE
-        thread = Timer(1/120,lambda controllerNumber = controllerNumber: self.controllerEventLoop(controllerNumber))
+        # UPDATE CONTROLLER INPUTS AT A RATE OF 60FPS TO REDUCE CPU USAGE
+        thread = Timer(1/60,lambda controllerNumber = controllerNumber: self.controllerEventLoop(controllerNumber))
         thread.daemon = True                            
         thread.start()
 
@@ -1099,10 +1118,12 @@ class CONTROL_PANEL():
         # UPDATE JOYSTICK VALUES
         for index in range(5):
             self.data.configControllerLabelObjects[index].setText(str(joystickValues[index]))
+            #self.ui.config_controller_form.itemAt((2*index)+1).widget().setText(str(joystickValues[index]))
 
         # UPDATE BUTTON STATES
         for index in range(5,19):
             self.data.configControllerLabelObjects[index].setText(str(buttonStates[index - 5]))
+            #self.ui.config_controller_form.itemAt((2*index)+1).widget().setText(str(buttonStates[index - 5]))
 
     def getSensorReadings(self):
         """
@@ -1122,7 +1143,7 @@ class CONTROL_PANEL():
         thread = Timer(0.5, self.getSensorReadings)
         thread.daemon = True                 
         thread.start()
-        if self.data.controlROVCommsStatus == False:
+        if self.data.rovCommsStatus == False:
             thread.cancel()
         self.data.controlSensorValues = self.rov.getSensors([1]*self.data.configSensorNumber).tolist()
         if len(self.data.controlSensorLabelObjects) > 0:
@@ -1172,13 +1193,13 @@ class CONTROL_PANEL():
             buttonObject.setText(self.data.configActuatorLabelList[actuator][2])
             buttonObject.setStyleSheet(self.data.redStyle)
             self.data.controlActuatorStates[actuator] = True
-            self.rov.setActuators(actuator, True)
+            #self.rov.setActuators(actuator, True)
 
         elif self.data.controlActuatorStates[actuator] == True:
             buttonObject.setText(self.data.configActuatorLabelList[actuator][1])
             buttonObject.setStyleSheet(self.data.greenStyle)
             self.data.controlActuatorStates[actuator] = False
-            self.rov.setActuators(actuator, False)
+            #self.rov.setActuators(actuator, False)
 
         # SEND COMMANDS TO ROV
         self.setActuators(self.data.controlActuatorStates)
@@ -1318,18 +1339,20 @@ class CONTROL_PANEL():
 
         NONE
         """
+        status = False
         if rovComPort != None:
             try:
                 self.comms = serial.Serial(rovComPort, baudRate, timeout = 0.2)
-                self.ui.printTerminal("Connection to ROV successful.")
+                # WAIT FOR ROV TO WAKE UP
+                self.getIdentity(self.comms, self.data.rovID)
+                message = "Connection to ROV successful."
+                status = True
             except:
-                self.ui.printTerminal("Failed to connect to {}.".format(rovComPort))
-                # DISCONNECT ROV
-                self.rovConnect()
+                message = "Failed to connect to {}.".format(rovComPort)
         else:
-            self.ui.printTerminal("Failed to recognise device identity.")
-            # DISCONNECT ROV
-            self.rovConnect()
+            message = "Failed to recognise device identity."
+
+        return status, message
 
     def findComPorts(self, menuObject, commsStatus, baudRate, rovIdentity):
         """
@@ -1351,8 +1374,8 @@ class CONTROL_PANEL():
         - identity = the devices response from an identity request.
         """
         # DISCONNECTED FROM CURRENT COM PORT IF ALREADY CONNECTED
-        #if commsStatus == True:
-            #self.comms.close()
+        if commsStatus == True:
+            self.comms.close()
 
         # CREATE LIST OF ALL POSSIBLE COM PORTS
         ports = ['COM%s' % (i + 1) for i in range(256)] 
@@ -1376,13 +1399,14 @@ class CONTROL_PANEL():
                 pass
         
         # REQUEST IDENTITY FROM EACH AVALIABLE COME PORT
-        identity = "Unknown"
+        rovComPort = None
+
         for port in availableComPorts:
-            comms = serial.Serial(port, baudRate, timeout = 0.2)
-            self.serialSend("?I", comms)
-            identity = comms.readline().decode('ascii')
+            comms = serial.Serial(port, baudRate, timeout = 1)
+            self.data.rovCommsStatus = True
+            identity = self.getIdentity(comms, self.data.rovID)
             comms.close()
-            rovComPort = None
+            self.data.rovCommsStatus = False
             # FIND WHICH COM PORT IS THE ROV
             if identity == rovIdentity:
                 rovComPort = port
@@ -1390,7 +1414,46 @@ class CONTROL_PANEL():
 
         return availableComPorts, rovComPort, identity
 
+    def getIdentity(self, serialInterface, identity):
+        """
+        PURPOSE
+
+        Request identity from a defined COM port.
+
+        INPUT
+
+        - serialInterface = pointer to the serial interface object.
+        - identity = the desired identity response from the device connected to the COM port.
+
+        RETURNS
+
+        - identity = the devices response.
+        """
+        identity = ""
+        startTime = datetime.now()
+        elapsedTime = 0
+        # TRY TO EXTRACT IDENTIFICATION FROM DEVICE FOR UP TO 3 SECONDS
+        while identity == "" and elapsedTime < 3:
+            self.serialSend("?I", serialInterface)
+            identity = self.serialReceive(serialInterface)
+            elapsedTime = (datetime.now() - startTime).total_seconds()
+
+        return identity        
+
     def setActuators(self, actuatorStates):
+        """
+        PURPOSE
+
+        Generates command to send to ROV with the desired actuator states.
+
+        INPUT
+
+        - actuatorStates = array containing the desired state of each actuator.
+
+        RETURNS
+
+        NONE
+        """
         # COMMAND INITIALISATION  
         transmitActuatorStates = '?RA'
         # ADD ACTUATOR STATES ONTO THE END OF STRING
@@ -1402,15 +1465,42 @@ class CONTROL_PANEL():
     def getSensors(self):
         command = "?RS"
         self.serialSend(command, self.comms)
-        self.serialReceive()
 
     def serialSend(self, command, serialInterface):
-        if self.data.controlROVCommsStatus:
+        """
+        PURPOSE
+
+        Sends a string down the serial interface to the ROV.
+
+        INPUT
+
+        - command = the command to send.
+        - serialInterface = pointer to the serial interface object..
+
+        RETURNS
+
+        NONE
+        """
+        if self.data.rovCommsStatus:
             serialInterface.write((command + '\n').encode('ascii'))
 
-    def serialReceive(self):
-        received = 'Unknown'
-        received = self.comms.readline().decode('ascii')
+    def serialReceive(self, serialInterface):
+        """
+        PURPOSE
+
+        Waits for data until a newline character is received.
+
+        INPUT
+
+        - serialInterface = pointer to the serial interface object.
+
+        RETURNS
+
+        NONE
+        """
+        received = ""
+        received = serialInterface.readline().decode('ascii').strip()
+        return(received)
 
 class CONFIG():
     """
@@ -1443,6 +1533,39 @@ class CONFIG():
         self.control = Object3
         self.rov = Object4
         self.controller = Object5
+
+    def changeComPort(self, index):
+        """
+        PURPOSE
+
+        Allows user to manually select the COM port to connet to without performing an identity check.
+
+        INPUT
+
+        - index = the menu index selected.
+
+        RETURNS
+
+        NONE
+        """
+        pass
+
+    def refreshComPorts(self):
+        """
+        PURPOSE
+
+        Manually refreshes the available COM port list.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        availableComPorts, rovComPort, identity = self.control.findComPorts(self.ui.config_com_port_list, self.data.rovCommsStatus, 115200, 'AVALONROV')
+        self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts))) 
 
     def setThrustersNumber(self, thrusterNumber, thrusterLayout, thrusterPosition, thrusterPositionList, thrusterReverse):
         """
@@ -2040,72 +2163,6 @@ class CONFIG():
                 # SET SELECTED MENU ITEM TO NONE
                 widget.setCurrentIndex(0)
 
-    # MATPLOTLIB ROV SIMULATION STUFF
-    def setupGraph(self):
-        # CREATE FIGURE
-        figure = plt.figure()
-        figure.set_facecolor('none')
-        # CREATE CANVAS TO PLOT GRAPH ON
-        plotWidget = FigureCanvas(figure)
-        plotWidget.setStyleSheet('background-color: transparent;')
-        # DEFINE A LAYOUT TO BE USED FOR PLOTTING
-        layout = QVBoxLayout(self.ui.config_simulation_graph) 
-        layout.setContentsMargins(0, 0, 0, 0) 
-        # DEFINE FIGURE AS 3-DIMENSIONAL
-        axes = figure.add_subplot(111, projection='3d')
-        axes.set_facecolor('none')
-        axes.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
-        axes.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
-        axes.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
-        # ADD GRAPH TO CANVAS    
-        layout.addWidget(plotWidget)
-
-        # START PLOTTING ON THE GRAPH IN A SEPERATE THREAD
-        self.updateGraph(axes, plotWidget)
-    
-    def getCylinderCoordinates(self, xCentre, yCentre, radius, zStart, zHeight):
-        z = np.linspace(zStart, zStart + zHeight, 50)
-        theta = np.linspace(0, 2 * np.pi, 50)
-        theta_grid, z_grid = np.meshgrid(theta, z)
-        x_grid = radius * np.cos(theta_grid) + xCentre
-        y_grid = radius * np.sin(theta_grid) + yCentre
-        return(x_grid, y_grid, z_grid)
-
-    def updateGraph(self, axes, plotWidget):
-
-        axes.clear()
-
-        # ROV BODY
-        x, y, z = np.indices((1, 1, 1))
-        cube = (x<1) & (y<1) & (z<1)
-        axes.voxels(cube, facecolors='#3F7FBF10', edgecolors='gray')
-
-        # TOP THRUSTERS
-        x, y, z = self.getCylinderCoordinates(0.2, 0.2, 0.15, 0.9, 0.1)
-        axes.plot_surface(x, y, z, alpha = 0.2)
-        x, y, z = self.getCylinderCoordinates(0.8, 0.8, 0.15, 0.9, 0.1)
-        axes.plot_surface(x, y, z, alpha = 0.2)
-        x, y, z = self.getCylinderCoordinates(0.2, 0.8, 0.15, 0.9, 0.1)
-        axes.plot_surface(x, y, z, alpha = 0.2)
-        x, y, z = self.getCylinderCoordinates(0.8, 0.2, 0.15, 0.9, 0.1)
-        axes.plot_surface(x, y, z, alpha = 0.2)
-
-        
-        axes.plot([0.2,0.2], [0.2,0.2], [1,1.5]
-            , marker = 'o', markersize = 10, markerfacecolor = 'b', markeredgecolor = 'b', color = 'g', linewidth = 10)
-        axes.plot([0.2,0.2], [0.2,0.2], [1,0.5]
-            , marker = 'o', markersize = 10, markerfacecolor = 'b', markeredgecolor = 'b', color = 'r', linewidth = 10)
-
-        # DRAW ONTO GRAPH
-        self.drawGraph(plotWidget)
-
-        #thread = Timer(1/60, lambda axes = axes, plotWidget = plotWidget: self.updateGraph(axes, plotWidget))
-        #thread.daemon = True
-        #thread.start()
-
-    def drawGraph(self, plotWidget):
-        plotWidget.draw()
-
 class TOOLBAR():
     """
     PURPOSE
@@ -2315,11 +2372,12 @@ class DATABASE():
 
     # LIST OF AVAILABLE COM PORTS
     comPorts = []
-    rovID = 'AVALON'
-    rovCOMPort = None
+    rovID = "AVALONROV"
+    rovComPort = None
+    rovConnectButtonStatus = False
     controllerCOMPort = None
-    controlROVCommsStatus = False
-    controlControllerCommsStatus = False
+    rovCommsStatus = False
+    controllerCommsStatus = False
 
     # STORES STATE OF EACH ACTUATOR
     controlActuatorStates = []
