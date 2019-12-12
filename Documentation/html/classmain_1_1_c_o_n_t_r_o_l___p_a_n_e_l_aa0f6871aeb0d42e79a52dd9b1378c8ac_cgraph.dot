@@ -1,0 +1,14 @@
+digraph "main.CONTROL_PANEL.toggleActuator"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="main.CONTROL_PANEL.toggle\lActuator",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="avalonComms.ROV.setActuators",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classavalon_comms_1_1_r_o_v.html#a650f7b8cdeade54010f7a49522356c98",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.CONTROL_PANEL.setActuators",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ab31bc9fe2cd07228e1f0e38056e971c8",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="main.CONTROL_PANEL.serialSend",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a313b30aaebe2fcd29b6833d982b81f8a",tooltip=" "];
+}

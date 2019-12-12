@@ -5,8 +5,8 @@
 # PYQT5 MODULES FOR GUI
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
-from PyQt5.QtWidgets import QMainWindow, QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect
-from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor
+from PyQt5.QtWidgets import QStyleFactory, QMainWindow, QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect
+from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette
 
 # ADDITIONAL MODULES
 import sys
@@ -21,6 +21,8 @@ from pygame.joystick import quit, Joystick, get_count
 from pygame.event import Event, get
 import serial
 import time
+
+import qdarkstyle
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -316,7 +318,7 @@ class UI(QMainWindow):
         
         INPUT
 
-        - resetStatus = true when called via the 'Reset Configuration' (so that number of thruster automatically resets).
+        - resetStatus = true when called via the 'Reset Configuration' button (so that the number of thruster automatically resets).
 
         RETURNS
 
@@ -412,6 +414,42 @@ class UI(QMainWindow):
         shadowEffect.setYOffset(0)
         # APPLY GLOW TO WIDGET
         widget.setGraphicsEffect(shadowEffect)
+
+    def changeTheme(self, theme):
+
+        # APPLY DARK THEME
+        if theme:
+            # CREATE Q
+            darkPalette = QPalette()
+            darkPalette.setColor(darkPalette.Window, QColor("#263238"))
+            #darkPalette.setColor(darkPalette.BaseWindowText, Qt.white)
+            darkPalette.setColor(darkPalette.Disabled, QPalette.WindowText, QColor(127,127,127))
+            darkPalette.setColor(darkPalette.Base,QColor(42,42,42))
+            darkPalette.setColor(darkPalette.AlternateBase,QColor(66,66,66))
+            darkPalette.setColor(darkPalette.ToolTipBase,Qt.white)
+            darkPalette.setColor(darkPalette.ToolTipText,Qt.white)
+            darkPalette.setColor(darkPalette.Text,Qt.white)
+            darkPalette.setColor(darkPalette.Disabled,QPalette.Text,QColor(127,127,127))
+            darkPalette.setColor(darkPalette.Dark,QColor(35,35,35))
+            darkPalette.setColor(darkPalette.Shadow,QColor(20,20,20))
+            darkPalette.setColor(darkPalette.Button,QColor("#263238"))
+            #darkPalette.setColor(darkPalette.ButtonText,Qt.AA_CompressHighFrequencyEventswhite)
+            darkPalette.setColor(darkPalette.Disabled,QPalette.ButtonText,QColor(127,127,127))
+            darkPalette.setColor(darkPalette.BrightText,Qt.red)
+            darkPalette.setColor(darkPalette.Link,QColor(42,130,218))
+            darkPalette.setColor(darkPalette.Highlight,QColor(42,130,218))
+            darkPalette.setColor(darkPalette.Disabled,QPalette.Highlight,QColor(80,80,80))
+            darkPalette.setColor(darkPalette.HighlightedText,Qt.white)
+            darkPalette.setColor(darkPalette.Disabled,QPalette.HighlightedText,QColor(127,127,127))
+
+            # APPLY CUSTOM COLOR PALEETTE
+            self.setPalette(darkPalette)
+
+        # APPLY DEFAULT THEME
+        else:
+            pass
+            
+
 
     def printTerminal(self, text):
         """
@@ -538,10 +576,11 @@ class UI(QMainWindow):
         NONE
         """
         self.toolbar_load_settings.triggered.connect(self.toolbar.loadSettings)
-        self.toolbar_reset_settings.triggered.connect(lambda: self.resetConfig(True))
+        self.toolbar_reset_settings.triggered.connect(self.toolbar.resetSettings)
         self.toolbar_save_settings.triggered.connect(self.toolbar.saveSettings)
         self.toolbar_open_documentation.triggered.connect(self.toolbar.openDocumentation)
         self.toolbar_open_github.triggered.connect(self.toolbar.openGitHub)
+        self.toolbar_toggle_theme.triggered.connect(self.toolbar.toggleTheme)
 
     def initiateCameraFeed(self):
         """
@@ -1342,9 +1381,14 @@ class CONTROL_PANEL():
         status = False
         if rovComPort != None:
             try:
-                self.comms = serial.Serial(rovComPort, baudRate, timeout = 0.2)
+                self.comms = serial.Serial(rovComPort, baudRate, timeout = 1)
                 # WAIT FOR ROV TO WAKE UP
-                self.getIdentity(self.comms, self.data.rovID)
+
+                #--------------------------------------------------#
+                # WHY DOES THIS INSTANCE OF GET IDENTITY NOT WORK? #
+                #--------------------------------------------------#
+
+                #self.getIdentity(self.comms, self.data.rovID)
                 message = "Connection to ROV successful."
                 status = True
             except:
@@ -1375,7 +1419,7 @@ class CONTROL_PANEL():
         """
         # DISCONNECTED FROM CURRENT COM PORT IF ALREADY CONNECTED
         if commsStatus == True:
-            self.comms.close()
+            self.rovConnect()
 
         # CREATE LIST OF ALL POSSIBLE COM PORTS
         ports = ['COM%s' % (i + 1) for i in range(256)] 
@@ -1400,7 +1444,7 @@ class CONTROL_PANEL():
         
         # REQUEST IDENTITY FROM EACH AVALIABLE COME PORT
         rovComPort = None
-
+        identity = ""
         for port in availableComPorts:
             comms = serial.Serial(port, baudRate, timeout = 1)
             self.data.rovCommsStatus = True
@@ -1433,7 +1477,7 @@ class CONTROL_PANEL():
         startTime = datetime.now()
         elapsedTime = 0
         # TRY TO EXTRACT IDENTIFICATION FROM DEVICE FOR UP TO 3 SECONDS
-        while identity == "" and elapsedTime < 3:
+        while (identity == "") and (elapsedTime < 5):
             self.serialSend("?I", serialInterface)
             identity = self.serialReceive(serialInterface)
             elapsedTime = (datetime.now() - startTime).total_seconds()
@@ -1482,7 +1526,11 @@ class CONTROL_PANEL():
         NONE
         """
         if self.data.rovCommsStatus:
-            serialInterface.write((command + '\n').encode('ascii'))
+            try:
+                serialInterface.write((command + '\n').encode('ascii'))
+            except:
+                self.ui.printTerminal("Failed to send command.")
+                self.rovDisconnect()
 
     def serialReceive(self, serialInterface):
         """
@@ -2092,7 +2140,8 @@ class CONFIG():
             # CHANGE BUTTON STYLE
             buttonObject.setStyleSheet(self.data.blueStyle)
             # INITIATE SEARCH FOR PRESSED BUTTON
-            self.findKeyBinding(index, buttonObject, menuObject)
+            startTime = datetime.now()
+            self.findKeyBinding(index, buttonObject, menuObject, startTime)
         
         else:
             # SET KEY BINDING
@@ -2101,7 +2150,7 @@ class CONFIG():
             # REVERT BUTTON STYLE
             buttonObject.setStyleSheet('')
 
-    def findKeyBinding(self, index, buttonObject, menuObject):
+    def findKeyBinding(self, index, buttonObject, menuObject, startTime):
         """
         PURPOSE
 
@@ -2112,6 +2161,7 @@ class CONFIG():
         - index = which key binding is being changed.
         - buttonObject = pointer to the auto binding button widget.
         - menuObject = pointer to the key bindings menu widget.
+        - startTime = the system time when the search for a pressed button begins (used for a timeout).
         
         RETURNS
 
@@ -2127,9 +2177,15 @@ class CONFIG():
                 self.autoKeyBinding(True, keyBinding, index, buttonObject, menuObject)
                 # EXIT THREAD
                 exit()
+
+        # 5 SECOND TIMEOUT
+        elapsedTime = (datetime.now() - startTime).total_seconds()
+        if elapsedTime > 3:
+            self.autoKeyBinding(True, menuObject.currentIndex() - 1, index, buttonObject, menuObject)
+            exit()
         
         # FIND BUTTON CHANGES AT A RATE OF 60FPS TO REDUCE CPU USAGE
-        thread = Timer(1/60, lambda index = index, buttonObject = buttonObject, menuObject = menuObject: self.findKeyBinding(index, buttonObject, menuObject))
+        thread = Timer(1/60, lambda index = index, buttonObject = buttonObject, menuObject = menuObject: self.findKeyBinding(index, buttonObject, menuObject, startTime))
         thread.daemon = True                            
         thread.start()
 
@@ -2156,7 +2212,7 @@ class CONFIG():
             # CHECK IF BINDING ALREADY EXISTS
             if item == binding and i != index:
                 # SET BINDING TO NONE
-                self.data.configKeyBindings[index] = self.data.configKeyBindingsList[0]
+                self.data.configKeyBindings[index] = 0
                 # FIND BINDING MENU WIDGET
                 layout = self.ui.config_keybindings_form.itemAt((2 * i) + 1).layout()
                 widget = layout.itemAt(0).widget()
@@ -2199,7 +2255,14 @@ class TOOLBAR():
                             self.data.configKeyBindings,
                             self.data.configKeyBindingsList)
 
-        self.ui.printTerminal('Program Settings Saved')
+        self.ui.printTerminal("Current program configuration saved to {}.".format(self.data.fileName))
+
+    def resetSettings(self):
+        """
+        PURPOSE
+        """
+        self.ui.printTerminal("Program configuration reset.")
+        self.ui.resetConfig(True)
 
     def writeConfig(self, thrusterPosition, 
                         thrusterReverse, 
@@ -2311,6 +2374,7 @@ class TOOLBAR():
         # USER CHOOSES SEQUENCE FILE
         self.data.fileName, _ = QFileDialog.getOpenFileName(self.ui, 'Open File','./','XML File (*.xml)')
         if self.data.fileName != '':
+            self.ui.printTerminal("Loading {} configuration file".format(self.data.fileName))
             self.ui.configSetup()
         else:
             # SET BACK TO DEFAULT NAME IF USER DOES NOT SELECT A FILE
@@ -2364,6 +2428,9 @@ class TOOLBAR():
         """
         # OPEN AVALON GITHUB PAGE IN BROWSER
         open('https://github.com/AvalonROV')
+
+    def toggleTheme(self):
+        self.ui.changeTheme(True)
 
 class DATABASE():
     ###############################
@@ -2475,7 +2542,13 @@ def guiInitiate():
     # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
     app = QApplication(sys.argv)
     app.setFont(QFont("Bahnschrift Light", 10))
+    
     app.setStyle("Fusion")
+
+    #app.setStyle(QStyleFactory.create("Fusion"))
+    
+    
+
     UI()
     # START EVENT LOOP
     app.exec_()

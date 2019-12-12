@@ -10,7 +10,7 @@ digraph "main.CONFIG.autoKeyBinding"
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node3 [label="main.CONFIG.setActuators\lNumber",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a83550f85d935a00bb1c642e7aaa8df1d",tooltip=" "];
   Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="main.CONFIG.findKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a88ce7e888dafe7aef2e0bf28b5332157",tooltip=" "];
+  Node4 [label="main.CONFIG.findKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a3cde77a87e2af677e8623cc9e6c632d1",tooltip=" "];
   Node4 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node4 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
 }

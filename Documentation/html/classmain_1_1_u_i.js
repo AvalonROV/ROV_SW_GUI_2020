@@ -1,11 +1,13 @@
 var classmain_1_1_u_i =
 [
     [ "__init__", "classmain_1_1_u_i.html#a7b46457344594a97b4937d424584b21a", null ],
+    [ "applyGlow", "classmain_1_1_u_i.html#ab3aedd6d16f7ae28ad4a628a864374cd", null ],
     [ "configSetup", "classmain_1_1_u_i.html#add9307a7f11ba93aa6e7a074a5514a7a", null ],
     [ "initiateCameraFeed", "classmain_1_1_u_i.html#a16e94903479e6aeb027ffda06eb4668e", null ],
     [ "linkConfigWidgets", "classmain_1_1_u_i.html#ab2fbdb605bc71c5e7fc26e79697b3bb1", null ],
     [ "linkControlPanelWidgets", "classmain_1_1_u_i.html#a8933f6b028ca8b28e2d7cd6289b8e6fb", null ],
     [ "linkToolbarWidgets", "classmain_1_1_u_i.html#a1d81665f596706acf8f462008896d6d4", null ],
+    [ "printTerminal", "classmain_1_1_u_i.html#a2ed6351be3128a81b8a9469be6a690e1", null ],
     [ "readConfigFile", "classmain_1_1_u_i.html#a7a43094d189f573deac56fee1bf1aab0", null ],
     [ "resetConfig", "classmain_1_1_u_i.html#a6ac1bdef42efb345f1b6ecfda7ebbace", null ],
     [ "resizeEvent", "classmain_1_1_u_i.html#a3b2f9c62c2f3c690426e5f40b86d0554", null ],

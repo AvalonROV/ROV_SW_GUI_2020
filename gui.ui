@@ -330,8 +330,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>243</width>
-                 <height>1477</height>
+                 <width>175</width>
+                 <height>1510</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -722,8 +722,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>2462</width>
-             <height>1497</height>
+             <width>2478</width>
+             <height>1522</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_26">
@@ -765,8 +765,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>456</width>
-                      <height>691</height>
+                      <width>470</width>
+                      <height>721</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_23">
@@ -897,8 +897,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>456</width>
-                      <height>691</height>
+                      <width>471</width>
+                      <height>721</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_20">
@@ -958,8 +958,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>456</width>
-                      <height>691</height>
+                      <width>471</width>
+                      <height>721</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_15">
@@ -998,8 +998,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>456</width>
-                      <height>691</height>
+                      <width>471</width>
+                      <height>720</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_27">
@@ -1053,8 +1053,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>456</width>
-                      <height>691</height>
+                      <width>470</width>
+                      <height>720</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_17">
@@ -1181,7 +1181,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
      <x>0</x>
      <y>0</y>
      <width>2514</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1191,6 +1191,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
     <addaction name="toolbar_save_settings"/>
     <addaction name="toolbar_load_settings"/>
     <addaction name="toolbar_reset_settings"/>
+    <addaction name="toolbar_toggle_theme"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -1225,6 +1226,11 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
   <action name="toolbar_open_github">
    <property name="text">
     <string>Open GitHub Repository</string>
+   </property>
+  </action>
+  <action name="toolbar_toggle_theme">
+   <property name="text">
+    <string>Toggle Theme</string>
    </property>
   </action>
  </widget>

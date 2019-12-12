@@ -17,12 +17,18 @@ digraph "main.CONTROL_PANEL.controllerConnect"
   Node5 [label="main.CONTROL_PANEL.switch\lControlDirection",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a913dbccde53830bd855254a3d3b2339e",tooltip=" "];
   Node4 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node6 [label="main.CONTROL_PANEL.toggle\lActuator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aa0f6871aeb0d42e79a52dd9b1378c8ac",tooltip=" "];
-  Node2 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node7 [label="main.CONTROL_PANEL.process\lJoysticks",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aeb2e3f837c68ab700e88ba437dfa69ee",tooltip=" "];
-  Node7 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node8 [label="main.CONTROL_PANEL.thruster\lVectorAlgorithm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a011dd14f8db54987af4d025afbfdcdbc",tooltip=" "];
-  Node2 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node9 [label="main.CONTROL_PANEL.update\lControllerValuesDisplay",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ae33ba42e85954cb8f8b8cd12b41e5543",tooltip=" "];
-  Node1 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node10 [label="main.CONTROL_PANEL.initiate\lController",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a2de8bc150469394c68c71424896ae691",tooltip=" "];
+  Node6 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="avalonComms.ROV.setActuators",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classavalon_comms_1_1_r_o_v.html#a650f7b8cdeade54010f7a49522356c98",tooltip=" "];
+  Node6 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="main.CONTROL_PANEL.setActuators",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ab31bc9fe2cd07228e1f0e38056e971c8",tooltip=" "];
+  Node8 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="main.CONTROL_PANEL.serialSend",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a313b30aaebe2fcd29b6833d982b81f8a",tooltip=" "];
+  Node2 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="main.CONTROL_PANEL.process\lJoysticks",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aeb2e3f837c68ab700e88ba437dfa69ee",tooltip=" "];
+  Node10 -> Node11 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="main.CONTROL_PANEL.thruster\lVectorAlgorithm",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a011dd14f8db54987af4d025afbfdcdbc",tooltip=" "];
+  Node2 -> Node12 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="main.CONTROL_PANEL.update\lControllerValuesDisplay",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ae33ba42e85954cb8f8b8cd12b41e5543",tooltip=" "];
+  Node1 -> Node13 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="main.CONTROL_PANEL.initiate\lController",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a2de8bc150469394c68c71424896ae691",tooltip=" "];
 }
