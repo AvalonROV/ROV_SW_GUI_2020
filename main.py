@@ -2,14 +2,17 @@
 ######## IMPORTS ########
 #########################
 
-# PYQT5 MODULES FOR GUI
+# PYQT5 MODULES
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
-from PyQt5.QtWidgets import QStyleFactory, QMainWindow, QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
+                            QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, 
+                            QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
+                            QFileDialog, QGraphicsDropShadowEffect)
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette
 
 # ADDITIONAL MODULES
-import sys
+import sys, os
 from threading import Thread, Timer
 from datetime import datetime
 from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW
@@ -21,22 +24,15 @@ from pygame.joystick import quit, Joystick, get_count
 from pygame.event import Event, get
 import serial
 import time
-
-import qdarkstyle
-
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
-import matplotlib.patches as patches
-from matplotlib.backends.backend_qt5agg import FigureCanvas
-from matplotlib.backends.backend_qt5agg import (
-        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-
 import numpy as np
 
 # SERIAL LIBRARY
 from avalonComms import ROV
 from avalonComms import controller as CONTROLLER
+
+from mosaicPopupWindow import MOSAIC_POPUP_WINDOW
+from cameraCapture import CAMERA_CAPTURE
+
 
 class UI(QMainWindow):
     """
@@ -45,7 +41,7 @@ class UI(QMainWindow):
     Handles everything to do with the GUI.
     """
     # INITIAL SETUP
-    def __init__(self):
+    def __init__(self, app):
         """
         PURPOSE
 
@@ -62,6 +58,9 @@ class UI(QMainWindow):
         super(UI,self).__init__()
         # LOAD UI FILE
         uic.loadUi('gui.ui',self)
+
+        # APP OBJECT TO ALLOW THEME CHANGING
+        self.app = app
 
         # CREATING OBJECTS AND PASSING OBJECTS TO THEM
         self.data = DATABASE()
@@ -416,41 +415,45 @@ class UI(QMainWindow):
         widget.setGraphicsEffect(shadowEffect)
 
     def changeTheme(self, theme):
-
         # APPLY DARK THEME
         if theme:
-            # CREATE Q
+            # CREATE QPALETTE
             darkPalette = QPalette()
-            darkPalette.setColor(darkPalette.Window, QColor("#263238"))
-            #darkPalette.setColor(darkPalette.BaseWindowText, Qt.white)
-            darkPalette.setColor(darkPalette.Disabled, QPalette.WindowText, QColor(127,127,127))
-            darkPalette.setColor(darkPalette.Base,QColor(42,42,42))
-            darkPalette.setColor(darkPalette.AlternateBase,QColor(66,66,66))
-            darkPalette.setColor(darkPalette.ToolTipBase,Qt.white)
-            darkPalette.setColor(darkPalette.ToolTipText,Qt.white)
-            darkPalette.setColor(darkPalette.Text,Qt.white)
-            darkPalette.setColor(darkPalette.Disabled,QPalette.Text,QColor(127,127,127))
-            darkPalette.setColor(darkPalette.Dark,QColor(35,35,35))
-            darkPalette.setColor(darkPalette.Shadow,QColor(20,20,20))
-            darkPalette.setColor(darkPalette.Button,QColor("#263238"))
-            #darkPalette.setColor(darkPalette.ButtonText,Qt.AA_CompressHighFrequencyEventswhite)
-            darkPalette.setColor(darkPalette.Disabled,QPalette.ButtonText,QColor(127,127,127))
-            darkPalette.setColor(darkPalette.BrightText,Qt.red)
-            darkPalette.setColor(darkPalette.Link,QColor(42,130,218))
-            darkPalette.setColor(darkPalette.Highlight,QColor(42,130,218))
-            darkPalette.setColor(darkPalette.Disabled,QPalette.Highlight,QColor(80,80,80))
-            darkPalette.setColor(darkPalette.HighlightedText,Qt.white)
-            darkPalette.setColor(darkPalette.Disabled,QPalette.HighlightedText,QColor(127,127,127))
 
-            # APPLY CUSTOM COLOR PALEETTE
-            self.setPalette(darkPalette)
+            darkPalette.setColor(QPalette.Window, QColor("#212121"))        # MAIN WINDOW BACKGROUND COLOR
+            darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
+            darkPalette.setColor(QPalette.Base,QColor("#616161"))           # TEXT ENTRY BACKGROUND COLOR
+            darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
+            darkPalette.setColor(QPalette.Button,QColor("#353535"))         # TAB BACKGROUND COLOR
+            darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR
+            
+            
+            # #darkPalette.setColor(darkPalette.BaseWindowText, Qt.white)
+            # darkPalette.setColor(darkPalette.Disabled, QPalette.WindowText, QColor(127,127,127))
+            # darkPalette.setColor(darkPalette.Base,QColor(42,42,42))
+            # darkPalette.setColor(darkPalette.AlternateBase,QColor(66,66,66))
+            # darkPalette.setColor(darkPalette.ToolTipBase,Qt.white)
+            # darkPalette.setColor(darkPalette.ToolTipText,Qt.white)
+            # darkPalette.setColor(darkPalette.Text,Qt.white)
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.Text,QColor(127,127,127))
+            # darkPalette.setColor(darkPalette.Dark,QColor(35,35,35))
+            # darkPalette.setColor(darkPalette.Shadow,QColor(20,20,20))
+            # #darkPalette.setColor(darkPalette.ButtonText,Qt.AA_CompressHighFrequencyEventswhite)
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.ButtonText,QColor(127,127,127))
+            # darkPalette.setColor(darkPalette.BrightText,Qt.red)
+            # darkPalette.setColor(darkPalette.Link,QColor(42,130,218))
+            # darkPalette.setColor(darkPalette.Highlight,QColor(42,130,218))
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.Highlight,QColor(80,80,80))
+            # darkPalette.setColor(darkPalette.HighlightedText,Qt.white)
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.HighlightedText,QColor(127,127,127))
 
+            # APPLY CUSTOM COLOR PALETTE
+            self.app.setPalette(darkPalette)
+            
         # APPLY DEFAULT THEME
         else:
-            pass
+            self.app.setPalette(self.app.style().standardPalette())
             
-
-
     def printTerminal(self, text):
         """
         PURPOSE
@@ -504,6 +507,8 @@ class UI(QMainWindow):
         self.control_timer.setNumDigits(11)
         self.control_timer.display('00:00:00:00')
         self.control_timer.setMinimumHeight(48)
+        # MACHINE VISION TASK BUTTONS
+        self.control_vision_mosaic.clicked.connect(self.control.popupMosaicTask)
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MANU TO THE SAME SLOT, PASSING THE CAMERA ID AS 1,2,3,4 ETC.
         self.control_camera_1_list.activated.connect(lambda index, camera = 0: self.control.changeExternalCameraFeed(index, camera))
@@ -597,19 +602,22 @@ class UI(QMainWindow):
         NONE
         """
         pass
-        # INITIATE CAMERAS IN SEPERATE THREADS
-        # PRIMARY CAMERA
-        #camThread1 = CAMERA_FEED_1(self)
-        #camThread1.cameraNewFrame.connect(self.updateCamera1Feed)
-        #camThread1.start()
+        # INITIATE CAMERAS IN QTHREADS
+        
+        # PRIMARY CAMERA        
+        self.camThread1 = CAMERA_CAPTURE(0)
+        self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
+        self.camThread1.start()
+        
         # SECONDARY CAMERA 1
-        #camThread2 = CAMERA_FEED_2(self)
-        #camThread2.cameraNewFrame.connect(self.updateCamera2Feed)
-        #camThread2.start()
+        #self.camThread2 = CAMERA_CAPTURE(1)
+        #self.camThread2.cameraNewFrameSignal.connect(self.updateCamera2Feed)
+        #self.camThread2.start()
+        
         # SECONDARY CAMERA 2
-        #camThread3 = CAMERA_FEED_3(self)
-        #camThread3.cameraNewFrame.connect(self.updateCamera3Feed)
-        #camThread3.start()
+        #self.camThread3 = CAMERA_CAPTURE(2)
+        #self.camThread3.cameraNewFrameSignal.connect(self.updateCamera3Feed)
+        #self.camThread3.start()
 
     @pyqtSlot(QImage)
     def updateCamera1Feed(self, frame):
@@ -667,97 +675,6 @@ class UI(QMainWindow):
         pixmap = QPixmap.fromImage(frame)
         pixmap = pixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
         self.secondary_camera_2.setPixmap(pixmap)
-
-class CAMERA_FEED_1(QThread):
-    # CREATE SIGNAL
-    cameraNewFrame = pyqtSignal(QImage)
-
-    # URL of camera stream
-    channel = 0
-    
-    def run(self):
-        # INITIATE SECONDARY 1 CAMERA
-        cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1280)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 720)
-        
-        while True:
-            # CAPTURE FRAME
-            ret, frame = cameraFeed.read()
-        
-            # IF FRAME IS SUCCESSFULLY CAPTURED            
-            if ret:
-                # CONVERT TO RGB COLOUR
-                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
-                # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
-                height, width, _ = cameraFrame.shape
-                # CONVERT TO QIMAGE
-                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
-                # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
-                self.cameraNewFrame.emit(cameraFrame)
-            
-            else:
-                self.cameraNewFrame.emit(QImage("graphics/no_signal.png"))
-
-class CAMERA_FEED_2(QThread):
-    # CREATE SIGNAL
-    cameraNewFrame = pyqtSignal(QImage)
-
-    # URL of camera stream
-    channel = 1
-    
-    def run(self):
-        # INITIATE SECONDARY 1 CAMERA
-        cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1280)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 720)
-        
-        while True:
-            # CAPTURE FRAME
-            ret, frame = cameraFeed.read()
-            # IF FRAME IS SUCCESSFULLY CAPTURED            
-            if ret:
-                # CONVERT TO RGB COLOUR
-                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
-                # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
-                height, width, _ = cameraFrame.shape
-                # CONVERT TO QIMAGE
-                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
-                # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
-                self.cameraNewFrame.emit(cameraFrame)
-            
-            else:
-                self.cameraNewFrame.emit(QImage("graphics/no_signal.png"))
-
-class CAMERA_FEED_3(QThread):
-    # CREATE SIGNAL
-    cameraNewFrame = pyqtSignal(QImage)
-
-    # URL of camera stream
-    channel = 2 
-    
-    def run(self):
-        # INITIATE SECONDARY 1 CAMERA
-        cameraFeed = VideoCapture(self.channel)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1280)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 720)
-        
-        while True:
-            # CAPTURE FRAME
-            ret, frame = cameraFeed.read()
-            # IF FRAME IS SUCCESSFULLY CAPTURED            
-            if ret:
-                # CONVERT TO RGB COLOUR
-                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
-                # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
-                height, width, _ = cameraFrame.shape
-                # CONVERT TO QIMAGE
-                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
-                # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
-                self.cameraNewFrame.emit(cameraFrame)
-
-            else:
-                self.cameraNewFrame.emit(QImage("graphics/no_signal.png"))
 
 class CONTROL_PANEL():
     """
@@ -828,14 +745,16 @@ class CONTROL_PANEL():
             status, message = self.serialConnect(rovComPort, 115200)
             self.ui.printTerminal(message)
 
+            # IF CONNECTION IS SUCCESSFUL
             if status == True:
                 self.data.rovCommsStatus = True
+                # START REQUESTING SENSOR READINGS
+                self.getSensorReadings()
+            
             else:
                 # DISCONNECT ROV
                 self.rovConnect()       
 
-            # START FETCHING SENSOR READINGS
-            #self.getSensorReadings()
         else:
             self.data.rovConnectButtonStatus = False
             self.ui.control_rov_connect.setText('CONNECT')
@@ -999,7 +918,7 @@ class CONTROL_PANEL():
                         # FIND POINTER TO THE BUTTON WIDGET CORRESPONDING TO THE ACTUATOR
                         widget = self.ui.control_panel_actuators.itemAt((2*whichControl)-1).widget()
                         # TOGGLES ACTUATORS AND CHANGES APPEARANCE OF GUI BUTTON
-                        self.toggleActuator(None, whichControl - 1, widget)
+                        self.toggleActuator(whichControl - 1, widget)
             
             # WAIT FOR BUTTON TO BE RELEASED
             else:
@@ -1118,7 +1037,7 @@ class CONTROL_PANEL():
 
         # DISCONNECT CONTROLLER AND EXIT THREAD IF DISCONNECT BUTTON HAS BEEN PRESSED
         if connectionStatus == False:
-            self.ui.printTerminal('Controller Disconnected')
+            self.ui.printTerminal('Controller Disconnected.')
             quit()
             exit()
 
@@ -1182,14 +1101,19 @@ class CONTROL_PANEL():
         thread = Timer(0.5, self.getSensorReadings)
         thread.daemon = True                 
         thread.start()
+        
         if self.data.rovCommsStatus == False:
             thread.cancel()
-        self.data.controlSensorValues = self.rov.getSensors([1]*self.data.configSensorNumber).tolist()
-        if len(self.data.controlSensorLabelObjects) > 0:
-            for index in range(0,len(self.data.controlSensorValues)):
-                self.data.controlSensorLabelObjects[index].setText(str(self.data.controlSensorValues[index]))
+        
+        else:
+            #self.data.controlSensorValues = self.rov.getSensors([1]*self.data.configSensorNumber).tolist()
 
-        #self.getSensors()
+            sensorReadings = self.getSensors()
+
+            # UPDATE GUI
+            if len(self.data.controlSensorLabelObjects) > 0:
+                for index in range(0,len(sensorReadings)):
+                    self.data.controlSensorLabelObjects[index].setText(str(sensorReadings[index]))
 
     def changeExternalCameraFeed(self, camera, display):
         """
@@ -1212,7 +1136,7 @@ class CONTROL_PANEL():
         # STORE WHICH CAMERA HAS BEEN SELECTED FOR EACH FEED
         self.data.controlCameraViewList[display] = camera
 
-    def toggleActuator(self, _, actuator, buttonObject):
+    def toggleActuator(self, actuator, buttonObject):
         """
         PURPOSE
 
@@ -1507,8 +1431,26 @@ class CONTROL_PANEL():
         self.serialSend(transmitActuatorStates, self.comms)
 
     def getSensors(self):
+        """
+        PURPOSE
+
+        Send request to ROV to get sensor readings and return them.
+        
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        - results = array containing the sensor readings.
+        """
+        # REQUEST SENSOR READINGS
         command = "?RS"
         self.serialSend(command, self.comms)
+        # READ RESPONSE INTO AN ARRAY
+        results = self.serialReceive(self.comms).split(",")
+
+        return results
 
     def serialSend(self, command, serialInterface):
         """
@@ -1530,7 +1472,7 @@ class CONTROL_PANEL():
                 serialInterface.write((command + '\n').encode('ascii'))
             except:
                 self.ui.printTerminal("Failed to send command.")
-                self.rovDisconnect()
+                self.rovConnect()
 
     def serialReceive(self, serialInterface):
         """
@@ -1549,6 +1491,13 @@ class CONTROL_PANEL():
         received = ""
         received = serialInterface.readline().decode('ascii').strip()
         return(received)
+
+    ###############################
+    #### COMPUTER VISION TASKS ####
+    ###############################
+
+    def popupMosaicTask(self):
+        self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.data)
 
 class CONFIG():
     """
@@ -1631,7 +1580,7 @@ class CONFIG():
 
         RETURNS
 
-        NONE
+        NONE 
         """
         for thruster in range(thrusterNumber):
             # CREATE THRUSTER NUMBER LABEL
@@ -1665,7 +1614,7 @@ class CONFIG():
 
             # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
             thrusterLocation.activated.connect(lambda index, thruster = thruster, setting = 0, controlObject = None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
-            thrusterReverseCheck.toggled.connect(lambda index, thruster = thruster, setting = 1, controlObject = thrusterReverse: self.setROVThrusterSettings(index, thruster, setting, controlObject))
+            thrusterReverseCheck.toggled.connect(lambda index, thruster = thruster, setting = 1, controlObject = thrusterReverseCheck: self.setROVThrusterSettings(index, thruster, setting, controlObject))
             thrusterTest.clicked.connect(lambda index, thruster = thruster, setting = 2, controlObject= None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
 
     def setControllerValuesDisplay(self):
@@ -1837,7 +1786,7 @@ class CONFIG():
                 state1.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 1, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
                 state2.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 2, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
                 # LINK CONTROL PANEL ACTUATOR BUTTONS TO SLOT - PASS ACTUATOR NUMBER
-                actuatorToggle.clicked.connect(lambda _, actuator = (oldNumber + number), buttonObject = actuatorToggle: self.control.toggleActuator(_, actuator, buttonObject))
+                actuatorToggle.clicked.connect(lambda state, actuator = (oldNumber + number), buttonObject = actuatorToggle: self.control.toggleActuator(actuator, buttonObject))
 
                 # CREATE KEYBINDING FOR ACTUATOR
                 self.addKeyBinding("Actuator {}".format((oldNumber + number + 1)), oldNumber + number + 1, configStatus)
@@ -1924,6 +1873,7 @@ class CONFIG():
                 # CREATE SENSOR READINGS TEXT BOX
                 sensorView = QLineEdit()
                 sensorView.setReadOnly(True)
+                sensorView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
                 # CREATE SENSOR LABEL
                 sensorLabel = QLabel(self.data.configSensorTypeList[self.data.configSensorSelectedType[oldNumber + number]])
                 # CREATE FORM LAYOUT
@@ -2430,8 +2380,14 @@ class TOOLBAR():
         open('https://github.com/AvalonROV')
 
     def toggleTheme(self):
-        self.ui.changeTheme(True)
+        if self.data.programTheme == False:
+            self.data.programTheme = True
+            self.ui.changeTheme(True)
 
+        else:
+            self.data.programTheme = False
+            self.ui.changeTheme(False)
+            
 class DATABASE():
     ###############################
     ######## CONTROL PANEL ########
@@ -2446,6 +2402,8 @@ class DATABASE():
     rovCommsStatus = False
     controllerCommsStatus = False
 
+    programTheme = False
+
     # STORES STATE OF EACH ACTUATOR
     controlActuatorStates = []
 
@@ -2459,7 +2417,7 @@ class DATABASE():
     
     # APPEARANGE STYLESHEETS
     greenStyle = 'background-color: #679e37'
-    redStyle = 'background-color: #f44336'
+    redStyle = 'background-color: #c62828'
     blueStyle = 'background-color: #0D47A1; color: white; font-weight: bold;'
     defaultBlue = 'color: #0D47A1; font-weight: bold;'
     textGreenStyle = 'color: #679e37; font-weight: bold;'
@@ -2471,6 +2429,8 @@ class DATABASE():
     controlTimerEnabled = False
     controlTimerNew = True
     controlTimerMem = 0
+
+    primaryCameraImage = None
 
     ###############################
     ######## CONFIGURATION ########
@@ -2542,14 +2502,8 @@ def guiInitiate():
     # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
     app = QApplication(sys.argv)
     app.setFont(QFont("Bahnschrift Light", 10))
-    
     app.setStyle("Fusion")
-
-    #app.setStyle(QStyleFactory.create("Fusion"))
-    
-    
-
-    UI()
+    UI(app)
     # START EVENT LOOP
     app.exec_()
 

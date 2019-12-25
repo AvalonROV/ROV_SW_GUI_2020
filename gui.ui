@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="program_tab_widget">
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -330,8 +330,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>175</width>
-                 <height>1510</height>
+                 <width>243</width>
+                 <height>1477</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -501,7 +501,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_18">
                      <item row="0" column="1">
-                      <widget class="QPushButton" name="pushButton_25">
+                      <widget class="QPushButton" name="control_vision_mosaic">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                          <horstretch>0</horstretch>
@@ -541,7 +541,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_6">
                        <property name="text">
-                        <string>Transet Line</string>
+                        <string>Mosaic</string>
                        </property>
                        <property name="alignment">
                         <set>Qt::AlignCenter</set>
@@ -722,8 +722,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>2478</width>
-             <height>1522</height>
+             <width>2462</width>
+             <height>1497</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_26">
@@ -765,8 +765,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>470</width>
-                      <height>721</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_23">
@@ -897,8 +897,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>471</width>
-                      <height>721</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_20">
@@ -958,8 +958,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>471</width>
-                      <height>721</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_15">
@@ -998,8 +998,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>471</width>
-                      <height>720</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_27">
@@ -1053,8 +1053,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>470</width>
-                      <height>720</height>
+                      <width>456</width>
+                      <height>691</height>
                      </rect>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_17">
@@ -1181,7 +1181,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
      <x>0</x>
      <y>0</y>
      <width>2514</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
