@@ -46,7 +46,7 @@ class MOSAIC_POPUP_WINDOW(QWidget):
 
         NONE
         """
-        defaultView = QPixmap('graphics/blank.png')
+        defaultView = QPixmap('..../graphics/blank.png')
         # ADD CAMERA VIEW AND CAPTURE BUTTON FOR EACH SIDE OF THE UNDERWATER OBJECT
         for index in range(5):
             button = QPushButton("Capture {}".format(index + 1))

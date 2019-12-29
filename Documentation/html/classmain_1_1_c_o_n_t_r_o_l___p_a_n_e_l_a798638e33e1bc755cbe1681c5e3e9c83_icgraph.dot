@@ -6,7 +6,7 @@ digraph "main.CONTROL_PANEL.updateTimer"
   rankdir="RL";
   Node1 [label="main.CONTROL_PANEL.update\lTimer",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="main.CONTROL_PANEL.readSystemTime",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac423942903ca9dfa20a8916aff38cb32",tooltip=" "];
+  Node2 [label="main.CONTROL_PANEL.readSystemTime",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac423942903ca9dfa20a8916aff38cb32",tooltip="TIMER FUNCTIONS #####."];
   Node2 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node3 [label="main.CONTROL_PANEL.toggle\lTimer",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac58feecba22059ec8ef908ec66b20fb0",tooltip=" "];

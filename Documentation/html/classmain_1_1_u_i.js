@@ -1,7 +1,8 @@
 var classmain_1_1_u_i =
 [
-    [ "__init__", "classmain_1_1_u_i.html#a7b46457344594a97b4937d424584b21a", null ],
+    [ "__init__", "classmain_1_1_u_i.html#a4da16ef68967e04e0716c62fb0a142ab", null ],
     [ "applyGlow", "classmain_1_1_u_i.html#ab3aedd6d16f7ae28ad4a628a864374cd", null ],
+    [ "changeTheme", "classmain_1_1_u_i.html#a83d5e6c17ae4622eb6c98a48a89768ed", null ],
     [ "configSetup", "classmain_1_1_u_i.html#add9307a7f11ba93aa6e7a074a5514a7a", null ],
     [ "initiateCameraFeed", "classmain_1_1_u_i.html#a16e94903479e6aeb027ffda06eb4668e", null ],
     [ "linkConfigWidgets", "classmain_1_1_u_i.html#ab2fbdb605bc71c5e7fc26e79697b3bb1", null ],
@@ -14,6 +15,8 @@ var classmain_1_1_u_i =
     [ "updateCamera1Feed", "classmain_1_1_u_i.html#a9c8058338101feba3ac37f114bea0cf9", null ],
     [ "updateCamera2Feed", "classmain_1_1_u_i.html#a6c7c52a952943f59bab586b955c5b648", null ],
     [ "updateCamera3Feed", "classmain_1_1_u_i.html#a1f3e90ec187802a603d2d7303315cb40", null ],
+    [ "app", "classmain_1_1_u_i.html#a5808ee7a343c2c1082908df862f3b21b", null ],
+    [ "camThread1", "classmain_1_1_u_i.html#abcd431b3b9c4665592523040ff23c6a1", null ],
     [ "config", "classmain_1_1_u_i.html#a92bab8eb619832c7e703a6047d233c82", null ],
     [ "control", "classmain_1_1_u_i.html#a7ef4676cd134ba0eef2632f9b7f3fe31", null ],
     [ "controller", "classmain_1_1_u_i.html#a7f09c16252572ca3bd8d9f20d5a1247d", null ],

@@ -12,7 +12,6 @@ var classmain_1_1_c_o_n_f_i_g =
     [ "removeKeyBinding", "classmain_1_1_c_o_n_f_i_g.html#afc3094d4998174f19321a18143116ab8", null ],
     [ "setActuatorsNumber", "classmain_1_1_c_o_n_f_i_g.html#a83550f85d935a00bb1c642e7aaa8df1d", null ],
     [ "setCamerasNumber", "classmain_1_1_c_o_n_f_i_g.html#a6856b3c5d77a16ff459edab6a558a96c", null ],
-    [ "setControllerValuesDisplay", "classmain_1_1_c_o_n_f_i_g.html#a6562f961af7b65cac8b88aa7eca9acd9", null ],
     [ "setKeyBindings", "classmain_1_1_c_o_n_f_i_g.html#a874214db27ad7967916224ec2e7433ef", null ],
     [ "setROVThrusterSettings", "classmain_1_1_c_o_n_f_i_g.html#ad4826e9d1c4231422415eaeae59538e3", null ],
     [ "setSensorsNumber", "classmain_1_1_c_o_n_f_i_g.html#af1b5338e3ba071d1c23a2a9193df2da0", null ],

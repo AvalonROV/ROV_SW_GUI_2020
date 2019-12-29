@@ -4,12 +4,12 @@
 
 # PYQT5 MODULES
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
+from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
 from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
                             QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, 
                             QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
                             QFileDialog, QGraphicsDropShadowEffect)
-from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette
+from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette, QPainter
 
 # ADDITIONAL MODULES
 import sys, os
@@ -26,15 +26,12 @@ import serial
 import time
 import numpy as np
 
-# SERIAL LIBRARY
+# CUSTOM LIBRARIES
 from avalonComms import ROV
-#from avalonComms import controller as CONTROLLER
-
-# CONTROLLER LIBRARY
-from xboxController import CONTROLLER
-
-from mosaicPopupWindow import MOSAIC_POPUP_WINDOW
-from cameraCapture import CAMERA_CAPTURE
+from libraries.controller.xboxController import CONTROLLER
+from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
+from libraries.camera.cameraCapture import CAMERA_CAPTURE
+from libraries.animation.slideAnimation import SLIDE_ANIMATION
 
 class UI(QMainWindow):
     """
@@ -116,25 +113,14 @@ class UI(QMainWindow):
         # RESIZE CAMERA FEEDS WHEN WINDOW IS RESIZED
         self.resizeEvent(QResizeEvent(self.size(), QSize()))
 
+        # SLIDING ANIMATION FOR SWITCHING BETWEEN CONTROL AND CONFIGURATION TABS
+        self.slideAnimation = SLIDE_ANIMATION(self.gui_view_widget)
+        self.slideAnimation.setSpeed(500)
+
         # INITIALISE UI
         self.showMaximized()
         #self.show()
 
-    def resizeEvent(self, event):
-        self.data.windowSizeObject = self.size()
-        self.data.windowHeight = self.data.windowSizeObject.height()
-        self.data.windowWidth = self.data.windowSizeObject.width()
-
-        cameraPixmap = QPixmap('graphics/no_signal.png')
-        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
-        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
-        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
-        self.primary_camera.setPixmap(primaryCameraPixmap)
-        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
-        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
-
-        QMainWindow.resizeEvent(self, event)
-    
     ##################################
     ## CONFIGURATION FILE FUNCTIONS ##
     ##################################
@@ -412,6 +398,19 @@ class UI(QMainWindow):
 
         NONE
         """
+        # CHANGE GUI VIEW BUTTONS
+        self.change_gui_control.clicked.connect(lambda state, view = 0: self.changeView(view))
+        self.applyGlow(self.change_gui_control, "#0D47A1", 10)
+        self.change_gui_control.setFixedHeight(self.change_gui_control.geometry().height() * 1.5)
+        self.change_gui_control.setFixedWidth(self.change_gui_control.geometry().width() * 4)
+        self.change_gui_control.setStyleSheet(self.data.blueStyle)
+
+        self.change_gui_config.clicked.connect(lambda statem, view = 1: self.changeView(view))
+        self.applyGlow(self.change_gui_config, "#0D47A1", 10)
+        self.change_gui_config.setFixedHeight(self.change_gui_config.geometry().height() * 1.5)
+        self.change_gui_config.setFixedWidth(self.change_gui_config.geometry().width() * 4)
+        self.change_gui_config.setStyleSheet(self.data.defaultBlue)
+
         # ROV CONNECT BUTTON
         self.control_rov_connect.clicked.connect(self.control.rovConnect)
         self.applyGlow(self.control_rov_connect, "#0D47A1", 10)
@@ -612,6 +611,19 @@ class UI(QMainWindow):
     ###########################
     ##### OTHER FUNCTIONS #####
     ###########################
+    def changeView(self, view):
+        """
+        """
+        if view == 0:
+            self.slideAnimation.screenPrevious()
+            self.change_gui_control.setStyleSheet(self.data.blueStyle)
+            self.change_gui_config.setStyleSheet(self.data.defaultBlue)
+
+        if view == 1:
+            self.slideAnimation.screenNext()
+            self.change_gui_control.setStyleSheet(self.data.defaultBlue)
+            self.change_gui_config.setStyleSheet(self.data.blueStyle)
+
     def applyGlow(self, widget, color, blurRadius):
         """
         PURPOSE
@@ -689,6 +701,29 @@ class UI(QMainWindow):
         time = datetime.now().strftime("%H:%M:%S")
         string = time + " -> " + str(text)
         self.config_terminal.appendPlainText(str(string))
+
+    def resizeEvent(self, event):
+        self.data.windowSizeObject = self.size()
+        self.data.windowHeight = self.data.windowSizeObject.height()
+        self.data.windowWidth = self.data.windowSizeObject.width()
+
+        cameraPixmap = QPixmap('graphics/no_signal.png')
+        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
+        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
+        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
+        self.primary_camera.setPixmap(primaryCameraPixmap)
+        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
+        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
+
+        QMainWindow.resizeEvent(self, event)
+
+    def animateOut(self):
+        animation = QPropertyAnimation(self, "pos")
+        animation.setDuration(400)
+        animation.setStartValue(QPoint(1920, 22))
+        animation.setEndValue(QPoint(1541, 22))
+        animation.setEasingCurve(QEasingCurve.OutCubic)
+        animation.start()
 
 class CONTROL_PANEL():
     """
@@ -1608,7 +1643,7 @@ class CONFIG():
                 state1.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 1, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
                 state2.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 2, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
                 # LINK CONTROL PANEL ACTUATOR BUTTONS TO SLOT - PASS ACTUATOR NUMBER
-                actuatorToggle.clicked.connect(lambda state, actuator = (oldNumber + number), buttonObject = actuatorToggle: self.control.toggleActuator(actuator, buttonObject))
+                actuatorToggle.clicked.connect(lambda state, actuator = (oldNumber + number), buttonObject = actuatorToggle: self.control.changeActuators(actuator, buttonObject))
 
                 # CREATE KEYBINDING FOR ACTUATOR
                 self.addKeyBinding("Actuator {}".format((oldNumber + number + 1)), oldNumber + number + 1, configStatus)
@@ -2191,7 +2226,7 @@ class TOOLBAR():
 
         NONE
         """
-        call(['Documentation.bat'])
+        call(['open_documentation.bat'])
 
     def openGitHub(self):
         """
