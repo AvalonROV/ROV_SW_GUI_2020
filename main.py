@@ -28,11 +28,13 @@ import numpy as np
 
 # SERIAL LIBRARY
 from avalonComms import ROV
-from avalonComms import controller as CONTROLLER
+#from avalonComms import controller as CONTROLLER
+
+# CONTROLLER LIBRARY
+from xboxController import CONTROLLER
 
 from mosaicPopupWindow import MOSAIC_POPUP_WINDOW
 from cameraCapture import CAMERA_CAPTURE
-
 
 class UI(QMainWindow):
     """
@@ -133,6 +135,63 @@ class UI(QMainWindow):
 
         QMainWindow.resizeEvent(self, event)
     
+    ##################################
+    ## CONFIGURATION FILE FUNCTIONS ##
+    ##################################
+    def configSetup(self):
+        """
+        PURPOSE
+
+        Calls function to read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
+        If no configuration file is found, the program will open with default settings. 
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # GET CONFIGURATION SETTINGS FROM CONFIG FILE
+        (configFileStatus,
+            self.data.configThrusterPosition,
+            self.data.configThrusterReverse, 
+            self.data.configActuatorLabelList,
+            self.data.configSensorSelectedType,
+            self.data.configDefaultCameraList,
+            self.data.configKeyBindings) = self.readConfigFile(self.data.fileName, 
+                                                                self.data.configThrusterPosition,
+                                                                self.data.configThrusterReverse, 
+                                                                self.data.configActuatorLabelList,
+                                                                self.data.configSensorSelectedType,
+                                                                self.data.configDefaultCameraList,
+                                                                self.data.configKeyBindings)       
+        
+        if configFileStatus == False:
+            self.printTerminal('Configuration file not found.')
+        else:
+            self.printTerminal('Configuration file settings applied.')
+        
+        #############################
+        ### APPLY SETTINGS TO GUI ###
+        #############################
+
+        # ADD KEYBINDING FOR SWITCHING CONTROL ORIENTATION
+        self.config.addKeyBinding("Switch Orientation", 0, True)
+        # UPDATE GUI WITH THRUSTER DATA
+        self.config.setThrustersNumber(self.data.configThrusterNumber, 
+                                        self.config_thruster_form,
+                                        self.data.configThrusterPosition,
+                                        self.data.configThrusterPositionList,
+                                        self.data.configThrusterReverse)
+        # UPDATE GUI WITH ACTUATOR DATA
+        self.config.setActuatorsNumber(True)  
+        # UPDATE GUI WITH SENSOR DATA
+        self.config.setSensorsNumber(True) 
+        # UPDATE GUI WITH ANALOG CAMERA DATA
+        self.config.setCamerasNumber(True) 
+
     def readConfigFile(self, fileName, 
                         thrusterPosition, 
                         thrusterReverse, 
@@ -245,9 +304,8 @@ class UI(QMainWindow):
                         keyBindings.append(self.data.configKeyBindingsList.index(control.text))     
 
         #############################
-        ######## RETURN DATA ########
+        ### RETURN EXTRACTED DATA ###
         #############################
-
         return (configFileStatus,
                 thrusterPosition,
                 thrusterReverse, 
@@ -255,59 +313,6 @@ class UI(QMainWindow):
                 sensorSelectedType,
                 defaultCameraList,
                 keyBindings)
-
-    def configSetup(self):
-        """
-        PURPOSE
-
-        Calls function to read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
-        If no configuration file is found, the program will open with default settings. 
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        # GET CONFIGURATION SETTINGS FROM CONFIG FILE
-        
-        (configFileStatus,
-            self.data.configThrusterPosition,
-            self.data.configThrusterReverse, 
-            self.data.configActuatorLabelList,
-            self.data.configSensorSelectedType,
-            self.data.configDefaultCameraList,
-            self.data.configKeyBindings) = self.readConfigFile(self.data.fileName, 
-                                                                self.data.configThrusterPosition,
-                                                                self.data.configThrusterReverse, 
-                                                                self.data.configActuatorLabelList,
-                                                                self.data.configSensorSelectedType,
-                                                                self.data.configDefaultCameraList,
-                                                                self.data.configKeyBindings)       
-        
-        if configFileStatus == False:
-            self.printTerminal('Configuration file not found.')
-        else:
-            self.printTerminal('Configuration file settings applied.')
-        
-        # APPLY SETTINGS TO GUI 
-
-        # ADD KEYBINDING FOR SWITCHING CONTROL ORIENTATION
-        self.config.addKeyBinding("Switch Orientation", 0, True)
-        # UPDATE GUI WITH THRUSTER DATA
-        self.config.setThrustersNumber(self.data.configThrusterNumber, 
-                                        self.config_thruster_form,
-                                        self.data.configThrusterPosition,
-                                        self.data.configThrusterPositionList,
-                                        self.data.configThrusterReverse)
-        # UPDATE GUI WITH ACTUATOR DATA
-        self.config.setActuatorsNumber(True)  
-        # UPDATE GUI WITH SENSOR DATA
-        self.config.setSensorsNumber(True) 
-        # UPDATE GUI WITH ANALOG CAMERA DATA
-        self.config.setCamerasNumber(True)                        
 
     def resetConfig(self, resetStatus):
         """
@@ -390,84 +395,9 @@ class UI(QMainWindow):
         if resetStatus == True:
             self.config.addKeyBinding("Switch Orientation", 0, False)
         
-    def applyGlow(self, widget, color, blurRadius):
-        """
-        PURPOSE
-
-        Applies a subtle underglow effect to a widget.
-
-        INPUT
-
-        - widget = pointer to the widget to apply the glow to.
-        - color = color to apply to the glow (HEX format)
-        - blueRadius = radius of the glow.
-
-        RETURNS
-
-        NONE
-        """
-        shadowEffect = QGraphicsDropShadowEffect()
-        shadowEffect.setBlurRadius(blurRadius)
-        shadowEffect.setColor(QColor(color))
-        shadowEffect.setXOffset(0)
-        shadowEffect.setYOffset(0)
-        # APPLY GLOW TO WIDGET
-        widget.setGraphicsEffect(shadowEffect)
-
-    def changeTheme(self, theme):
-        # APPLY DARK THEME
-        if theme:
-            # CREATE QPALETTE
-            darkPalette = QPalette()
-
-            darkPalette.setColor(QPalette.Window, QColor("#212121"))        # MAIN WINDOW BACKGROUND COLOR
-            darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
-            darkPalette.setColor(QPalette.Base,QColor("#616161"))           # TEXT ENTRY BACKGROUND COLOR
-            darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
-            darkPalette.setColor(QPalette.Button,QColor("#353535"))         # TAB BACKGROUND COLOR
-            darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR
-            
-            
-            # #darkPalette.setColor(darkPalette.BaseWindowText, Qt.white)
-            # darkPalette.setColor(darkPalette.Disabled, QPalette.WindowText, QColor(127,127,127))
-            # darkPalette.setColor(darkPalette.Base,QColor(42,42,42))
-            # darkPalette.setColor(darkPalette.AlternateBase,QColor(66,66,66))
-            # darkPalette.setColor(darkPalette.ToolTipBase,Qt.white)
-            # darkPalette.setColor(darkPalette.ToolTipText,Qt.white)
-            # darkPalette.setColor(darkPalette.Text,Qt.white)
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.Text,QColor(127,127,127))
-            # darkPalette.setColor(darkPalette.Dark,QColor(35,35,35))
-            # darkPalette.setColor(darkPalette.Shadow,QColor(20,20,20))
-            # #darkPalette.setColor(darkPalette.ButtonText,Qt.AA_CompressHighFrequencyEventswhite)
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.ButtonText,QColor(127,127,127))
-            # darkPalette.setColor(darkPalette.BrightText,Qt.red)
-            # darkPalette.setColor(darkPalette.Link,QColor(42,130,218))
-            # darkPalette.setColor(darkPalette.Highlight,QColor(42,130,218))
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.Highlight,QColor(80,80,80))
-            # darkPalette.setColor(darkPalette.HighlightedText,Qt.white)
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.HighlightedText,QColor(127,127,127))
-
-            # APPLY CUSTOM COLOR PALETTE
-            self.app.setPalette(darkPalette)
-            
-        # APPLY DEFAULT THEME
-        else:
-            self.app.setPalette(self.app.style().standardPalette())
-            
-    def printTerminal(self, text):
-        """
-        PURPOSE
-
-        Prints text to the serial terminal on the configuration tab.
-
-        INPUT
-        
-        - text = the text to display on the serial terminal
-        """
-        time = datetime.now().strftime("%H:%M:%S")
-        string = time + " -> " + str(text)
-        self.config_terminal.appendPlainText(str(string))
-
+    #################################
+    ##### GUI LINKING FUNCTIONS #####
+    #################################
     def linkControlPanelWidgets(self):
         """
         PURPOSE
@@ -557,8 +487,8 @@ class UI(QMainWindow):
         # CREATE KEYBINDING FOR ACTUATOR
         self.config.addKeyBinding("Switch Orientation", 0, False)
 
-        # CREATE DISPLAY FOR CONTROLLER INPUTS
-        self.config.setControllerValuesDisplay()
+        # CREATE INDICATORS FOR CONTROLLER VALUES
+        self.controller.setupControllerValuesDisplay(self.config_controller_form)
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MANU TO THE SAME SLOT, PASSING THE CAMERA ID AS 1,2,3,4 ETC.
         self.config_camera_1_list.activated.connect(lambda index, camera = 0: self.config.changeDefaultCameras(index, camera))
@@ -587,6 +517,9 @@ class UI(QMainWindow):
         self.toolbar_open_github.triggered.connect(self.toolbar.openGitHub)
         self.toolbar_toggle_theme.triggered.connect(self.toolbar.toggleTheme)
 
+    #############################
+    ### CAMERA FEED FUNCTIONS ###
+    #############################
     def initiateCameraFeed(self):
         """
         PURPOSE
@@ -675,6 +608,87 @@ class UI(QMainWindow):
         pixmap = QPixmap.fromImage(frame)
         pixmap = pixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
         self.secondary_camera_2.setPixmap(pixmap)
+
+    ###########################
+    ##### OTHER FUNCTIONS #####
+    ###########################
+    def applyGlow(self, widget, color, blurRadius):
+        """
+        PURPOSE
+
+        Applies a subtle underglow effect to a widget.
+
+        INPUT
+
+        - widget = pointer to the widget to apply the glow to.
+        - color = color to apply to the glow (HEX format)
+        - blueRadius = radius of the glow.
+
+        RETURNS
+
+        NONE
+        """
+        shadowEffect = QGraphicsDropShadowEffect()
+        shadowEffect.setBlurRadius(blurRadius)
+        shadowEffect.setColor(QColor(color))
+        shadowEffect.setXOffset(0)
+        shadowEffect.setYOffset(0)
+        # APPLY GLOW TO WIDGET
+        widget.setGraphicsEffect(shadowEffect)
+
+    def changeTheme(self, theme):
+        # APPLY DARK THEME
+        if theme:
+            # CREATE QPALETTE
+            darkPalette = QPalette()
+
+            darkPalette.setColor(QPalette.Window, QColor("#212121"))        # MAIN WINDOW BACKGROUND COLOR
+            darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
+            darkPalette.setColor(QPalette.Base,QColor("#616161"))           # TEXT ENTRY BACKGROUND COLOR
+            darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
+            darkPalette.setColor(QPalette.Button,QColor("#353535"))         # TAB BACKGROUND COLOR
+            darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR
+            
+            
+            # #darkPalette.setColor(darkPalette.BaseWindowText, Qt.white)
+            # darkPalette.setColor(darkPalette.Disabled, QPalette.WindowText, QColor(127,127,127))
+            # darkPalette.setColor(darkPalette.Base,QColor(42,42,42))
+            # darkPalette.setColor(darkPalette.AlternateBase,QColor(66,66,66))
+            # darkPalette.setColor(darkPalette.ToolTipBase,Qt.white)
+            # darkPalette.setColor(darkPalette.ToolTipText,Qt.white)
+            # darkPalette.setColor(darkPalette.Text,Qt.white)
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.Text,QColor(127,127,127))
+            # darkPalette.setColor(darkPalette.Dark,QColor(35,35,35))
+            # darkPalette.setColor(darkPalette.Shadow,QColor(20,20,20))
+            # #darkPalette.setColor(darkPalette.ButtonText,Qt.AA_CompressHighFrequencyEventswhite)
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.ButtonText,QColor(127,127,127))
+            # darkPalette.setColor(darkPalette.BrightText,Qt.red)
+            # darkPalette.setColor(darkPalette.Link,QColor(42,130,218))
+            # darkPalette.setColor(darkPalette.Highlight,QColor(42,130,218))
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.Highlight,QColor(80,80,80))
+            # darkPalette.setColor(darkPalette.HighlightedText,Qt.white)
+            # darkPalette.setColor(darkPalette.Disabled,QPalette.HighlightedText,QColor(127,127,127))
+
+            # APPLY CUSTOM COLOR PALETTE
+            self.app.setPalette(darkPalette)
+            
+        # APPLY DEFAULT THEME
+        else:
+            self.app.setPalette(self.app.style().standardPalette())
+            
+    def printTerminal(self, text):
+        """
+        PURPOSE
+
+        Prints text to the serial terminal on the configuration tab.
+
+        INPUT
+        
+        - text = the text to display on the serial terminal
+        """
+        time = datetime.now().strftime("%H:%M:%S")
+        string = time + " -> " + str(text)
+        self.config_terminal.appendPlainText(str(string))
 
 class CONTROL_PANEL():
     """
@@ -768,6 +782,9 @@ class CONTROL_PANEL():
                 self.rov.disconnect()
             self.data.rovCommsStatus = False
 
+    ############################
+    ### CONTROLLER FUNCTIONS ###
+    ############################
     def controllerConnect(self):
         """
         PURPOSE
@@ -789,17 +806,14 @@ class CONTROL_PANEL():
             self.ui.config_controller_connect.setText('DISCONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.blueStyle)
             self.ui.config_controller_connect.setStyleSheet(self.data.blueStyle)
+            
             # INITIATE COMMUNICATION WITH THE CONTROLLER
-            
-            # SERIAL LIBRARY
-            self.controller.initialiseConnection(self.data.controllerCOMPort)
-            
-            connectionStatus, controllerNumber, message = self.initiateController()
+            connectionStatus, controllerNumber, message = self.controller.findController("Controller (Xbox One For Windows)")
             self.ui.printTerminal(message)
             
             if connectionStatus == True:
-                # READ CONTROLLER INPUTS IN A TIMED THREAD
-                self.controllerEventLoop(controllerNumber)
+                # READ CONTROLLER INPUTS IN A TIMED THREAD, RETURN VALUES TO PROCESSING FUNCTIONS
+                self.controller.startControllerEventLoop(controllerNumber, self.processButtons, self.processJoysticks)
             else:
                 self.controllerConnect()
         else:
@@ -807,96 +821,35 @@ class CONTROL_PANEL():
             self.ui.control_controller_connect.setText('CONNECT')
             self.ui.config_controller_connect.setText('CONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue)  
-            self.ui.config_controller_connect.setStyleSheet(self.data.defaultBlue)  
-
-    def initiateController(self):
-        """
-        PURPOSE
-
-        Initiates the PyGame library and any connected controllers.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        - connectionStatus = true if the correct controller is found.
-        - controllerNumber = index of the connected controller from the list of available controllers.
-        - message = status message
-        """
-
-        connectionStatus = False
-        controllerNumber = 0
-
-        # INITIALISE PYGAME MODULE (JOYSTICK IS AUTOMATICALLY INITIATED)
-        init()
-
-        # GET NUMBER OF JOYSTICKS CONNECTED
-        joystick_count = get_count()
-
-        # THROW ERROR IS NO CONTROLLERS ARE DETECTED
-        if joystick_count < 1:
-            message = 'No Controllers Found.'
-            connectionStatus = False
+            self.ui.config_controller_connect.setStyleSheet(self.data.defaultBlue)
+            # STOP UPDATING CONTROLLER VALUES  
+            self.controller.stopControllerEventLoop()
+            # UNINITIALISE JOYSTICK MODULE
             quit()
 
-        else:
-            for i in range(joystick_count):
-                joystick = Joystick(i)
-                joystick.init()
-                # GET NAME OF CONTROLLER/JOYSTICK FROM OS
-                name = joystick.get_name()
-            
-                # ONLY ACCEPT XBOX ONE CONTROLLER
-                if name == 'Controller (Xbox One For Windows)':
-                    connectionStatus = True
-                    controllerNumber = i
-                    message = 'Connected to controller.'
-
-        return connectionStatus, controllerNumber, message
-
-    def processButtons(self, buttonStates, arrowStates):
+    def processButtons(self, buttonStates):
         """
         PURPOSE
-
+        
         Analyses the states of all the buttons.
         If a button has been pressed, the corresponding control that the button is binded to is toggled.
 
         INPUT
 
-        - buttonStates = an array containing the states of all the controller buttons (0 or 1).
-        - arrowSTates = and array containing the states of the arrow buttons (-1, 0 or 1).
+        NONE
 
         RETURNS
 
-        -filteredButtonStates = an array containing the button states with the arrow button states added onto the end.
-
         NONE
         """
-        # APPEND ARROW BUTTONS ONTO THE END OF BUTTONSTATES ARRAY
-        for i in arrowStates:
-            if i == -1:
-                # LEFT OR DOWN PRESSED
-                buttonStates.append(1)
-                buttonStates.append(0)
-            elif i == 1:
-                # RIGHT OR UP PRESSED
-                buttonStates.append(0)
-                buttonStates.append(1)
-            else:
-                buttonStates.append(0)
-                buttonStates.append(0)
-
-        # STORE BUTTON STATES IN DATABASE FOR ACCESS BY OTHER FUNCTIONS
         self.data.configButtonStates = buttonStates
 
         for index, button in enumerate(buttonStates):
             # IF BUTTON IS PRESSED
             if button == 1:
-                # FIND WHICH BUTTON HAS BEEN PRESSED
+                # FIND THE NAME OF THE BUTTON THAT HAS BEEN PRESSED ('A', 'B' ETC.)
                 whichButton = self.data.configControllerButtons[index]
-                # FIND THE INDEX ON THE KEYBINDINGS MENU THAT CORRESPONDS TO THAT BUTTON
+                # FIND THE BUTTONS INDEX ON THE KEYBINDINGS MENU
                 whichMenuIndex = self.data.configKeyBindingsList.index(whichButton)
                 # FIND WHICH ACTUATOR USES THAT KEYBINDING
                 try:
@@ -905,11 +858,12 @@ class CONTROL_PANEL():
                 except:
                     buttonExists = False
 
-                # IF BUTTON IS ASSIGNED IN THE PROGRAM AND HAS PREVIOUSLY BEEN RELEASED
+                # IF KEYBINDING EXISTS AND HAS PREVIOUSLY BEEN RELEASED
                 if buttonExists == True & self.data.configControllerButtonReleased[index] == True:
-                    # PREVENT TOGGLING BEING ACTUATED AGAIN UNTIL THE BUTTON IS RELEASED
+                    # PREVENT ACTUATOR BEING TOGGLED AGAIN UNTILL BUTTON IS RELEASED
                     self.data.configControllerButtonReleased[index] = False
-                    # IF ROV CONTROL ORIENTATION IS BEING TOGGLED
+                    
+                    # IF ROV CONTROL ORIENTATION IS BEING TOGGLED (SPECIAL CASE)
                     if whichControl == 0:
                         self.switchControlDirection()
                     
@@ -918,39 +872,26 @@ class CONTROL_PANEL():
                         # FIND POINTER TO THE BUTTON WIDGET CORRESPONDING TO THE ACTUATOR
                         widget = self.ui.control_panel_actuators.itemAt((2*whichControl)-1).widget()
                         # TOGGLES ACTUATORS AND CHANGES APPEARANCE OF GUI BUTTON
-                        self.toggleActuator(whichControl - 1, widget)
+                        self.changeActuators(whichControl - 1, widget)
             
             # WAIT FOR BUTTON TO BE RELEASED
             else:
                 self.data.configControllerButtonReleased[index] = True
-
-        return buttonStates
-
+        
     def processJoysticks(self, joystickValues):
         """
         PURPOSE
-        -Analyses the values of all the joysticks.
-        -Rounds their values to 1 decimal place.
-        -Adds dead zone.
+
+        Calculates the required speed of each thruster on the ROV to move a certain direction.
 
         INPUT
-
-        - joystickValues = an array containing the values of all the joysticks (-1 -> 1).
+        - joystickValues = an array containing the filtered values of all the joysticks (-1 -> 1).
 
         RETURNS
-
-        NONE
+        - motorSpeeds = array containing the speed of each thruster
         """
-        # ADD DEADZONE OF 0.1
-        joystickValues = [0 if (number < 0.1 and number > -0.1) else number for number in joystickValues]
-        # ROUND TO 1 DECIMAL PLACE
-        joystickValues = [round(number, 1) for number in joystickValues]
-        
-        # RUN THRUSTER VECTOR CONTROL ALGORITHM
-        self.thrusterVectorAlgorithm(joystickValues)
+        self.changeThrusters()
 
-        return(joystickValues)
-        
     def controllerEventLoop(self, controllerNumber):
         """
         PURPOSE
@@ -983,106 +924,179 @@ class CONTROL_PANEL():
         thread.daemon = True                            
         thread.start()
 
-    def getControllerInputs(self, connectionStatus, controllerNumber):
+    ###########################
+    ## ROV CONTROL FUNCTIONS ##
+    ###########################
+    def changeActuators(self, actuator, buttonObject):
         """
         PURPOSE
 
-        Gets a single readings of all the button and joystick values from the controller.
+        Sends commmand to ROV when an actuator has been toggled.
 
         INPUT
 
-        - connectionStatus = False to disconnect the controller and close the thread.
-        - controllerNumber = index of the connected controller from the list of available controllers.
+        - _ = Not used.
+        - actuator = the actuator being toggled.
+        - buttonObject = pointer to the button widget (Allowed appearance to be modified)
 
         RETURNS
 
-        - buttonStates = an array containing the states of all the controller buttons (0 or 1).
-        - joystickValues = an array containing the values of all the joysticks (-1 -> 1).
+        NONE
         """
-        # STORES THE STATE OF EACH BUTTON
-        buttonStates = []
-        # STORES THE VALUES OF EACH JOYSTICK
-        joystickValues = []
+        if self.data.controlActuatorStates[actuator] == False:
+            buttonObject.setText(self.data.configActuatorLabelList[actuator][2])
+            buttonObject.setStyleSheet(self.data.redStyle)
+            self.data.controlActuatorStates[actuator] = True
+            #self.rov.setActuators(actuator, True)
 
-        if connectionStatus == True:
-            # GET CONTROLLER EVENTS
-            get()
+        elif self.data.controlActuatorStates[actuator] == True:
+            buttonObject.setText(self.data.configActuatorLabelList[actuator][1])
+            buttonObject.setStyleSheet(self.data.greenStyle)
+            self.data.controlActuatorStates[actuator] = False
+            #self.rov.setActuators(actuator, False)
 
-            # INITIATE CONNECTED CONTROLLER
-            joystick = Joystick(controllerNumber)
-            joystick.init()
+        # SEND COMMANDS TO ROV
+        self.setActuators(self.data.controlActuatorStates)
 
-            # GET NUMBER OF VARIABLE JOYSTICK AXES
-            axes = joystick.get_numaxes()
-            
-            # GET VALUES OF EACH VARIABLE AXES
-            for i in range(axes):
-                axis = joystick.get_axis(i)
-                joystickValues.append(axis)
-
-            # GET NUMBER OF BUTTONS
-            buttons = joystick.get_numbuttons()
-
-            # GET STATE OF EACH BUTTON
-            for i in range(buttons):
-                button = joystick.get_button(i)
-                buttonStates.append(button)
-                            
-            # GET NUMBER OF ARROW BUTTONS
-            arrows = joystick.get_numhats()
-
-                # GET STATE OF EACH ARROW BUTTONS
-            for i in range(arrows):
-                arrowStates = joystick.get_hat(i)
-
-        # DISCONNECT CONTROLLER AND EXIT THREAD IF DISCONNECT BUTTON HAS BEEN PRESSED
-        if connectionStatus == False:
-            self.ui.printTerminal('Controller Disconnected.')
-            quit()
-            exit()
-
-        # RETURN ARRAY OF BUTTON STATES AND JOYSTICK VALUES
-        return(buttonStates, arrowStates, joystickValues)
-
-    def thrusterVectorAlgorithm(self, joystickValues):
+    def changeThrusters(self):
         """
         PURPOSE
 
-        Calculates the required speed of each thruster on the ROV to move a certain direction.
+        Sends commmand to ROV with thruster speeds.
 
         INPUT
-        - joystickValues = an array containing the filtered values of all the joysticks (-1 -> 1).
+
+        NONE
 
         RETURNS
-        - motorSpeeds = array containing the speed of each thruster
+
+        NONE
         """
         pass
 
-    def updateControllerValuesDisplay(self, buttonStates, joystickValues):
+    def switchControlDirection(self):
         """
         PURPOSE
 
-        Updates the text fields on the configuration tab with the latest controller button states and joystick values.
+        Changes the control orientation of the ROV, to allow easy maneuvering in reverse.
 
         INPUT
 
-        - buttonStates = an array containing the states of all the controller buttons (0 or 1).
-        - joystickValues = an array containing the values of all the joysticks (-1 -> 1).
+        NONE
 
         RETURNS
-        
+
         NONE
         """
-        # UPDATE JOYSTICK VALUES
-        for index in range(5):
-            self.data.configControllerLabelObjects[index].setText(str(joystickValues[index]))
-            #self.ui.config_controller_form.itemAt((2*index)+1).widget().setText(str(joystickValues[index]))
+        if self.data.controlControlDirection == True:
+            self.data.controlControlDirection = False
+            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textDisabledStyle)
+            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textGreenStyle)
+        else:
+            self.data.controlControlDirection = True
+            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
+            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
 
-        # UPDATE BUTTON STATES
-        for index in range(5,19):
-            self.data.configControllerLabelObjects[index].setText(str(buttonStates[index - 5]))
-            #self.ui.config_controller_form.itemAt((2*index)+1).widget().setText(str(buttonStates[index - 5]))
+    ###########################
+    ##### TIMER FUNCTIONS #####
+    ###########################
+    def readSystemTime(self):
+        """
+        PURPOSE
 
+        Reads the system time in a new thread and calculates the number of seconds elapsed since the timer was started.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # CALCULATE SECONDS ELAPSED SINCE TIMER STARTED 
+        currentTime = datetime.now()
+        currentSeconds = (currentTime - self.startTime).total_seconds() + self.data.controlTimerMem
+        self.updateTimer(currentSeconds)
+    
+        # READ SYSTEM TIME EVERY 1 SECOND (TO REDUCE CPU USAGE)
+        thread = Timer(0.5,self.readSystemTime)
+        thread.daemon = True                            
+        thread.start()
+        
+        # STOP THREAD IF STOP BUTTON CLICKED
+        if self.data.controlTimerEnabled == False:
+            thread.cancel()
+            self.data.controlTimerMem = currentSeconds
+
+    def toggleTimer(self):
+        """
+        PURPOSE
+
+        Starts/Stops the timer.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        if self.data.controlTimerEnabled == False:
+            self.data.controlTimerEnabled = True
+            self.ui.control_timer_start.setText('Stop')
+            self.ui.control_timer_start.setStyleSheet(self.data.redStyle)
+            self.startTime = datetime.now()
+            # START TIMER
+            self.readSystemTime()
+        else:
+            self.data.controlTimerEnabled = False
+            self.ui.control_timer_start.setText('Start')
+            self.ui.control_timer_start.setStyleSheet(self.data.greenStyle)
+
+    def resetTimer(self):
+        """
+        PURPOSE
+
+        Resets the timer back to zero if the timer is stopped.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        if self.data.controlTimerEnabled == False:
+            self.data.controlTimerMem = 0
+            self.updateTimer(0)
+
+    def updateTimer(self, currentSeconds):
+        """
+        PURPOSE
+
+        Converts seconds into DD:HH:MM:SS format and updates the timer widget on the GUI.
+
+        INPUT
+
+        - currentSeconds = the number of seconds since the timer was started.
+
+        RETURNS
+
+        NONE
+        """
+        # CONVERT SECONDS TO DD:HH:MM:SS
+        minutes, seconds = divmod(currentSeconds,60)
+        hours, minutes = divmod(minutes, 60)
+        days, hours = divmod(hours, 24)
+        # DISPLAY TIME SINCE MEASUREMENT START
+        self.ui.control_timer.display('%02d:%02d:%02d:%02d' % (days, hours, minutes, seconds))
+
+    ###########################
+    ##### OTHER FUNCTIONS #####
+    ###########################
     def getSensorReadings(self):
         """
         PURPOSE
@@ -1135,154 +1149,6 @@ class CONTROL_PANEL():
         
         # STORE WHICH CAMERA HAS BEEN SELECTED FOR EACH FEED
         self.data.controlCameraViewList[display] = camera
-
-    def toggleActuator(self, actuator, buttonObject):
-        """
-        PURPOSE
-
-        Sends commmand to ROV when an actuator has been toggled.
-
-        INPUT
-
-        - _ = Not used.
-        - actuator = the actuator being toggled.
-        - buttonObject = pointer to the button widget (Allowed appearance to be modified)
-
-        RETURNS
-
-        NONE
-        """
-        if self.data.controlActuatorStates[actuator] == False:
-            buttonObject.setText(self.data.configActuatorLabelList[actuator][2])
-            buttonObject.setStyleSheet(self.data.redStyle)
-            self.data.controlActuatorStates[actuator] = True
-            #self.rov.setActuators(actuator, True)
-
-        elif self.data.controlActuatorStates[actuator] == True:
-            buttonObject.setText(self.data.configActuatorLabelList[actuator][1])
-            buttonObject.setStyleSheet(self.data.greenStyle)
-            self.data.controlActuatorStates[actuator] = False
-            #self.rov.setActuators(actuator, False)
-
-        # SEND COMMANDS TO ROV
-        self.setActuators(self.data.controlActuatorStates)
-
-    def toggleTimer(self):
-        """
-        PURPOSE
-
-        Starts/Stops the timer.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        if self.data.controlTimerEnabled == False:
-            self.data.controlTimerEnabled = True
-            self.ui.control_timer_start.setText('Stop')
-            self.ui.control_timer_start.setStyleSheet(self.data.redStyle)
-            self.startTime = datetime.now()
-            # START TIMER
-            self.readSystemTime()
-        else:
-            self.data.controlTimerEnabled = False
-            self.ui.control_timer_start.setText('Start')
-            self.ui.control_timer_start.setStyleSheet(self.data.greenStyle)
-    
-    def switchControlDirection(self):
-        """
-        PURPOSE
-
-        Changes the control orientation of the ROV, to allow easy maneuvering in reverse.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        if self.data.controlControlDirection == True:
-            self.data.controlControlDirection = False
-            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textDisabledStyle)
-            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textGreenStyle)
-        else:
-            self.data.controlControlDirection = True
-            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
-            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
-
-    def resetTimer(self):
-        """
-        PURPOSE
-
-        Resets the timer back to zero if the timer is stopped.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        if self.data.controlTimerEnabled == False:
-            self.data.controlTimerMem = 0
-            self.updateTimer(0)
-
-    def readSystemTime(self):
-        """
-        PURPOSE
-
-        Reads the system time in a new thread and calculates the number of seconds elapsed since the timer was started.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        # CALCULATE SECONDS ELAPSED SINCE TIMER STARTED 
-        currentTime = datetime.now()
-        currentSeconds = (currentTime - self.startTime).total_seconds() + self.data.controlTimerMem
-        self.updateTimer(currentSeconds)
-    
-        # READ SYSTEM TIME EVERY 1 SECOND (TO REDUCE CPU USAGE)
-        thread = Timer(0.5,self.readSystemTime)
-        thread.daemon = True                            
-        thread.start()
-        
-        # STOP THREAD IF STOP BUTTON CLICKED
-        if self.data.controlTimerEnabled == False:
-            thread.cancel()
-            self.data.controlTimerMem = currentSeconds
-
-    def updateTimer(self, currentSeconds):
-        """
-        PURPOSE
-
-        Converts seconds into DD:HH:MM:SS format and updates the timer widget on the GUI.
-
-        INPUT
-
-        - currentSeconds = the number of seconds since the timer was started.
-
-        RETURNS
-
-        NONE
-        """
-        # CONVERT SECONDS TO DD:HH:MM:SS
-        minutes, seconds = divmod(currentSeconds,60)
-        hours, minutes = divmod(minutes, 60)
-        days, hours = divmod(hours, 24)
-        # DISPLAY TIME SINCE MEASUREMENT START
-        self.ui.control_timer.display('%02d:%02d:%02d:%02d' % (days, hours, minutes, seconds))
 
     ##############################
     #### SERIAL LIBRARY MOCKS ####
@@ -1495,7 +1361,6 @@ class CONTROL_PANEL():
     ###############################
     #### COMPUTER VISION TASKS ####
     ###############################
-
     def popupMosaicTask(self):
         self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.data)
 
@@ -1531,6 +1396,9 @@ class CONFIG():
         self.rov = Object4
         self.controller = Object5
 
+    ##########################
+    ##### COMMS SETTINGS #####
+    ##########################
     def changeComPort(self, index):
         """
         PURPOSE
@@ -1564,6 +1432,9 @@ class CONFIG():
         availableComPorts, rovComPort, identity = self.control.findComPorts(self.ui.config_com_port_list, self.data.rovCommsStatus, 115200, 'AVALONROV')
         self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts))) 
 
+    #########################
+    ### THRUSTER SETTINGS ###
+    #########################
     def setThrustersNumber(self, thrusterNumber, thrusterLayout, thrusterPosition, thrusterPositionList, thrusterReverse):
         """
         PURPOSE
@@ -1617,58 +1488,6 @@ class CONFIG():
             thrusterReverseCheck.toggled.connect(lambda index, thruster = thruster, setting = 1, controlObject = thrusterReverseCheck: self.setROVThrusterSettings(index, thruster, setting, controlObject))
             thrusterTest.clicked.connect(lambda index, thruster = thruster, setting = 2, controlObject= None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
 
-    def setControllerValuesDisplay(self):
-        """
-        PURPOSE
-
-        Adds a list of text box's on the configuration tab for each button/joystick to show their current values.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        # NAMES OF JOYSTICK AXES
-        joystickLabels = ['Left X', 'Left Y','Triggers', 'Right Y', 'Right X']
-        buttonLabels = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
-        
-        # CREATE DISPLAY FOR JOYSTICKS
-        for index in range(5):
-            # CREATE JOYSTICK LABEL
-            label = QLabel(joystickLabels[index])
-            label.setStyleSheet("font-weight: bold;")
-            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            # CREATE TEXT BOX TO DISPLAY VALUE
-            value = QLineEdit()
-            value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            value.setReadOnly(True)
-
-            # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
-            self.data.configControllerLabelObjects.append(value)
-
-            # ADD TO FORM LAYOUT
-            self.ui.config_controller_form.addRow(label, value)
-
-        # CREATE DISPLAY FOR BUTTONS
-        for index in range(14):
-            # CREATE BUTTON LABEL
-            label = QLabel(buttonLabels[index])
-            label.setStyleSheet("font-weight: bold;")
-            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            # CREATE TEXT BOX TO DISPLAY VALUE
-            value = QLineEdit()
-            value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            value.setReadOnly(True)
-
-            # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
-            self.data.configControllerLabelObjects.append(value)
-
-            # ADD TO FORM LAYOUT
-            self.ui.config_controller_form.addRow(label, value)
-
     def setROVThrusterSettings(self, index, thruster, setting, controlObject):
         """
         PURPOSE
@@ -1709,6 +1528,9 @@ class CONFIG():
         if setting == 2:
             pass  
 
+    #########################
+    ### ACTUATOR SETTINGS ###
+    #########################
     def setActuatorsNumber(self, configStatus):
         """
         PURPOSE
@@ -1840,6 +1662,9 @@ class CONFIG():
             if self.data.controlActuatorStates[actuator] == True:
                 controlObject.setText(text)  
 
+    #########################
+    #### SENSOR SETTINGS ####
+    #########################
     def setSensorsNumber(self, configStatus):
         """
         PURPOSE
@@ -1920,6 +1745,9 @@ class CONFIG():
         sensorLabel.setText(self.data.configSensorTypeList[index])
         self.data.configSensorSelectedType[sensor - 1] = index
 
+    #########################
+    #### CAMERA SETTINGS ####
+    #########################
     def setCamerasNumber(self, configStatus):
         """
         PURPOSE
@@ -2003,6 +1831,9 @@ class CONFIG():
         if camera == 3:
             self.ui.control_camera_4_list.setCurrentIndex(self.data.configDefaultCameraList[3]) 
 
+    #########################
+    # KEY BINDING FUNCTIONS #
+    #########################
     def addKeyBinding(self, label, index, configStatus):
         """
         PURPOSE
@@ -2066,6 +1897,37 @@ class CONFIG():
         self.ui.config_keybindings_form.removeRow(index)
         del self.data.configKeyBindings[index]
 
+    def setKeyBindings(self, binding, index):
+        """
+        PURPOSE
+
+        Sets the keybinding for a specific control on the ROV. 
+        The keybinding can be selected from a menu, or detected by pressing a button on the controller.
+
+        INPUT
+         
+        - binding = menu index selected.
+        - index = the ROV control having its key binding changed.
+
+        RETURNS 
+
+        NONE
+        """
+        self.data.configKeyBindings[index] = binding
+
+        # PREVENT BINDING BEING ASSOCIATED WITH MULTIPLE CONTROLS
+        for i, item in enumerate(self.data.configKeyBindings):
+            # CHECK IF BINDING ALREADY EXISTS
+            if i != index:
+                if item == binding:
+                    # SET BINDING TO NONE
+                    self.data.configKeyBindings[i] = 0
+                    # FIND BINDING MENU WIDGET
+                    layout = self.ui.config_keybindings_form.itemAt((2 * i) + 1).layout()
+                    widget = layout.itemAt(0).widget()
+                    # SET SELECTED MENU ITEM TO NONE
+                    widget.setCurrentIndex(0)
+
     def autoKeyBinding(self, bindingFound, binding, index, buttonObject, menuObject):
         """
         PURPOSE
@@ -2085,7 +1947,6 @@ class CONFIG():
 
         NONE
         """
-
         if bindingFound == False:
             # CHANGE BUTTON STYLE
             buttonObject.setStyleSheet(self.data.blueStyle)
@@ -2138,36 +1999,6 @@ class CONFIG():
         thread = Timer(1/60, lambda index = index, buttonObject = buttonObject, menuObject = menuObject: self.findKeyBinding(index, buttonObject, menuObject, startTime))
         thread.daemon = True                            
         thread.start()
-
-    def setKeyBindings(self, binding, index):
-        """
-        PURPOSE
-
-        Sets the keybinding for a specific control on the ROV. 
-        The keybinding can be selected from a menu, or detected by pressing a button on the controller.
-
-        INPUT
-         
-        binding = menu index selected.
-        index = the ROV control having its key binding changed.
-
-        RETURNS 
-
-        NONE
-        """
-        self.data.configKeyBindings[index] = binding
-
-        # PREVENT BINDING BEING ASSOCIATED WITH MULTIPLE CONTROLS
-        for i, item in enumerate(self.data.configKeyBindings):
-            # CHECK IF BINDING ALREADY EXISTS
-            if item == binding and i != index:
-                # SET BINDING TO NONE
-                self.data.configKeyBindings[index] = 0
-                # FIND BINDING MENU WIDGET
-                layout = self.ui.config_keybindings_form.itemAt((2 * i) + 1).layout()
-                widget = layout.itemAt(0).widget()
-                # SET SELECTED MENU ITEM TO NONE
-                widget.setCurrentIndex(0)
 
 class TOOLBAR():
     """

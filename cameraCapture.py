@@ -37,7 +37,7 @@ class VIEW(QWidget):
         NONE
         """
         pixmap = QPixmap.fromImage(frame)
-        pixmap = pixmap.scaledToHeight(300)
+        pixmap = pixmap.scaledToHeight(600)
         self.view.setPixmap(pixmap)
     
 class CAMERA_CAPTURE(QThread):
@@ -54,7 +54,7 @@ class CAMERA_CAPTURE(QThread):
         cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
         cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
         cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
-        
+
         while True:
             # CAPTURE FRAME
             status, frame = cameraFeed.read()
@@ -72,6 +72,9 @@ class CAMERA_CAPTURE(QThread):
             
             else:
                 self.cameraNewFrameSignal.emit(QImage("graphics/no_signal.png"))
+
+    def exit(self):
+        self.timer.stop()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
