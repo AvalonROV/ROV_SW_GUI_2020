@@ -21,7 +21,7 @@ class VIEW(QWidget):
         camThread.start()
         self.show()
         
-    @pyqtSlot(QImage)
+    @pyqtSlot(QPixmap)
     def updateCameraFeed(self, frame):
         """
         PURPOSE
@@ -30,19 +30,18 @@ class VIEW(QWidget):
 
         INPUT
 
-        - frame = QImage containing the new frame captures from the camera.
+        - frame = QPixmap containing the new frame captures from the camera.
 
         RETURNS
 
         NONE
         """
-        pixmap = QPixmap.fromImage(frame)
-        pixmap = pixmap.scaledToHeight(600)
+        pixmap = frame.scaledToHeight(600)
         self.view.setPixmap(pixmap)
     
 class CAMERA_CAPTURE(QThread):
     # CREATE SIGNAL
-    cameraNewFrameSignal = pyqtSignal(QImage)
+    cameraNewFrameSignal = pyqtSignal(QPixmap)
 
     def __init__(self, channel):
         QThread.__init__(self)
@@ -55,9 +54,12 @@ class CAMERA_CAPTURE(QThread):
         cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
         cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
 
-        while True:
+        while True:    
             # CAPTURE FRAME
             status, frame = cameraFeed.read()
+
+            if self.currentThread().isInterruptionRequested():
+                print("NEED TO EXIT")
         
             # IF FRAME IS CAPTURED            
             if status:
@@ -65,8 +67,10 @@ class CAMERA_CAPTURE(QThread):
                 cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
                 # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
                 height, width, _ = cameraFrame.shape
-                # CONVERT TO QIMAGE
+                # GENERATE QIMAGE
                 cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
+                # CONVERT TO PIXMAP
+                cameraFrame = QPixmap.fromImage(cameraFrame)
                 # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
                 self.cameraNewFrameSignal.emit(cameraFrame)
             
@@ -74,7 +78,7 @@ class CAMERA_CAPTURE(QThread):
                 self.cameraNewFrameSignal.emit(QImage("graphics/no_signal.png"))
 
     def exit(self):
-        self.timer.stop()
+        print("EXIT")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

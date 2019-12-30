@@ -5,7 +5,7 @@
 # PYQT5 MODULES
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
+from PyQt5.QtWidgets import (QGroupBox, QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
                             QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, 
                             QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
                             QFileDialog, QGraphicsDropShadowEffect)
@@ -114,8 +114,10 @@ class UI(QMainWindow):
         self.resizeEvent(QResizeEvent(self.size(), QSize()))
 
         # SLIDING ANIMATION FOR SWITCHING BETWEEN CONTROL AND CONFIGURATION TABS
-        self.slideAnimation = SLIDE_ANIMATION(self.gui_view_widget)
-        self.slideAnimation.setSpeed(500)
+        #self.slideAnimation = SLIDE_ANIMATION(self.gui_view_widget)
+        #self.slideAnimation.setSpeed(500)
+
+        #self.vision
 
         # INITIALISE UI
         self.showMaximized()
@@ -141,12 +143,14 @@ class UI(QMainWindow):
         """
         # GET CONFIGURATION SETTINGS FROM CONFIG FILE
         (configFileStatus,
+            self.data.programTheme,
             self.data.configThrusterPosition,
             self.data.configThrusterReverse, 
             self.data.configActuatorLabelList,
             self.data.configSensorSelectedType,
             self.data.configDefaultCameraList,
             self.data.configKeyBindings) = self.readConfigFile(self.data.fileName, 
+                                                                self.data.programTheme,
                                                                 self.data.configThrusterPosition,
                                                                 self.data.configThrusterReverse, 
                                                                 self.data.configActuatorLabelList,
@@ -163,6 +167,9 @@ class UI(QMainWindow):
         ### APPLY SETTINGS TO GUI ###
         #############################
 
+        # APPLY THEME
+        self.changeTheme(self.data.programTheme)
+
         # ADD KEYBINDING FOR SWITCHING CONTROL ORIENTATION
         self.config.addKeyBinding("Switch Orientation", 0, True)
         # UPDATE GUI WITH THRUSTER DATA
@@ -178,7 +185,8 @@ class UI(QMainWindow):
         # UPDATE GUI WITH ANALOG CAMERA DATA
         self.config.setCamerasNumber(True) 
 
-    def readConfigFile(self, fileName, 
+    def readConfigFile(self, fileName,
+                        theme, 
                         thrusterPosition, 
                         thrusterReverse, 
                         actuatorLabelList, 
@@ -225,6 +233,10 @@ class UI(QMainWindow):
             root = configFile.getroot()
 
             for child in root:
+
+                if child.tag == 'theme':
+                    theme = True if child.text == "dark" else False
+
                 ##############################
                 ### READ THRUSTER SETTINGS ###
                 ##############################
@@ -293,6 +305,7 @@ class UI(QMainWindow):
         ### RETURN EXTRACTED DATA ###
         #############################
         return (configFileStatus,
+                theme,
                 thrusterPosition,
                 thrusterReverse, 
                 actuatorLabelList,
@@ -438,6 +451,7 @@ class UI(QMainWindow):
         self.control_timer.setMinimumHeight(48)
         # MACHINE VISION TASK BUTTONS
         self.control_vision_mosaic.clicked.connect(self.control.popupMosaicTask)
+        self.control_vision_shape_detection.clicked.connect(self.control.popupShapeDetectionTask)
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MANU TO THE SAME SLOT, PASSING THE CAMERA ID AS 1,2,3,4 ETC.
         self.control_camera_1_list.activated.connect(lambda index, camera = 0: self.control.changeExternalCameraFeed(index, camera))
@@ -537,9 +551,9 @@ class UI(QMainWindow):
         # INITIATE CAMERAS IN QTHREADS
         
         # PRIMARY CAMERA        
-        self.camThread1 = CAMERA_CAPTURE(0)
-        self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
-        self.camThread1.start()
+        #self.camThread1 = CAMERA_CAPTURE(0)
+        #self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
+        #self.camThread1.start()
         
         # SECONDARY CAMERA 1
         #self.camThread2 = CAMERA_CAPTURE(1)
@@ -551,7 +565,7 @@ class UI(QMainWindow):
         #self.camThread3.cameraNewFrameSignal.connect(self.updateCamera3Feed)
         #self.camThread3.start()
 
-    @pyqtSlot(QImage)
+    @pyqtSlot(QPixmap)
     def updateCamera1Feed(self, frame):
         """
         PURPOSE
@@ -566,11 +580,10 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = QPixmap.fromImage(frame)
-        pixmap = pixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
+        pixmap = frame.scaledToHeight(self.primary_camera.size().height()*0.98)
         self.primary_camera.setPixmap(pixmap)
 
-    @pyqtSlot(QImage)
+    @pyqtSlot(QPixmap)
     def updateCamera2Feed(self, frame):
         """
         PURPOSE
@@ -585,11 +598,10 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = QPixmap.fromImage(frame)
-        pixmap = pixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
+        pixmap = frame.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
         self.secondary_camera_1.setPixmap(pixmap)
 
-    @pyqtSlot(QImage)
+    @pyqtSlot(QPixmap)
     def updateCamera3Feed(self, frame):
         """
         PURPOSE
@@ -604,8 +616,7 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = QPixmap.fromImage(frame)
-        pixmap = pixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
+        pixmap = frame.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
         self.secondary_camera_2.setPixmap(pixmap)
 
     ###########################
@@ -614,13 +625,16 @@ class UI(QMainWindow):
     def changeView(self, view):
         """
         """
+        self.animation = SLIDE_ANIMATION(self.gui_view_widget)
+        self.animation.setSpeed(500)
+
         if view == 0:
-            self.slideAnimation.screenPrevious()
+            self.animation.screenPrevious()
             self.change_gui_control.setStyleSheet(self.data.blueStyle)
             self.change_gui_config.setStyleSheet(self.data.defaultBlue)
 
         if view == 1:
-            self.slideAnimation.screenNext()
+            self.animation.screenNext()
             self.change_gui_control.setStyleSheet(self.data.defaultBlue)
             self.change_gui_config.setStyleSheet(self.data.blueStyle)
 
@@ -649,45 +663,58 @@ class UI(QMainWindow):
         widget.setGraphicsEffect(shadowEffect)
 
     def changeTheme(self, theme):
+        
         # APPLY DARK THEME
         if theme:
             # CREATE QPALETTE
             darkPalette = QPalette()
-
-            darkPalette.setColor(QPalette.Window, QColor("#212121"))        # MAIN WINDOW BACKGROUND COLOR
+            #f57f17
+            darkPalette.setColor(QPalette.Window, QColor("#161616"))        # MAIN WINDOW BACKGROUND COLOR
             darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
-            darkPalette.setColor(QPalette.Base,QColor("#616161"))           # TEXT ENTRY BACKGROUND COLOR
+            darkPalette.setColor(QPalette.Base,QColor("#323232"))           # TEXT ENTRY BACKGROUND COLOR
             darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
-            darkPalette.setColor(QPalette.Button,QColor("#353535"))         # TAB BACKGROUND COLOR
-            darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR
-            
-            
-            # #darkPalette.setColor(darkPalette.BaseWindowText, Qt.white)
-            # darkPalette.setColor(darkPalette.Disabled, QPalette.WindowText, QColor(127,127,127))
-            # darkPalette.setColor(darkPalette.Base,QColor(42,42,42))
-            # darkPalette.setColor(darkPalette.AlternateBase,QColor(66,66,66))
-            # darkPalette.setColor(darkPalette.ToolTipBase,Qt.white)
-            # darkPalette.setColor(darkPalette.ToolTipText,Qt.white)
-            # darkPalette.setColor(darkPalette.Text,Qt.white)
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.Text,QColor(127,127,127))
-            # darkPalette.setColor(darkPalette.Dark,QColor(35,35,35))
-            # darkPalette.setColor(darkPalette.Shadow,QColor(20,20,20))
-            # #darkPalette.setColor(darkPalette.ButtonText,Qt.AA_CompressHighFrequencyEventswhite)
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.ButtonText,QColor(127,127,127))
-            # darkPalette.setColor(darkPalette.BrightText,Qt.red)
-            # darkPalette.setColor(darkPalette.Link,QColor(42,130,218))
-            # darkPalette.setColor(darkPalette.Highlight,QColor(42,130,218))
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.Highlight,QColor(80,80,80))
-            # darkPalette.setColor(darkPalette.HighlightedText,Qt.white)
-            # darkPalette.setColor(darkPalette.Disabled,QPalette.HighlightedText,QColor(127,127,127))
+            darkPalette.setColor(QPalette.Button,QColor("#353535"))         # BUTTON COLOR
+            darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR       
+            darkPalette.setColor(QPalette.Dark,QColor("#f57f17"))
 
+            self.changeGroupBoxColor("#212121")
+            
             # APPLY CUSTOM COLOR PALETTE
             self.app.setPalette(darkPalette)
             
         # APPLY DEFAULT THEME
         else:
             self.app.setPalette(self.app.style().standardPalette())
-            
+            pass
+
+    def changeGroupBoxColor(self, color):
+        groupBoxes = [self.group_box_ext_cam,
+                        self.group_box_comms_connect,
+                        self.group_box_actuators,
+                        self.group_box_sensors,
+                        self.group_box_minirov,
+                        self.group_box_image_processing,
+                        self.group_box_orientation,
+                        self.group_box_timer,
+                        self.group_box_comms_config,
+                        self.group_box_thruster_config,
+                        self.group_box_actuator_config,
+                        self.group_box_sensor_config,
+                        self.group_box_camera_config,
+                        self.group_box_binding_config,
+                        self.group_box_controller_config,
+                        self.group_box_rov_visual,
+                        self.group_box_mosaic_task,
+                        self.group_box_shape_detection
+                        ]
+        
+        for box in groupBoxes:
+            box.setStyleSheet("""QGroupBox {
+                                background-color: #212121; 
+                                border-radius: 20px;
+                                margin-top: 40px;
+                                }""")
+
     def printTerminal(self, text):
         """
         PURPOSE
@@ -1147,12 +1174,12 @@ class CONTROL_PANEL():
         NONE
         """
         # READ SENSORS EVERY 1 SECOND
-        thread = Timer(0.5, self.getSensorReadings)
-        thread.daemon = True                 
-        thread.start()
+        timer = Timer(0.5, self.getSensorReadings)
+        timer.daemon = True                 
+        timer.start()
         
         if self.data.rovCommsStatus == False:
-            thread.cancel()
+            timer.cancel()
         
         else:
             #self.data.controlSensorValues = self.rov.getSensors([1]*self.data.configSensorNumber).tolist()
@@ -1397,7 +1424,36 @@ class CONTROL_PANEL():
     #### COMPUTER VISION TASKS ####
     ###############################
     def popupMosaicTask(self):
-        self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.data)
+        self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
+        self.animation.setSpeed(500)
+
+        if self.data.controlMosaicTaskStatus == False:
+            print("Next")
+            self.data.controlMosaicTaskStatus = True
+            self.data.controlShapeDetectionTaskStatus = False
+            self.animation.jumpTo(1)
+
+        else:
+            print("Previous")
+            self.data.controlMosaicTaskStatus = False
+            self.animation.jumpTo(0)
+
+        #self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.data)
+
+    def popupShapeDetectionTask(self):
+        self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
+        self.animation.setSpeed(500)
+
+        if self.data.controlShapeDetectionTaskStatus == False:
+            print("Next")
+            self.data.controlShapeDetectionTaskStatus = True
+            self.data.controlMosaicTaskStatus = False
+            self.animation.jumpTo(2)
+
+        else:
+            print("Previous")
+            self.data.controlShapeDetectionTaskStatus = False
+            self.animation.jumpTo(0)
 
 class CONFIG():
     """
@@ -2060,7 +2116,8 @@ class TOOLBAR():
         NONE
         """
         # WRITE CURRENT PROGRAM CONFIGURATION TO XML FILE.
-        self.writeConfig(self.data.configThrusterPosition,
+        self.writeConfig(self.data.programTheme,
+                            self.data.configThrusterPosition,
                             self.data.configThrusterReverse, 
                             self.data.configActuatorLabelList,
                             self.data.configActuatorNumber,
@@ -2080,7 +2137,8 @@ class TOOLBAR():
         self.ui.printTerminal("Program configuration reset.")
         self.ui.resetConfig(True)
 
-    def writeConfig(self, thrusterPosition, 
+    def writeConfig(self, theme,
+                        thrusterPosition, 
                         thrusterReverse, 
                         actuatorLabelList,
                         actuatorNumber, 
@@ -2114,6 +2172,8 @@ class TOOLBAR():
         """
         root = Element("root")
 
+        SubElement(root, "theme").text = "dark" if theme else "light"
+        
         ###################################
         ### CONFIGURATION FOR THRUSTERS ###
         ###################################
@@ -2297,6 +2357,9 @@ class DATABASE():
     controlTimerMem = 0
 
     primaryCameraImage = None
+
+    controlMosaicTaskStatus = False
+    controlShapeDetectionTaskStatus = False
 
     ###############################
     ######## CONFIGURATION ########

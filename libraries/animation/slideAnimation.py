@@ -29,6 +29,11 @@ class SLIDE_ANIMATION(QWidget):
     def setWrap(self, wrap):
         self.m_wrap = wrap
 
+    def jumpTo(self, page):
+        now = self.stackedWidget.currentIndex()
+        if self.m_wrap or now < (self.stackedWidget.count()):
+            self.slideInIdx(page)
+
     def screenNext(self):
         now = self.stackedWidget.currentIndex()
         if self.m_wrap or now < (self.stackedWidget.count() - 1):
