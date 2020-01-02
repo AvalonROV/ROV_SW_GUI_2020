@@ -57,9 +57,6 @@ class CAMERA_CAPTURE(QThread):
         while True:    
             # CAPTURE FRAME
             status, frame = cameraFeed.read()
-
-            if self.currentThread().isInterruptionRequested():
-                print("NEED TO EXIT")
         
             # IF FRAME IS CAPTURED            
             if status:

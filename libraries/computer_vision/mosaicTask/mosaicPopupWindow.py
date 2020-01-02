@@ -8,6 +8,13 @@ from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, 
                             QFileDialog, QGraphicsDropShadowEffect)
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette
 
+class VIEW(QWidget):
+    def __init__(self):
+        super(VIEW, self).__init__()
+        self.setWindowTitle("Mosaic Task Popup")
+        self.mosaicTask = MOSAIC_POPUP_WINDOW(self)
+        self.show()
+
 class MOSAIC_POPUP_WINDOW(QWidget):
     """
     PURPOSE
@@ -15,22 +22,17 @@ class MOSAIC_POPUP_WINDOW(QWidget):
     Popup windows to complete the computer vision mosaic task. 
     Each side of the object can be captured, then an openCV algorithm will stitch them together.
     """
-    def __init__(self, Object1):
+    def __init__(self, viewWidget):
         QWidget.__init__(self) 
         # LOAD UI FILE
-        uic.loadUi('mosaicPopup.ui',self)
-        # KEEPS POPUP ON TOP OF MAIN PROGRAM
-        self.setWindowFlags(Qt.WindowStaysOnTopHint)
-
-        # FIND SCREEN SIZE
-        self.sizeObject = QDesktopWidget().screenGeometry(-1)
-        self.screenHeight = self.sizeObject.height()
-        self.screenWidth = self.sizeObject.width()
-
-        self.data = Object1
+        uic.loadUi('libraries/computer_vision/mosaicTask/mosaicPopup.ui',self)
+        
         # ADD IMAGE CAPTURE BUTTONS
         self.addWidgets()
-        self.show()
+
+        layout = QGridLayout()
+        layout.addWidget(self)
+        viewWidget.setLayout(layout)
 
     def addWidgets(self):
         """
@@ -46,19 +48,21 @@ class MOSAIC_POPUP_WINDOW(QWidget):
 
         NONE
         """
-        defaultView = QPixmap('..../graphics/blank.png')
+        defaultView = QPixmap('graphics/blank.png')
         # ADD CAMERA VIEW AND CAPTURE BUTTON FOR EACH SIDE OF THE UNDERWATER OBJECT
         for index in range(5):
             button = QPushButton("Capture {}".format(index + 1))
             image = QLabel()
-            image.setPixmap(defaultView.scaledToHeight(0.1 * self.screenHeight))
+            image.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+            image.setPixmap(defaultView.scaledToHeight(10))
             # ADD TO GRID LAYOUT
-            self.mosaic_grid_layout.addWidget(image, index, 0)
-            self.mosaic_grid_layout.addWidget(button, index, 1)
+            self.mosaic_grid_layout.addWidget(image, (index * 2), 0)
+            self.mosaic_grid_layout.addWidget(button, (index * 2) + 1, 0)
             button.clicked.connect(lambda _, index = index, buttonObject = button, imageObject = image: self.captureImage(index, buttonObject, imageObject))
 
-        self.mosaic_grid_layout.setColumnStretch(3,1)
-        self.mosaic_result.setPixmap(defaultView.scaledToHeight(0.5 * self.screenHeight))
+        computeButton = QPushButton("Compute Mosaic")
+        self.mosaic_grid_layout.addWidget(computeButton, 10, 0)
+        computeButton.clicked.connect(self.computeMosaic)
 
     def captureImage(self, index, buttonObject, imageObject):
         #cameraFrame = QPixmap.fromImage(self.data.primaryCameraImage).scaledToHeight(200)
@@ -83,9 +87,12 @@ class MOSAIC_POPUP_WINDOW(QWidget):
             # CONVERT TO QIMAGE
             cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
             # CONVERT TO PIXMAP
-            cameraFrame = QPixmap.fromImage(cameraFrame).scaledToHeight(0.1 * self.screenHeight)
+            cameraFrame = QPixmap.fromImage(cameraFrame).scaledToHeight(10)
             # VIEW IMAGE
             imageObject.setPixmap(cameraFrame)
+
+    def computeMosaic(self):
+        pass
 
 def guiInitiate(): 
     """
@@ -105,7 +112,7 @@ def guiInitiate():
     app = QApplication(sys.argv)
     app.setFont(QFont("Bahnschrift Light", 10))
     app.setStyle("Fusion")
-    MOSAIC_POPUP_WINDOW(app)
+    ex = VIEW()
     # START EVENT LOOP
     app.exec_()
 

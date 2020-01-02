@@ -4,6 +4,35 @@ from PyQt5.QtCore import Qt, QParallelAnimationGroup, QPropertyAnimation, QPoint
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QHBoxLayout, QGridLayout, QLabel, QPushButton, QSizePolicy, QStackedWidget, QVBoxLayout
 from PyQt5.QtGui import QColor
 
+class VIEW(QMainWindow):
+    def __init__(self):
+        super(VIEW, self).__init__()
+
+        widget = QStackedWidget()
+        self.animation = SLIDE_ANIMATION(widget)
+        
+        for i in range(5):
+            label = QLabel("Screen {}".format(i), alignment = Qt.AlignCenter)
+            color = QColor(*random.sample(range(255), 3))
+            label.setStyleSheet("background-color: {}; color: white; font: 40pt".format(color.name()))
+            widget.addWidget(label)
+
+        screenNext = QPushButton("Next")
+        screenNext.clicked.connect(self.animation.screenNext)
+
+        screenPrevious = QPushButton("Previous")
+        screenPrevious.clicked.connect(self.animation.screenPrevious)
+
+        layout = QHBoxLayout()
+        layout.addWidget(screenPrevious)
+        layout.addWidget(screenNext)
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        lay = QVBoxLayout(central_widget)
+        lay.addLayout(layout)
+        lay.addWidget(widget)
+
 class SLIDE_ANIMATION(QWidget):
     def __init__(self, stackedWidget):
         QWidget.__init__(self)
@@ -116,38 +145,9 @@ class SLIDE_ANIMATION(QWidget):
         self.stackedWidget.widget(self.m_now).move(self.m_pnow)
         self.m_active = False
 
-class MainWindow(QMainWindow):
-    def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent)
-
-        widget = QStackedWidget()
-        self.animation = SLIDE_ANIMATION(widget)
-        
-        for i in range(5):
-            label = QLabel("Screen {}".format(i), alignment = Qt.AlignCenter)
-            color = QColor(*random.sample(range(255), 3))
-            label.setStyleSheet("background-color: {}; color: white; font: 40pt".format(color.name()))
-            widget.addWidget(label)
-
-        screenNext = QPushButton("Next")
-        screenNext.clicked.connect(self.animation.screenNext)
-
-        screenPrevious = QPushButton("Previous")
-        screenPrevious.clicked.connect(self.animation.screenPrevious)
-
-        layout = QHBoxLayout()
-        layout.addWidget(screenPrevious)
-        layout.addWidget(screenNext)
-
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        lay = QVBoxLayout(central_widget)
-        lay.addLayout(layout)
-        lay.addWidget(widget)
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    w = MainWindow()
+    w = VIEW()
     w.resize(1920, 1080)
     w.show()
     sys.exit(app.exec_())

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1187</width>
+    <width>1121</width>
     <height>713</height>
    </rect>
   </property>
@@ -18,6 +18,50 @@
     <property name="topMargin">
      <number>10</number>
     </property>
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="change_gui_control">
+        <property name="text">
+         <string>CONTROL PANEL</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="change_gui_config">
+        <property name="text">
+         <string>CONFIGURATION</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
     <item row="1" column="0">
      <widget class="QStackedWidget" name="gui_view_widget">
       <property name="currentIndex">
@@ -26,12 +70,12 @@
       <widget class="QWidget" name="page">
        <layout class="QGridLayout" name="gridLayout_8">
         <item row="0" column="0">
-         <widget class="QSplitter" name="splitter">
-          <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
-          </property>
+         <widget class="QSplitter" name="control_panel_splitter">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="handleWidth">
+           <number>10</number>
           </property>
           <widget class="QWidget" name="con_panel_camera_widget" native="true">
            <property name="enabled">
@@ -54,7 +98,7 @@
                   <verstretch>1</verstretch>
                  </sizepolicy>
                 </property>
-                <layout class="QGridLayout" name="gridLayout_14">
+                <layout class="QGridLayout" name="gridLayout_14" rowstretch="0,1">
                  <item row="0" column="0">
                   <layout class="QHBoxLayout" name="horizontalLayout_11">
                    <item>
@@ -190,7 +234,7 @@
                   </widget>
                  </item>
                  <item>
-                  <layout class="QGridLayout" name="gridLayout">
+                  <layout class="QGridLayout" name="gridLayout" rowstretch="0,1">
                    <item row="1" column="0">
                     <widget class="QLabel" name="secondary_camera_1">
                      <property name="frameShape">
@@ -290,38 +334,20 @@
               </item>
              </layout>
             </item>
-            <item row="1" column="0">
-             <widget class="QGroupBox" name="group_box_cam_feeds">
-              <property name="title">
-               <string>Camera Feeds</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="con_panel_functions_widget" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
            <layout class="QGridLayout" name="gridLayout_28">
             <item row="0" column="1">
              <widget class="QScrollArea" name="scrollArea_3">
-              <property name="styleSheet">
-               <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-              </property>
               <property name="frameShape">
                <enum>QFrame::NoFrame</enum>
               </property>
               <property name="lineWidth">
                <number>0</number>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
               </property>
               <property name="widgetResizable">
                <bool>true</bool>
@@ -332,7 +358,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <x>0</x>
                  <y>0</y>
                  <width>175</width>
-                 <height>605</height>
+                 <height>620</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -462,63 +488,9 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QGroupBox" name="group_box_minirov">
+                   <widget class="QGroupBox" name="group_box_tasks">
                     <property name="title">
-                     <string>Mini ROV</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_3">
-                     <item row="0" column="0">
-                      <widget class="QPushButton" name="pushButton_18">
-                       <property name="text">
-                        <string>Activate</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_2">
-                       <property name="text">
-                        <string>Tether Length</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QProgressBar" name="progressBar">
-                       <property name="value">
-                        <number>24</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="3" column="0">
-                      <layout class="QHBoxLayout" name="horizontalLayout_6">
-                       <item>
-                        <widget class="QPushButton" name="pushButton_19">
-                         <property name="text">
-                          <string>Extend</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="pushButton_24">
-                         <property name="text">
-                          <string>Retract</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QGroupBox" name="group_box_image_processing">
-                    <property name="title">
-                     <string>Image Processing</string>
+                     <string>Tasks</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -704,6 +676,60 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
               </property>
               <widget class="QWidget" name="page_3">
                <layout class="QGridLayout" name="gridLayout_35">
+                <item row="0" column="1">
+                 <widget class="QGroupBox" name="group_box_minirov">
+                  <property name="title">
+                   <string>Mini ROV</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_3">
+                   <item row="0" column="0">
+                    <widget class="QPushButton" name="pushButton_18">
+                     <property name="text">
+                      <string>Activate</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_2">
+                     <property name="text">
+                      <string>Tether Length</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QProgressBar" name="progressBar">
+                     <property name="value">
+                      <number>24</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0">
+                    <layout class="QHBoxLayout" name="horizontalLayout_6">
+                     <item>
+                      <widget class="QPushButton" name="pushButton_19">
+                       <property name="text">
+                        <string>Extend</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_24">
+                       <property name="text">
+                        <string>Retract</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
                 <item row="0" column="0">
                  <widget class="QWidget" name="widget_2" native="true">
                   <property name="sizePolicy">
@@ -720,6 +746,19 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="1">
+                 <spacer name="verticalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
               <widget class="QWidget" name="page_4">
@@ -728,6 +767,9 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <widget class="QGroupBox" name="group_box_mosaic_task">
                   <property name="title">
                    <string>Mosaic Task</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -739,6 +781,9 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <widget class="QGroupBox" name="group_box_shape_detection">
                   <property name="title">
                    <string>Shape Detection</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -755,526 +800,492 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
       <widget class="QWidget" name="page_2">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="QScrollArea" name="config_scroll">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QScrollArea { background: transparent; }
+         <layout class="QGridLayout" name="gridLayout_9" rowstretch="1,1" columnstretch="1,1,1,1,1">
+          <item row="0" column="2">
+           <widget class="QGroupBox" name="group_box_actuator_config">
+            <property name="title">
+             <string>Actuator Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_22">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="config_actuator_scroll">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
 QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
 QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAsNeeded</enum>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContents</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents_5">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>984</width>
-             <height>632</height>
-            </rect>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_26">
-            <item row="1" column="0">
-             <layout class="QGridLayout" name="gridLayout_9" rowstretch="1,1" columnstretch="1,1,1,1,1">
-              <item row="0" column="2">
-               <widget class="QGroupBox" name="group_box_actuator_config">
-                <property name="title">
-                 <string>Actuator Configuration</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_4">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>98</width>
+                  <height>32</height>
+                 </rect>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_22">
+                <layout class="QGridLayout" name="gridLayout_23">
                  <item row="0" column="0">
-                  <widget class="QScrollArea" name="config_actuator_scroll">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
-                   <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOff</enum>
-                   </property>
-                   <property name="sizeAdjustPolicy">
-                    <enum>QAbstractScrollArea::AdjustToContents</enum>
-                   </property>
-                   <property name="widgetResizable">
-                    <bool>true</bool>
-                   </property>
-                   <widget class="QWidget" name="scrollAreaWidgetContents_4">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>172</width>
-                      <height>276</height>
-                     </rect>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_23">
-                     <item row="0" column="0">
-                      <layout class="QFormLayout" name="config_actuator_form">
-                       <item row="0" column="0">
-                        <widget class="QLabel" name="numberOfSensorsLabel_2">
-                         <property name="text">
-                          <string>Quantity</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="1">
-                        <widget class="QSpinBox" name="config_actuators_number"/>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </widget>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <widget class="QGroupBox" name="group_box_camera_config">
-                <property name="title">
-                 <string>Camera Configuration</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_13">
-                 <item row="0" column="0">
-                  <layout class="QFormLayout" name="formLayout_13">
+                  <layout class="QFormLayout" name="config_actuator_form">
                    <item row="0" column="0">
-                    <widget class="QLabel" name="numberOfCamerasLabel">
+                    <widget class="QLabel" name="numberOfSensorsLabel_2">
                      <property name="text">
                       <string>Quantity</string>
                      </property>
                     </widget>
                    </item>
                    <item row="0" column="1">
-                    <widget class="QSpinBox" name="config_cameras_number">
-                     <property name="value">
-                      <number>0</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="defaultCameraLabel">
-                     <property name="text">
-                      <string>Default Feed 1</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QComboBox" name="config_camera_1_list"/>
-                   </item>
-                   <item row="2" column="0">
-                    <widget class="QLabel" name="secondaryCamera1Label">
-                     <property name="text">
-                      <string>Default Feed 2</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QComboBox" name="config_camera_2_list"/>
-                   </item>
-                   <item row="3" column="0">
-                    <widget class="QLabel" name="secondaryCamera2Label">
-                     <property name="text">
-                      <string>Default Feed 3</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="1">
-                    <widget class="QComboBox" name="config_camera_3_list"/>
-                   </item>
-                   <item row="4" column="0">
-                    <widget class="QLabel" name="secondaryCamera3Label">
-                     <property name="text">
-                      <string>Default Feed 4</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="1">
-                    <widget class="QComboBox" name="config_camera_4_list"/>
+                    <widget class="QSpinBox" name="config_actuators_number"/>
                    </item>
                   </layout>
                  </item>
                 </layout>
                </widget>
-              </item>
-              <item row="0" column="3">
-               <widget class="QGroupBox" name="group_box_sensor_config">
-                <property name="title">
-                 <string>Sensor Configuration</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_21">
-                 <item row="0" column="0">
-                  <widget class="QScrollArea" name="config_sensor_scroll">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QGroupBox" name="group_box_camera_config">
+            <property name="title">
+             <string>Camera Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="0">
+              <layout class="QFormLayout" name="formLayout_13">
+               <item row="0" column="0">
+                <widget class="QLabel" name="numberOfCamerasLabel">
+                 <property name="text">
+                  <string>Quantity</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="config_cameras_number">
+                 <property name="value">
+                  <number>0</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="defaultCameraLabel">
+                 <property name="text">
+                  <string>Default Feed 1</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="config_camera_1_list"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="secondaryCamera1Label">
+                 <property name="text">
+                  <string>Default Feed 2</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="config_camera_2_list"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="secondaryCamera2Label">
+                 <property name="text">
+                  <string>Default Feed 3</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QComboBox" name="config_camera_3_list"/>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="secondaryCamera3Label">
+                 <property name="text">
+                  <string>Default Feed 4</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QComboBox" name="config_camera_4_list"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QGroupBox" name="group_box_sensor_config">
+            <property name="title">
+             <string>Sensor Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_21">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="config_sensor_scroll">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
 QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
 QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
-                   <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOff</enum>
-                   </property>
-                   <property name="sizeAdjustPolicy">
-                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
-                   </property>
-                   <property name="widgetResizable">
-                    <bool>true</bool>
-                   </property>
-                   <widget class="QWidget" name="scrollAreaWidgetContents_2">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>171</width>
-                      <height>276</height>
-                     </rect>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_20">
-                     <item row="0" column="0">
-                      <layout class="QFormLayout" name="config_sensor_form">
-                       <item row="0" column="0">
-                        <widget class="QLabel" name="numberOfSensorsLabel">
-                         <property name="text">
-                          <string>Quantity</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="1">
-                        <widget class="QSpinBox" name="config_sensors_number"/>
-                       </item>
-                       <item row="1" column="0">
-                        <widget class="QLabel" name="measurementRateLabel">
-                         <property name="text">
-                          <string>Measurement Rate</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="1">
-                        <widget class="QComboBox" name="measurementRateComboBox"/>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </widget>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QGroupBox" name="group_box_thruster_config">
-                <property name="title">
-                 <string>Thruster Configuration</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustIgnored</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>164</width>
+                  <height>56</height>
+                 </rect>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_16">
+                <layout class="QGridLayout" name="gridLayout_20">
                  <item row="0" column="0">
-                  <widget class="QScrollArea" name="scrollArea">
-                   <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOff</enum>
-                   </property>
-                   <property name="sizeAdjustPolicy">
-                    <enum>QAbstractScrollArea::AdjustToContents</enum>
-                   </property>
-                   <property name="widgetResizable">
-                    <bool>true</bool>
-                   </property>
-                   <widget class="QWidget" name="scrollAreaWidgetContents">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>171</width>
-                      <height>276</height>
-                     </rect>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_15">
-                     <item row="0" column="0">
-                      <layout class="QFormLayout" name="config_thruster_form"/>
-                     </item>
-                    </layout>
-                   </widget>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QGroupBox" name="group_box_controller_config">
-                <property name="title">
-                 <string>Controller Values</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_30">
-                 <item row="0" column="0">
-                  <widget class="QScrollArea" name="scrollArea_4">
-                   <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOff</enum>
-                   </property>
-                   <property name="sizeAdjustPolicy">
-                    <enum>QAbstractScrollArea::AdjustToContents</enum>
-                   </property>
-                   <property name="widgetResizable">
-                    <bool>true</bool>
-                   </property>
-                   <widget class="QWidget" name="scrollAreaWidgetContents_7">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>171</width>
-                      <height>275</height>
-                     </rect>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_27">
-                     <item row="0" column="0">
-                      <layout class="QFormLayout" name="config_controller_form"/>
-                     </item>
-                    </layout>
-                   </widget>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QGroupBox" name="group_box_rov_visual">
-                <property name="title">
-                 <string>ROV Visualisation</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_31">
-                 <item row="0" column="0">
-                  <widget class="QWidget" name="config_simulation_graph" native="true"/>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QGroupBox" name="group_box_binding_config">
-                <property name="title">
-                 <string>Key Bindings</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_19">
-                 <item row="0" column="0">
-                  <widget class="QScrollArea" name="scrollArea_2">
-                   <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOff</enum>
-                   </property>
-                   <property name="sizeAdjustPolicy">
-                    <enum>QAbstractScrollArea::AdjustToContents</enum>
-                   </property>
-                   <property name="widgetResizable">
-                    <bool>true</bool>
-                   </property>
-                   <widget class="QWidget" name="scrollAreaWidgetContents_6">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>172</width>
-                      <height>275</height>
-                     </rect>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_17">
-                     <item row="0" column="0">
-                      <layout class="QFormLayout" name="config_keybindings_form"/>
-                     </item>
-                    </layout>
-                   </widget>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QGroupBox" name="group_box_comms_config">
-                <property name="title">
-                 <string>Communication Configuration</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_34">
-                 <item row="0" column="0">
-                  <layout class="QGridLayout" name="gridLayout_33">
-                   <item row="1" column="1">
-                    <widget class="QPushButton" name="config_controller_connect">
+                  <layout class="QFormLayout" name="config_sensor_form">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="numberOfSensorsLabel">
                      <property name="text">
-                      <string>CONNECT</string>
+                      <string>Quantity</string>
                      </property>
                     </widget>
                    </item>
                    <item row="0" column="1">
-                    <widget class="QPushButton" name="config_rov_connect">
-                     <property name="text">
-                      <string>CONNECT</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="label_10">
-                     <property name="text">
-                      <string>ROV</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                    </widget>
+                    <widget class="QSpinBox" name="config_sensors_number"/>
                    </item>
                    <item row="1" column="0">
-                    <widget class="QLabel" name="label_11">
+                    <widget class="QLabel" name="measurementRateLabel">
                      <property name="text">
-                      <string>Controller</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
+                      <string>Measurement Rate</string>
                      </property>
                     </widget>
                    </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="measurementRateComboBox"/>
+                   </item>
                   </layout>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QGroupBox" name="group_box_thruster_config">
+            <property name="title">
+             <string>Thruster Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_16">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="scrollArea">
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
+</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>100</width>
+                  <height>30</height>
+                 </rect>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_15">
+                 <item row="0" column="0">
+                  <layout class="QFormLayout" name="config_thruster_form"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QGroupBox" name="group_box_controller_config">
+            <property name="title">
+             <string>Controller Values</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_30">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="scrollArea_4">
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_7">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>100</width>
+                  <height>30</height>
+                 </rect>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_27">
+                 <item row="0" column="0">
+                  <layout class="QFormLayout" name="config_controller_form"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QGroupBox" name="group_box_rov_visual">
+            <property name="title">
+             <string>ROV Visualisation</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_31">
+             <item row="0" column="0">
+              <widget class="QWidget" name="config_simulation_graph" native="true"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QGroupBox" name="group_box_binding_config">
+            <property name="title">
+             <string>Key Bindings</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_19">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="scrollArea_2">
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_6">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>100</width>
+                  <height>30</height>
+                 </rect>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_17">
+                 <item row="0" column="0">
+                  <layout class="QFormLayout" name="config_keybindings_form"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QGroupBox" name="group_box_comms_config">
+            <property name="title">
+             <string>Communication Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_34">
+             <item row="0" column="0">
+              <layout class="QGridLayout" name="gridLayout_33">
+               <item row="1" column="1">
+                <widget class="QPushButton" name="config_controller_connect">
+                 <property name="text">
+                  <string>CONNECT</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QPushButton" name="config_rov_connect">
+                 <property name="text">
+                  <string>CONNECT</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>ROV</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Controller</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="0">
+              <layout class="QFormLayout" name="formLayout_7">
+               <item row="0" column="0">
+                <widget class="QLabel" name="cOMPortLabel">
+                 <property name="text">
+                  <string>COM Port</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="baudRateLabel">
+                 <property name="text">
+                  <string>Baud Rate</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="config_baud_rate_list"/>
+               </item>
+               <item row="0" column="1">
+                <layout class="QGridLayout" name="gridLayout_32">
+                 <item row="0" column="0">
+                  <widget class="QComboBox" name="config_com_port_list"/>
                  </item>
                  <item row="1" column="0">
-                  <layout class="QFormLayout" name="formLayout_7">
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="cOMPortLabel">
-                     <property name="text">
-                      <string>COM Port</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="baudRateLabel">
-                     <property name="text">
-                      <string>Baud Rate</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QComboBox" name="config_baud_rate_list"/>
-                   </item>
-                   <item row="0" column="1">
-                    <layout class="QGridLayout" name="gridLayout_32">
-                     <item row="0" column="0">
-                      <widget class="QComboBox" name="config_com_port_list"/>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QPushButton" name="config_find_com_ports">
-                       <property name="text">
-                        <string>Find COM Ports</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                  </layout>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLineEdit" name="config_terminal_send"/>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QPlainTextEdit" name="config_terminal">
-                   <property name="readOnly">
-                    <bool>true</bool>
+                  <widget class="QPushButton" name="config_find_com_ports">
+                   <property name="text">
+                    <string>Find COM Ports</string>
                    </property>
                   </widget>
                  </item>
                 </layout>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLineEdit" name="config_terminal_send"/>
+             </item>
+             <item row="3" column="0">
+              <widget class="QPlainTextEdit" name="config_terminal">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
      </widget>
-    </item>
-    <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="change_gui_control">
-        <property name="text">
-         <string>CONTROL PANEL</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="change_gui_config">
-        <property name="text">
-         <string>CONFIGURATION</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
@@ -1283,7 +1294,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1187</width>
+     <width>1121</width>
      <height>21</height>
     </rect>
    </property>

@@ -75,7 +75,7 @@ class UI(QMainWindow):
         self.data.screenWidth = self.data.sizeObject.width()
 
         # SET DEFAULT WIDGET SIZES
-        self.con_panel_functions_widget.resize(self.data.screenWidth/6,self.con_panel_functions_widget.height())
+        self.con_panel_functions_widget.resize(self.data.screenWidth/3,self.con_panel_functions_widget.height())
 
         # ADD AVALON LOGO
         avalonPixmap = QPixmap('graphics/logo.png')
@@ -113,11 +113,8 @@ class UI(QMainWindow):
         # RESIZE CAMERA FEEDS WHEN WINDOW IS RESIZED
         self.resizeEvent(QResizeEvent(self.size(), QSize()))
 
-        # SLIDING ANIMATION FOR SWITCHING BETWEEN CONTROL AND CONFIGURATION TABS
-        #self.slideAnimation = SLIDE_ANIMATION(self.gui_view_widget)
-        #self.slideAnimation.setSpeed(500)
-
-        #self.vision
+        # INITIALISE WIDGETS FOR THE MACHINE VISION TASKS AND ADD THEM TO THE GUI
+        self.control.initialiseVisionWidgets()
 
         # INITIALISE UI
         self.showMaximized()
@@ -424,6 +421,9 @@ class UI(QMainWindow):
         self.change_gui_config.setFixedWidth(self.change_gui_config.geometry().width() * 4)
         self.change_gui_config.setStyleSheet(self.data.defaultBlue)
 
+        # SPITTER
+        self.control_panel_splitter.splitterMoved.connect(self.splitterEvent)
+
         # ROV CONNECT BUTTON
         self.control_rov_connect.clicked.connect(self.control.rovConnect)
         self.applyGlow(self.control_rov_connect, "#0D47A1", 10)
@@ -551,9 +551,10 @@ class UI(QMainWindow):
         # INITIATE CAMERAS IN QTHREADS
         
         # PRIMARY CAMERA        
-        #self.camThread1 = CAMERA_CAPTURE(0)
-        #self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
-        #self.camThread1.start()
+        self.camThread1 = CAMERA_CAPTURE(0)
+        self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
+        self.camThread1.finished().connect(self.camThread1.run)
+        self.camThread1.start()
         
         # SECONDARY CAMERA 1
         #self.camThread2 = CAMERA_CAPTURE(1)
@@ -668,15 +669,14 @@ class UI(QMainWindow):
         if theme:
             # CREATE QPALETTE
             darkPalette = QPalette()
-            #f57f17
             darkPalette.setColor(QPalette.Window, QColor("#161616"))        # MAIN WINDOW BACKGROUND COLOR
             darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
             darkPalette.setColor(QPalette.Base,QColor("#323232"))           # TEXT ENTRY BACKGROUND COLOR
             darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
             darkPalette.setColor(QPalette.Button,QColor("#353535"))         # BUTTON COLOR
             darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR       
-            darkPalette.setColor(QPalette.Dark,QColor("#f57f17"))
 
+            # MODIFY GROUP BOXES
             self.changeGroupBoxColor("#212121")
             
             # APPLY CUSTOM COLOR PALETTE
@@ -688,32 +688,11 @@ class UI(QMainWindow):
             pass
 
     def changeGroupBoxColor(self, color):
-        groupBoxes = [self.group_box_ext_cam,
-                        self.group_box_comms_connect,
-                        self.group_box_actuators,
-                        self.group_box_sensors,
-                        self.group_box_minirov,
-                        self.group_box_image_processing,
-                        self.group_box_orientation,
-                        self.group_box_timer,
-                        self.group_box_comms_config,
-                        self.group_box_thruster_config,
-                        self.group_box_actuator_config,
-                        self.group_box_sensor_config,
-                        self.group_box_camera_config,
-                        self.group_box_binding_config,
-                        self.group_box_controller_config,
-                        self.group_box_rov_visual,
-                        self.group_box_mosaic_task,
-                        self.group_box_shape_detection
-                        ]
-        
-        for box in groupBoxes:
-            box.setStyleSheet("""QGroupBox {
-                                background-color: #212121; 
-                                border-radius: 20px;
-                                margin-top: 40px;
-                                }""")
+        self.gui_view_widget.setStyleSheet("""QGroupBox {
+                                            background-color: #212121; 
+                                            border-radius: 20px;
+                                            margin-top: 40px;
+                                            }""")
 
     def printTerminal(self, text):
         """
@@ -730,27 +709,30 @@ class UI(QMainWindow):
         self.config_terminal.appendPlainText(str(string))
 
     def resizeEvent(self, event):
-        self.data.windowSizeObject = self.size()
-        self.data.windowHeight = self.data.windowSizeObject.height()
-        self.data.windowWidth = self.data.windowSizeObject.width()
-
-        cameraPixmap = QPixmap('graphics/no_signal.png')
-        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
-        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
-        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
-        self.primary_camera.setPixmap(primaryCameraPixmap)
-        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
-        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
-
+        self.changePixmapSize()
         QMainWindow.resizeEvent(self, event)
 
-    def animateOut(self):
-        animation = QPropertyAnimation(self, "pos")
-        animation.setDuration(400)
-        animation.setStartValue(QPoint(1920, 22))
-        animation.setEndValue(QPoint(1541, 22))
-        animation.setEasingCurve(QEasingCurve.OutCubic)
-        animation.start()
+    def splitterEvent(self):
+        self.changePixmapSize()
+    
+    def changePixmapSize(self): 
+        # self.primary_camera.setStyleSheet("background-color: white")
+        # self.secondary_camera_1.setStyleSheet("background-color: white")
+        # self.secondary_camera_2.setStyleSheet("background-color: white")
+
+        cameraPixmap = QPixmap('graphics/no_signal.png')
+
+        cam1Size = [self.primary_camera.size().width(), self.primary_camera.size().height()]
+        primaryCameraPixmap = cameraPixmap.scaled(cam1Size[0]*0.99, cam1Size[1]*0.99, Qt.KeepAspectRatio)
+        self.primary_camera.setPixmap(primaryCameraPixmap)  
+
+        cam2Size = [self.secondary_camera_1.size().width(), self.secondary_camera_1.size().height()]
+        secondary1CameraPixmap = cameraPixmap.scaled(cam2Size[0]*0.99, cam2Size[1]*0.99, Qt.KeepAspectRatio)
+        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
+
+        cam3Size = [self.secondary_camera_2.size().width(), self.secondary_camera_2.size().height()]
+        secondary2CameraPixmap = cameraPixmap.scaled(cam3Size[0]*0.99, cam3Size[1]*0.99, Qt.KeepAspectRatio)
+        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
 
 class CONTROL_PANEL():
     """
@@ -861,9 +843,9 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.controllerCommsStatus == False:
+        if self.data.controllerConnectButtonStatus == False:
             # UPDATE BUTTON STYLE
-            self.data.controllerCommsStatus = True
+            self.data.controllerConnectButtonStatus = True
             self.ui.control_controller_connect.setText('DISCONNECT')
             self.ui.config_controller_connect.setText('DISCONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.blueStyle)
@@ -879,7 +861,7 @@ class CONTROL_PANEL():
             else:
                 self.controllerConnect()
         else:
-            self.data.controllerCommsStatus = False
+            self.data.controllerConnectButtonStatus = False
             self.ui.control_controller_connect.setText('CONNECT')
             self.ui.config_controller_connect.setText('CONNECT')
             self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue)  
@@ -970,7 +952,7 @@ class CONTROL_PANEL():
         NONE
         """
         # TAKE SINGLE READING OF CONTROLLER VALUES
-        buttonStates, arrowStates, joystickValues = self.getControllerInputs(self.data.controllerCommsStatus, controllerNumber)
+        buttonStates, arrowStates, joystickValues = self.getControllerInputs(self.data.controllerConnectButtonStatus, controllerNumber)
 
         # PROCESS BUTTON STATES
         filteredButtonStates = self.processButtons(buttonStates, arrowStates)
@@ -1423,37 +1405,46 @@ class CONTROL_PANEL():
     ###############################
     #### COMPUTER VISION TASKS ####
     ###############################
+    def initialiseVisionWidgets(self):
+        self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.ui.group_box_mosaic_task)
+
     def popupMosaicTask(self):
         self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
-        self.animation.setSpeed(500)
+        self.animation.setSpeed(300)
 
         if self.data.controlMosaicTaskStatus == False:
-            print("Next")
             self.data.controlMosaicTaskStatus = True
             self.data.controlShapeDetectionTaskStatus = False
             self.animation.jumpTo(1)
+            self.ui.control_vision_mosaic.setText("Stop")
+            self.ui.control_vision_mosaic.setStyleSheet(self.data.blueStyle)
+            self.ui.control_vision_shape_detection.setText("Start")
+            self.ui.control_vision_shape_detection.setStyleSheet("")
 
         else:
-            print("Previous")
             self.data.controlMosaicTaskStatus = False
             self.animation.jumpTo(0)
-
-        #self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.data)
+            self.ui.control_vision_mosaic.setText("Start")
+            self.ui.control_vision_mosaic.setStyleSheet("")
 
     def popupShapeDetectionTask(self):
         self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
-        self.animation.setSpeed(500)
+        self.animation.setSpeed(300)
 
         if self.data.controlShapeDetectionTaskStatus == False:
-            print("Next")
             self.data.controlShapeDetectionTaskStatus = True
             self.data.controlMosaicTaskStatus = False
             self.animation.jumpTo(2)
+            self.ui.control_vision_shape_detection.setText("Stop")
+            self.ui.control_vision_shape_detection.setStyleSheet(self.data.blueStyle)
+            self.ui.control_vision_mosaic.setText("Start")
+            self.ui.control_vision_mosaic.setStyleSheet("")
 
         else:
-            print("Previous")
             self.data.controlShapeDetectionTaskStatus = False
             self.animation.jumpTo(0)
+            self.ui.control_vision_shape_detection.setText("Start")
+            self.ui.control_vision_shape_detection.setStyleSheet("")
 
 class CONFIG():
     """
@@ -2315,33 +2306,29 @@ class TOOLBAR():
             self.ui.changeTheme(False)
             
 class DATABASE():
+    """
+    PURPOSE
+
+    Stores all the variables and lists to be accessed anywhere in the program.
+    """
     ###############################
     ######## CONTROL PANEL ########
     ###############################
+    programTheme = False                    # FALSE = LIGHT THEME, TRUE = DARK THEME
+    comPorts = []                           # LIST OF AVAILABLE COM PORTS
+    rovID = "AVALONROV"                     # IDENTITY RESPONSE REQUIRED FROM COM PORT TO CONNECT
+    rovComPort = None                       # ACTUAL COM PORT OF THE ROV
+    rovConnectButtonStatus = False          # TRUE WHEN CONNECT BUTTONS IS PRESSED
+    rovCommsStatus = False                  # TRUE WHEN CONNECTION TO COM PORT IS SUCCESSFUL
+    controllerConnectButtonStatus = False   # TRUE WHEN CONNECTION TO CONTROLLER IS SUCCESSFUL
 
-    # LIST OF AVAILABLE COM PORTS
-    comPorts = []
-    rovID = "AVALONROV"
-    rovComPort = None
-    rovConnectButtonStatus = False
-    controllerCOMPort = None
-    rovCommsStatus = False
-    controllerCommsStatus = False
+    controlActuatorStates = []              # STORES STATE OF EACH ACTUATOR
+    controlSensorValues = []                # STORES RECIEVED SENSORS VALUES
+    controlSensorLabelObjects = []          # STORES SENSOR LABEL OBJECTS
 
-    programTheme = False
-
-    # STORES STATE OF EACH ACTUATOR
-    controlActuatorStates = []
-
-    # STORES RECIEVED SENSORS VALUES
-    controlSensorValues = []
-    # STORES SENSOR LABEL OBJECTS
-    controlSensorLabelObjects = []
-
-    # STORES THE SELECTED CAMERA FEEDS
-    controlCameraViewList = [None] * 4
+    controlCameraViewList = [None] * 4      # STORES THE SELECTED EXTERNAL CAMERA FEEDS
     
-    # APPEARANGE STYLESHEETS
+    # STYLESHEETS USED FOR BUTTONS AND TEXT ETC.
     greenStyle = 'background-color: #679e37'
     redStyle = 'background-color: #c62828'
     blueStyle = 'background-color: #0D47A1; color: white; font-weight: bold;'
@@ -2349,68 +2336,52 @@ class DATABASE():
     textGreenStyle = 'color: #679e37; font-weight: bold;'
     textDisabledStyle = 'color: rgba(0,0,0,25%);'
 
-    # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
-    controlControlDirection = True
+    controlControlDirection = True          # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
 
-    controlTimerEnabled = False
-    controlTimerNew = True
-    controlTimerMem = 0
+    controlTimerEnabled = False             # TIMER START/STOP BUTTON
+    controlTimerNew = True                  # FALSE IF TIMER IS STARTED AGAIN AFTER BEING PAUSED
+    controlTimerMem = 0                     # TIME WHEN THE TIMER IS PAUSED
 
-    primaryCameraImage = None
-
-    controlMosaicTaskStatus = False
-    controlShapeDetectionTaskStatus = False
+    controlMosaicTaskStatus = False         # TRUE IF STARTED
+    controlShapeDetectionTaskStatus = False # TRUE IF STARTED
 
     ###############################
     ######## CONFIGURATION ########
     ###############################
+    fileName = 'config.xml' # DEFAULT CONFIG FILE NAME
 
-    # DEFAULT CONFIG FILE NAME
-    fileName = 'config.xml'
-
-    # STORES OPTIONS TO BE DISPLAYED ON THRUSTER POSITION DROP DOWN MENU
+    # THRUSTER CONFIGURATION SETTINGS
     configThrusterNumber = 8
     configThrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     configThrusterPosition = ['None'] * 8
     configThrusterReverse = [False] * 8
 
-    # STORES OPTIONS TO BE DISPLAYED ON SENSOR TYPE DROP DOWN MENU
-    configSensorTypeList = ['None','Temperature (°C)','Depth (m)', 'Yaw (°)', 'Pitch (°)', 'Roll (°)']
-    # STORES SELECTED SENSOR TYPES
-    configSensorSelectedType = []
-    # STORES CURRENT NUMBER OF SENSORS
+    # SENSOR CONFIGURATION SETTINGS
     configSensorNumber = 0
-
-    # STORES USER DEFINED LABELS FOR EACH ACTUATOR (NAME, DEFAULT STATE, ACTUATED STATE)
-    configActuatorLabelList = []
-    # STORES CURRENT NUMBER OF ACTUATORS
+    configSensorTypeList = ['None','Temperature (°C)','Depth (m)', 'Yaw (°)', 'Pitch (°)', 'Roll (°)']
+    configSensorSelectedType = []
+    
+    # ACTUATOS CONFIGURATION SETTINGS
     configActuatorNumber = 0
+    configActuatorLabelList = []    # LABELS (NAME, DEFAULT STATE, ACTUATED STATE)
 
-    # STORES LIST OF AVAILABLE CAMERAS
-    configCameraList = []
-    # STORES TOTAL NUMBER OF CAMERAS
-    configCameraNumber = 0
-    # STORES LIST OF DEFAULT CAMERA FEEDS TO BE DIPLAYED ON PROGRAM START
-    configDefaultCameraList = [0] * 4
+    # EXTERNAL CAMERA CONFIGURATION SETTINGS
+    configCameraNumber = 0 
+    configCameraList = []   # LIST OF AVAILABLE CAMERAS
+    configDefaultCameraList = [0] * 4   # DEFAULT CAMERAS TO SHOW ON STARTUP
 
-    # STORES LIST OF CONTROLLER KEY BINDINGS FOR THE ACTUATORS
+    # KEY BINDING CONFIGURATINO SETTINGS
+    # KEY BINDING LIST FOR DROP DOWN MENU
     configKeyBindingsList = ['None','A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
-    # STORES THE ORDER THAT BUTTONS APPEAR IN THE CONTROLLER RETURN ARRAY
+    # THE ORDER THAT BUTTONS APPEAR IN THE BUTTON STATES ARRAY
     configControllerButtons = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
-    # USED FOR DEBOUNCING CONTROLLER BUTTONS
-    configControllerButtonReleased = [True] * 14
-    # STORES SELECTED BINDINGS
-    configKeyBindings = []
-    # STORES CONTROLLER BUTTON STATES
-    configButtonStates = []
-
-    # STORES CONTROLLER LABEL OBJECTS
-    configControllerLabelObjects = []
+    configControllerButtonReleased = [True] * 14    # USED FOR DEBOUNCING CONTROLLER BUTTONS
+    configKeyBindings = []  # STORES SELECTED BINDINGS
+    configButtonStates = [] # STORES CONTROLLER BUTTON STATES
 
     ###############################
     ############ OTHER ############
     ###############################
-
     screenHeight = 0
     screenWidth = 0
 
