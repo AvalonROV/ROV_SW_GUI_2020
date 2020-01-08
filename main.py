@@ -5,11 +5,11 @@
 # PYQT5 MODULES
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-from PyQt5.QtWidgets import (QGroupBox, QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
+from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QGroupBox, QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
                             QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, 
                             QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
                             QFileDialog, QGraphicsDropShadowEffect)
-from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette, QPainter
+from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QFont, QColor, QPalette, QPainter
 
 # ADDITIONAL MODULES
 import sys, os
@@ -30,6 +30,7 @@ import numpy as np
 from avalonComms import ROV
 from libraries.controller.xboxController import CONTROLLER
 from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
+from libraries.computer_vision.transectLineTask.transectLinePopupWindow import TRANSECT_LINE_POPUP_WINDOW
 from libraries.camera.cameraCapture import CAMERA_CAPTURE
 from libraries.animation.slideAnimation import SLIDE_ANIMATION
 
@@ -77,10 +78,8 @@ class UI(QMainWindow):
         # SET DEFAULT WIDGET SIZES
         self.con_panel_functions_widget.resize(self.data.screenWidth/3,self.con_panel_functions_widget.height())
 
-        # ADD AVALON LOGO
-        avalonPixmap = QPixmap('graphics/logo.png')
-        avalonPixmap = avalonPixmap.scaledToWidth(250)
-        self.avalon_logo.setPixmap(avalonPixmap)
+        # LOAD SETTINGS FROM CONFIG FILE
+        self.configSetup()
 
         # SET CAMERA FEED PLACE HOLDER
         cameraPixmap = QPixmap('graphics/no_signal.png')
@@ -92,9 +91,9 @@ class UI(QMainWindow):
         self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
 
         # LINK GUI BUTTONS TO METHODS
-        self.linkToolbarWidgets()
         self.linkControlPanelWidgets()
         self.linkConfigWidgets()
+        self.linkToolbarWidgets()
 
         # INITIAL STARTUP MESSAGE
         self.printTerminal("Welcome to the Avalon ROV control interface.")
@@ -104,18 +103,12 @@ class UI(QMainWindow):
         # INITIATE CAMERA FEEDS
         self.initiateCameraFeed()
 
-        # SEND OUT ID REQUEST TO EACH COM PORT TO AUTOMATICALLY FIND ROV
-        self.data.comPorts = self.rov.findROVs(self.data.rovID)
-
-        # LOAD SETTINGS FROM CONFIG FILE
-        self.configSetup()
-
-        # RESIZE CAMERA FEEDS WHEN WINDOW IS RESIZED
-        self.resizeEvent(QResizeEvent(self.size(), QSize()))
-
         # INITIALISE WIDGETS FOR THE MACHINE VISION TASKS AND ADD THEM TO THE GUI
         self.control.initialiseVisionWidgets()
-
+        
+        # RESIZE GUI PIXMAPS WHEN WINDOW IS RESIZED
+        self.resizeEvent(QResizeEvent(self.size(), QSize()))
+    
         # INITIALISE UI
         self.showMaximized()
         #self.show()
@@ -168,7 +161,7 @@ class UI(QMainWindow):
         self.changeTheme(self.data.programTheme)
 
         # ADD KEYBINDING FOR SWITCHING CONTROL ORIENTATION
-        self.config.addKeyBinding("Switch Orientation", 0, True)
+        self.config.addKeyBinding("Switch Orientation", 0, False)
         # UPDATE GUI WITH THRUSTER DATA
         self.config.setThrustersNumber(self.data.configThrusterNumber, 
                                         self.config_thruster_form,
@@ -327,9 +320,8 @@ class UI(QMainWindow):
         ###############################
         ### RESET THRUSTER SETTINGS ###
         ###############################
-        for number in range(self.data.configThrusterNumber):
-            # REMOVE THRUSTERS FROM CONFIG TAB
-            self.config_thruster_form.removeRow(0)
+        for i in reversed(range(self.config_thruster_form.rowCount())): 
+            self.config_thruster_form.removeRow(i)
 
         self.data.configThrusterPosition = ['None'] * 8
         self.data.configThrusterReverse = [False] * 8
@@ -351,7 +343,7 @@ class UI(QMainWindow):
             # REMOVE ACTUATORS FROM CONFIG TAB
             self.config_actuator_form.removeRow(1) 
             # REMOVE ACTUATORS FROM CONTROL PANEL TAB
-            self.control_panel_actuators.removeRow(0)
+            #self.control_panel_actuators.removeRow(0)
         self.config_actuators_number.setValue(0)
         self.data.configActuatorNumber = 0
 
@@ -361,11 +353,18 @@ class UI(QMainWindow):
         self.data.controlSensorLabelObjects = []
         self.data.configSensorSelectedType = []
         # DELETE PREVIOUS SENSORS FROM GUI
-        for number in range(self.data.configSensorNumber):
-            # REMOVE SENSORS FROM CONFIG TAB
-            self.config_sensor_form.removeRow(2) 
-            # REMOVE SENSORS FROM CONTROL PANEL TAB
-            self.control_panel_sensors.removeRow(0)
+        for i in reversed(range(self.control_panel_sensors.rowCount())): 
+            self.control_panel_sensors.removeRow(i)
+        for i in reversed(range(1, self.config_sensor_form.rowCount())): 
+            self.config_sensor_form.removeRow(i)
+            pass
+        
+        # for number in range(self.data.configSensorNumber):
+        #     # REMOVE SENSORS FROM CONFIG TAB
+        #     self.config_sensor_form.removeRow(2) 
+        #     # REMOVE SENSORS FROM CONTROL PANEL TAB
+        #     self.control_panel_sensors.removeRow(0)
+        
         self.config_sensors_number.setValue(0)
         self.data.configSensorNumber = 0
 
@@ -410,16 +409,20 @@ class UI(QMainWindow):
         """
         # CHANGE GUI VIEW BUTTONS
         self.change_gui_control.clicked.connect(lambda state, view = 0: self.changeView(view))
-        self.applyGlow(self.change_gui_control, "#0D47A1", 10)
         self.change_gui_control.setFixedHeight(self.change_gui_control.geometry().height() * 1.5)
         self.change_gui_control.setFixedWidth(self.change_gui_control.geometry().width() * 4)
-        self.change_gui_control.setStyleSheet(self.data.blueStyle)
+        self.applyGlow(self.change_gui_control, "#0D47A1", 10)
+        self.change_gui_control.setStyleSheet(self.data.blueButtonClicked)
 
         self.change_gui_config.clicked.connect(lambda statem, view = 1: self.changeView(view))
         self.applyGlow(self.change_gui_config, "#0D47A1", 10)
         self.change_gui_config.setFixedHeight(self.change_gui_config.geometry().height() * 1.5)
         self.change_gui_config.setFixedWidth(self.change_gui_config.geometry().width() * 4)
-        self.change_gui_config.setStyleSheet(self.data.defaultBlue)
+        self.change_gui_config.setStyleSheet(self.data.blueButtonDefault)
+
+        # TAB CHANGE SLIDE ANIMATION
+        self.animation = SLIDE_ANIMATION(self.gui_view_widget)
+        self.animation.setSpeed(500)
 
         # SPITTER
         self.control_panel_splitter.splitterMoved.connect(self.splitterEvent)
@@ -428,23 +431,23 @@ class UI(QMainWindow):
         self.control_rov_connect.clicked.connect(self.control.rovConnect)
         self.applyGlow(self.control_rov_connect, "#0D47A1", 10)
         self.control_rov_connect.setFixedHeight(self.control_rov_connect.geometry().height() * 1.5)
-        self.control_rov_connect.setStyleSheet(self.data.defaultBlue)
+        self.control_rov_connect.setStyleSheet(self.data.blueButtonDefault)
         # CONTROLLER CONNECT BUTTON
         self.control_controller_connect.clicked.connect(self.control.controllerConnect)
         self.applyGlow(self.control_controller_connect, "#0D47A1", 10)
         self.control_controller_connect.setFixedHeight(self.control_controller_connect.geometry().height() * 1.5)
-        self.control_controller_connect.setStyleSheet(self.data.defaultBlue)
+        self.control_controller_connect.setStyleSheet(self.data.blueButtonDefault)
         # SWITCH CONTROL DIRECTION BUTTON
         self.control_switch_direction.setIcon(QIcon('graphics/switch_direction.png'))
         self.control_switch_direction.clicked.connect(self.control.switchControlDirection)
         self.control_switch_direction.setFixedHeight(self.control_switch_direction.geometry().height() * 1.5)
         self.control_switch_direction.setIconSize(QSize(50,50))
         self.applyGlow(self.control_switch_direction, "#679e37", 10)
-        self.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
-        self.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
+        self.control_switch_direction_forward.setStyleSheet(self.data.greenText)
+        self.control_switch_direction_reverse.setStyleSheet(self.data.disabledText)
         # TIMER CONTROL BUTTONS
         self.control_timer_start.clicked.connect(self.control.toggleTimer)
-        self.control_timer_start.setStyleSheet(self.data.greenStyle)
+        self.control_timer_start.setStyleSheet(self.data.greenText)
         self.control_timer_reset.clicked.connect(self.control.resetTimer)
         self.control_timer.setNumDigits(11)
         self.control_timer.display('00:00:00:00')
@@ -452,6 +455,8 @@ class UI(QMainWindow):
         # MACHINE VISION TASK BUTTONS
         self.control_vision_mosaic.clicked.connect(self.control.popupMosaicTask)
         self.control_vision_shape_detection.clicked.connect(self.control.popupShapeDetectionTask)
+        self.control_vision_transect_line.clicked.connect(self.control.popupTransectLineTask)
+        self.control_vision_coral_health.clicked.connect(self.control.popupCoralHealthTask)
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MANU TO THE SAME SLOT, PASSING THE CAMERA ID AS 1,2,3,4 ETC.
         self.control_camera_1_list.activated.connect(lambda index, camera = 0: self.control.changeExternalCameraFeed(index, camera))
@@ -477,12 +482,12 @@ class UI(QMainWindow):
         self.config_rov_connect.clicked.connect(self.control.rovConnect)
         self.applyGlow(self.config_rov_connect, "#0D47A1", 10)
         self.config_rov_connect.setFixedHeight(self.config_rov_connect.geometry().height() * 1.5)
-        self.config_rov_connect.setStyleSheet(self.data.defaultBlue)
+        self.config_rov_connect.setStyleSheet(self.data.blueButtonDefault)
         # CONTROLLER CONNECT BUTTON
         self.config_controller_connect.clicked.connect(self.control.controllerConnect)
         self.applyGlow(self.config_controller_connect, "#0D47A1", 10)
         self.config_controller_connect.setFixedHeight(self.config_controller_connect.geometry().height() * 1.5)
-        self.config_controller_connect.setStyleSheet(self.data.defaultBlue)
+        self.config_controller_connect.setStyleSheet(self.data.blueButtonDefault)
             
         self.config_com_port_list.activated.connect(self.config.changeComPort) 
         self.config_find_com_ports.clicked.connect(self.config.refreshComPorts)   
@@ -490,15 +495,8 @@ class UI(QMainWindow):
         self.config_cameras_number.editingFinished.connect(lambda: self.config.setCamerasNumber(False))
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
         
-        # ADD THRUSTER CONFIGURATION WIDGETS
-        self.config.setThrustersNumber(self.data.configThrusterNumber, 
-                                        self.config_thruster_form,
-                                        self.data.configThrusterPosition,
-                                        self.data.configThrusterPositionList,
-                                        self.data.configThrusterReverse)
-
         # CREATE KEYBINDING FOR ACTUATOR
-        self.config.addKeyBinding("Switch Orientation", 0, False)
+        #self.config.addKeyBinding("Switch Orientation", 0, False)
 
         # CREATE INDICATORS FOR CONTROLLER VALUES
         self.controller.setupControllerValuesDisplay(self.config_controller_form)
@@ -551,10 +549,9 @@ class UI(QMainWindow):
         # INITIATE CAMERAS IN QTHREADS
         
         # PRIMARY CAMERA        
-        self.camThread1 = CAMERA_CAPTURE(0)
-        self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
-        self.camThread1.finished().connect(self.camThread1.run)
-        self.camThread1.start()
+        #self.camThread1 = CAMERA_CAPTURE(0)
+        #self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
+        #self.camThread1.start()
         
         # SECONDARY CAMERA 1
         #self.camThread2 = CAMERA_CAPTURE(1)
@@ -626,18 +623,16 @@ class UI(QMainWindow):
     def changeView(self, view):
         """
         """
-        self.animation = SLIDE_ANIMATION(self.gui_view_widget)
-        self.animation.setSpeed(500)
+        if self.animation.animationComplete:
+            if view == 0:
+                self.animation.screenPrevious()
+                self.change_gui_control.setStyleSheet(self.data.blueButtonClicked)
+                self.change_gui_config.setStyleSheet(self.data.blueButtonDefault)
 
-        if view == 0:
-            self.animation.screenPrevious()
-            self.change_gui_control.setStyleSheet(self.data.blueStyle)
-            self.change_gui_config.setStyleSheet(self.data.defaultBlue)
-
-        if view == 1:
-            self.animation.screenNext()
-            self.change_gui_control.setStyleSheet(self.data.defaultBlue)
-            self.change_gui_config.setStyleSheet(self.data.blueStyle)
+            if view == 1:
+                self.animation.screenNext()
+                self.change_gui_control.setStyleSheet(self.data.blueButtonDefault)
+                self.change_gui_config.setStyleSheet(self.data.blueButtonClicked)
 
     def applyGlow(self, widget, color, blurRadius):
         """
@@ -664,9 +659,23 @@ class UI(QMainWindow):
         widget.setGraphicsEffect(shadowEffect)
 
     def changeTheme(self, theme):
-        
         # APPLY DARK THEME
         if theme:
+            # WHITE LOGO
+            self.avalon_logo.clear()
+            avalonPixmap = QPixmap('graphics/logo_white.png')
+            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
+            self.avalon_logo.setPixmap(avalonPixmap)
+
+            # DARK THEME STYLE SHEETS
+            self.data.greenText = 'background-color: #679e37'
+            self.data.redText = 'background-color: #c62828'
+            self.data.disabledText = 'color: rgba(0,0,0,25%);'
+            self.data.actuatorGreen = 'background-color: #679e37'
+            self.data.actuatorRed = 'background-color: #c62828'
+            self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
+            self.data.blueButtonDefault = 'color: white; font-weight: bold;'
+
             # CREATE QPALETTE
             darkPalette = QPalette()
             darkPalette.setColor(QPalette.Window, QColor("#161616"))        # MAIN WINDOW BACKGROUND COLOR
@@ -684,6 +693,21 @@ class UI(QMainWindow):
             
         # APPLY DEFAULT THEME
         else:
+            # WHITE LOGO
+            self.avalon_logo.clear()
+            avalonPixmap = QPixmap('graphics/logo.png')
+            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
+            self.avalon_logo.setPixmap(avalonPixmap)
+
+            # DARK THEME STYLE SHEETS
+            self.data.greenText = 'background-color: #679e37'
+            self.data.redText = 'background-color: #c62828'
+            self.data.disabledText = 'color: rgba(0,0,0,25%);'
+            self.data.actuatorGreen = 'background-color: #679e37'
+            self.data.actuatorRed = 'background-color: #c62828'
+            self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
+            self.data.blueButtonDefault = 'color: #0D47A1; font-weight: bold;'
+
             self.app.setPalette(self.app.style().standardPalette())
             pass
 
@@ -714,11 +738,11 @@ class UI(QMainWindow):
 
     def splitterEvent(self):
         self.changePixmapSize()
-    
+        
     def changePixmapSize(self): 
-        # self.primary_camera.setStyleSheet("background-color: white")
-        # self.secondary_camera_1.setStyleSheet("background-color: white")
-        # self.secondary_camera_2.setStyleSheet("background-color: white")
+        
+        # UPDATE PIXMAP SIZE ON MOSAIC TASK POPUP WINDOW
+        self.control.mosaicPopup.imageResizeEvent()
 
         cameraPixmap = QPixmap('graphics/no_signal.png')
 
@@ -785,8 +809,8 @@ class CONTROL_PANEL():
             # MODIFY BUTTON STYLE
             self.ui.control_rov_connect.setText('DISCONNECT')
             self.ui.config_rov_connect.setText('DISCONNECT')
-            self.ui.control_rov_connect.setStyleSheet(self.data.blueStyle)
-            self.ui.config_rov_connect.setStyleSheet(self.data.blueStyle)
+            self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonClicked)
+            self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonClicked)
             
             # ROV SERIAL LIBRARY
             #self.rov.initialiseConnection('AVALON',self.data.rovComPort, 115200)
@@ -817,8 +841,8 @@ class CONTROL_PANEL():
             self.data.rovConnectButtonStatus = False
             self.ui.control_rov_connect.setText('CONNECT')
             self.ui.config_rov_connect.setText('CONNECT')
-            self.ui.control_rov_connect.setStyleSheet(self.data.defaultBlue)
-            self.ui.config_rov_connect.setStyleSheet(self.data.defaultBlue)
+            self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonDefault)
+            self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonDefault)
             # CLOSE COM PORT
             if self.data.rovCommsStatus:
                 self.ui.printTerminal("Disconnected from {}".format(self.data.rovComPort))
@@ -848,8 +872,8 @@ class CONTROL_PANEL():
             self.data.controllerConnectButtonStatus = True
             self.ui.control_controller_connect.setText('DISCONNECT')
             self.ui.config_controller_connect.setText('DISCONNECT')
-            self.ui.control_controller_connect.setStyleSheet(self.data.blueStyle)
-            self.ui.config_controller_connect.setStyleSheet(self.data.blueStyle)
+            self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonClicked)
+            self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonClicked)
             
             # INITIATE COMMUNICATION WITH THE CONTROLLER
             connectionStatus, controllerNumber, message = self.controller.findController("Controller (Xbox One For Windows)")
@@ -864,8 +888,8 @@ class CONTROL_PANEL():
             self.data.controllerConnectButtonStatus = False
             self.ui.control_controller_connect.setText('CONNECT')
             self.ui.config_controller_connect.setText('CONNECT')
-            self.ui.control_controller_connect.setStyleSheet(self.data.defaultBlue)  
-            self.ui.config_controller_connect.setStyleSheet(self.data.defaultBlue)
+            self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonDefault)  
+            self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonDefault)
             # STOP UPDATING CONTROLLER VALUES  
             self.controller.stopControllerEventLoop()
             # UNINITIALISE JOYSTICK MODULE
@@ -936,38 +960,6 @@ class CONTROL_PANEL():
         """
         self.changeThrusters()
 
-    def controllerEventLoop(self, controllerNumber):
-        """
-        PURPOSE
-
-        - Initiates a seperate thread that continuously requests the controller joystick and button states.
-        - Passes button states and joystick values to processing functions.
-
-        INPUT
-
-        - controllerNumber = index of the connected controller from the list of available controllers.
-
-        RETURNS
-
-        NONE
-        """
-        # TAKE SINGLE READING OF CONTROLLER VALUES
-        buttonStates, arrowStates, joystickValues = self.getControllerInputs(self.data.controllerConnectButtonStatus, controllerNumber)
-
-        # PROCESS BUTTON STATES
-        filteredButtonStates = self.processButtons(buttonStates, arrowStates)
-        
-        # PROCESS JOYSTICK VALUES
-        filteredJoystickValues = self.processJoysticks(joystickValues)
-
-        # UPDATE GUI
-        self.updateControllerValuesDisplay(filteredButtonStates, filteredJoystickValues)
-
-        # UPDATE CONTROLLER INPUTS AT A RATE OF 60FPS TO REDUCE CPU USAGE
-        thread = Timer(1/60,lambda controllerNumber = controllerNumber: self.controllerEventLoop(controllerNumber))
-        thread.daemon = True                            
-        thread.start()
-
     ###########################
     ## ROV CONTROL FUNCTIONS ##
     ###########################
@@ -989,13 +981,13 @@ class CONTROL_PANEL():
         """
         if self.data.controlActuatorStates[actuator] == False:
             buttonObject.setText(self.data.configActuatorLabelList[actuator][2])
-            buttonObject.setStyleSheet(self.data.redStyle)
+            buttonObject.setStyleSheet(self.data.actuatorRed)
             self.data.controlActuatorStates[actuator] = True
             #self.rov.setActuators(actuator, True)
 
         elif self.data.controlActuatorStates[actuator] == True:
             buttonObject.setText(self.data.configActuatorLabelList[actuator][1])
-            buttonObject.setStyleSheet(self.data.greenStyle)
+            buttonObject.setStyleSheet(self.data.actuatorGreen)
             self.data.controlActuatorStates[actuator] = False
             #self.rov.setActuators(actuator, False)
 
@@ -1034,12 +1026,12 @@ class CONTROL_PANEL():
         """
         if self.data.controlControlDirection == True:
             self.data.controlControlDirection = False
-            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textDisabledStyle)
-            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textGreenStyle)
+            self.ui.control_switch_direction_forward.setStyleSheet(self.data.disabledText)
+            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.greenText)
         else:
             self.data.controlControlDirection = True
-            self.ui.control_switch_direction_forward.setStyleSheet(self.data.textGreenStyle)
-            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.textDisabledStyle)
+            self.ui.control_switch_direction_forward.setStyleSheet(self.data.greenText)
+            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.disabledText)
 
     ###########################
     ##### TIMER FUNCTIONS #####
@@ -1090,14 +1082,14 @@ class CONTROL_PANEL():
         if self.data.controlTimerEnabled == False:
             self.data.controlTimerEnabled = True
             self.ui.control_timer_start.setText('Stop')
-            self.ui.control_timer_start.setStyleSheet(self.data.redStyle)
+            self.ui.control_timer_start.setStyleSheet(self.data.redText)
             self.startTime = datetime.now()
             # START TIMER
             self.readSystemTime()
         else:
             self.data.controlTimerEnabled = False
             self.ui.control_timer_start.setText('Start')
-            self.ui.control_timer_start.setStyleSheet(self.data.greenStyle)
+            self.ui.control_timer_start.setStyleSheet(self.data.greenText)
 
     def resetTimer(self):
         """
@@ -1406,45 +1398,77 @@ class CONTROL_PANEL():
     #### COMPUTER VISION TASKS ####
     ###############################
     def initialiseVisionWidgets(self):
-        self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.ui.group_box_mosaic_task)
+        self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
+        self.animation.setSpeed(300)
+
+        #self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.ui.group_box_mosaic_task)
+        self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.ui.scroll_mosaic_task)
+        self.transectLinePopup = TRANSECT_LINE_POPUP_WINDOW(self.ui.group_box_transect_task)
+
+    def changeVisionButtons(self, index, status):
+        layout = self.ui.group_box_tasks.layout()
+        for i in range(len(self.data.controlVisionTaskStatus)):
+            button = layout.itemAtPosition(i, 1).widget()
+            if i == index:
+                if status:
+                    button.setText("Stop")
+                    button.setStyleSheet(self.data.blueButtonClicked)
+                else:
+                    button.setText("Start")
+                    button.setStyleSheet("")
+
+            else:
+                button.setText("Start")
+                button.setStyleSheet("")
+                self.data.controlVisionTaskStatus[i] = False
 
     def popupMosaicTask(self):
-        self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
-        self.animation.setSpeed(300)
-
-        if self.data.controlMosaicTaskStatus == False:
-            self.data.controlMosaicTaskStatus = True
-            self.data.controlShapeDetectionTaskStatus = False
-            self.animation.jumpTo(1)
-            self.ui.control_vision_mosaic.setText("Stop")
-            self.ui.control_vision_mosaic.setStyleSheet(self.data.blueStyle)
-            self.ui.control_vision_shape_detection.setText("Start")
-            self.ui.control_vision_shape_detection.setStyleSheet("")
-
-        else:
-            self.data.controlMosaicTaskStatus = False
-            self.animation.jumpTo(0)
-            self.ui.control_vision_mosaic.setText("Start")
-            self.ui.control_vision_mosaic.setStyleSheet("")
-
+        if self.animation.animationComplete:
+            if self.data.controlVisionTaskStatus[0] == False:
+                self.data.controlVisionTaskStatus[0] = True
+                self.changeVisionButtons(0, True)
+                self.animation.jumpTo(1)
+                
+            else:
+                self.data.controlVisionTaskStatus[0] = False
+                self.changeVisionButtons(0, False)
+                self.animation.jumpTo(0)
+            
     def popupShapeDetectionTask(self):
-        self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
-        self.animation.setSpeed(300)
+        if self.animation.animationComplete:
+            if self.data.controlVisionTaskStatus[1] == False:
+                self.data.controlVisionTaskStatus[1] = True
+                self.changeVisionButtons(1, True)
+                self.animation.jumpTo(2)
+                
+            else:
+                self.data.controlVisionTaskStatus[1] = False
+                self.changeVisionButtons(1, False)
+                self.animation.jumpTo(0)
+            
+    def popupTransectLineTask(self):
+        if self.animation.animationComplete:
+            if self.data.controlVisionTaskStatus[2] == False:
+                self.data.controlVisionTaskStatus[2] = True
+                self.changeVisionButtons(2, True)
+                self.animation.jumpTo(3)
+                
+            else:
+                self.data.controlVisionTaskStatus[2] = False
+                self.changeVisionButtons(2, False)
+                self.animation.jumpTo(0)
 
-        if self.data.controlShapeDetectionTaskStatus == False:
-            self.data.controlShapeDetectionTaskStatus = True
-            self.data.controlMosaicTaskStatus = False
-            self.animation.jumpTo(2)
-            self.ui.control_vision_shape_detection.setText("Stop")
-            self.ui.control_vision_shape_detection.setStyleSheet(self.data.blueStyle)
-            self.ui.control_vision_mosaic.setText("Start")
-            self.ui.control_vision_mosaic.setStyleSheet("")
-
-        else:
-            self.data.controlShapeDetectionTaskStatus = False
-            self.animation.jumpTo(0)
-            self.ui.control_vision_shape_detection.setText("Start")
-            self.ui.control_vision_shape_detection.setStyleSheet("")
+    def popupCoralHealthTask(self):
+        if self.animation.animationComplete:
+            if self.data.controlVisionTaskStatus[3] == False:
+                self.data.controlVisionTaskStatus[3] = True
+                self.changeVisionButtons(3, True)
+                self.animation.jumpTo(4)
+                
+            else:
+                self.data.controlVisionTaskStatus[3] = False
+                self.changeVisionButtons(3, False)
+                self.animation.jumpTo(0)
 
 class CONFIG():
     """
@@ -1678,7 +1702,7 @@ class CONFIG():
                 actuatorLayout.addWidget(state2,2,1)
 
                 # SET DEFAULT STYLE SHEET
-                actuatorToggle.setStyleSheet(self.data.greenStyle)
+                actuatorToggle.setStyleSheet(self.data.actuatorGreen)
 
                 # ADD TO CONFIG TAB ACTUATORS FORM
                 self.ui.config_actuator_form.addRow(actuatorNumber, actuatorLayout)
@@ -2031,7 +2055,7 @@ class CONFIG():
         """
         if bindingFound == False:
             # CHANGE BUTTON STYLE
-            buttonObject.setStyleSheet(self.data.blueStyle)
+            buttonObject.setStyleSheet(self.data.blueButtonClicked)
             # INITIATE SEARCH FOR PRESSED BUTTON
             startTime = datetime.now()
             self.findKeyBinding(index, buttonObject, menuObject, startTime)
@@ -2327,14 +2351,17 @@ class DATABASE():
     controlSensorLabelObjects = []          # STORES SENSOR LABEL OBJECTS
 
     controlCameraViewList = [None] * 4      # STORES THE SELECTED EXTERNAL CAMERA FEEDS
+
+    controlVisionTaskStatus = [False] * 4   # STORES THE ON/OFF STATUS OF EACH TASK
     
     # STYLESHEETS USED FOR BUTTONS AND TEXT ETC.
-    greenStyle = 'background-color: #679e37'
-    redStyle = 'background-color: #c62828'
-    blueStyle = 'background-color: #0D47A1; color: white; font-weight: bold;'
-    defaultBlue = 'color: #0D47A1; font-weight: bold;'
-    textGreenStyle = 'color: #679e37; font-weight: bold;'
-    textDisabledStyle = 'color: rgba(0,0,0,25%);'
+    greenText = ""
+    redText = ""
+    disabledText = ""
+    actuatorGreen = ""
+    actuatorRed = ""
+    blueButtonClicked = ""
+    blueButtonDefault = ""
 
     controlControlDirection = True          # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
 
@@ -2401,9 +2428,23 @@ def guiInitiate():
     """
     # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
     app = QApplication(sys.argv)
+
+    # PROGRAM BOOT SPLASH SCREEN
+    splash_pix = QPixmap('graphics/splash_screen.png')
+    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    splash.setMask(splash_pix.mask())
+    #progressBar = QProgressBar(splash)
+    splash.show()
+    app.processEvents()
+
+    # for i in range(0, 100):
+    #     progressBar.setValue(i)
+    #     
+
     app.setFont(QFont("Bahnschrift Light", 10))
     app.setStyle("Fusion")
-    UI(app)
+    program = UI(app)
+    splash.finish(program)
     # START EVENT LOOP
     app.exec_()
 

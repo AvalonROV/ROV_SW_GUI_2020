@@ -121,6 +121,7 @@ class CONTROLLER(QObject):
 
         - controllerLabelObjects = array containing pointers to the label objects to update the controller values.
         """
+        print("SETTING UP CONTROLLER VALUES")
         # NAMES OF JOYSTICK AXES
         joystickLabels = ['Left X', 'Left Y','Triggers', 'Right Y', 'Right X']
         buttonLabels = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']

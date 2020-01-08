@@ -18,10 +18,12 @@ class VIEW(QMainWindow):
             widget.addWidget(label)
 
         screenNext = QPushButton("Next")
-        screenNext.clicked.connect(self.animation.screenNext)
+        #screenNext.clicked.connect(self.animation.screenNext)
+        screenNext.clicked.connect(lambda state, page = 0: self.animation.jumpTo(page))
 
         screenPrevious = QPushButton("Previous")
-        screenPrevious.clicked.connect(self.animation.screenPrevious)
+        #screenPrevious.clicked.connect(self.animation.screenPrevious)
+        screenPrevious.clicked.connect(lambda state, page = 1: self.animation.jumpTo(page))
 
         layout = QHBoxLayout()
         layout.addWidget(screenPrevious)
@@ -45,6 +47,7 @@ class SLIDE_ANIMATION(QWidget):
         self.m_wrap = False
         self.m_pnow = QPoint(0, 0)
         self.m_active = False
+        self.animationComplete = True
 
     def setDirection(self, direction):
         self.m_direction = direction
@@ -60,7 +63,7 @@ class SLIDE_ANIMATION(QWidget):
 
     def jumpTo(self, page):
         now = self.stackedWidget.currentIndex()
-        if self.m_wrap or now < (self.stackedWidget.count()):
+        if (self.m_wrap or now < (self.stackedWidget.count())):
             self.slideInIdx(page)
 
     def screenNext(self):
@@ -81,6 +84,9 @@ class SLIDE_ANIMATION(QWidget):
         self.slideInWgt(self.stackedWidget.widget(idx))
 
     def slideInWgt(self, newwidget):
+
+        self.animationComplete = False
+
         if self.m_active:
             return
 
@@ -144,6 +150,7 @@ class SLIDE_ANIMATION(QWidget):
         self.stackedWidget.widget(self.m_now).hide()
         self.stackedWidget.widget(self.m_now).move(self.m_pnow)
         self.m_active = False
+        self.animationComplete = True
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

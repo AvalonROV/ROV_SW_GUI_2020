@@ -2,11 +2,8 @@ import sys
 from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
-from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
-                            QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, 
-                            QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
-                            QFileDialog, QGraphicsDropShadowEffect)
-from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette
+from PyQt5.QtWidgets import (QScrollArea, QWidget, QLabel, QApplication, QGridLayout, QPushButton, QSizePolicy)
+from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QFont
 
 class VIEW(QWidget):
     def __init__(self):
@@ -24,15 +21,17 @@ class MOSAIC_POPUP_WINDOW(QWidget):
     """
     def __init__(self, viewWidget):
         QWidget.__init__(self) 
-        # LOAD UI FILE
-        uic.loadUi('libraries/computer_vision/mosaicTask/mosaicPopup.ui',self)
-        
+        self.mainLayout = QGridLayout()
+        self.scroll = QScrollArea()
+        # self.scroll.setStyleSheet("""QScrollArea { background: transparent;
+        #                             background: transparent; }
+        #                             background: 0; }""")
+        self.mainLayout.addWidget(self.scroll)
+        self.layout = QGridLayout()
+        self.scroll.setLayout(self.layout)
         # ADD IMAGE CAPTURE BUTTONS
         self.addWidgets()
-
-        layout = QGridLayout()
-        layout.addWidget(self)
-        viewWidget.setLayout(layout)
+        viewWidget.setLayout(self.mainLayout)
 
     def addWidgets(self):
         """
@@ -54,14 +53,14 @@ class MOSAIC_POPUP_WINDOW(QWidget):
             button = QPushButton("Capture {}".format(index + 1))
             image = QLabel()
             image.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            image.setPixmap(defaultView.scaledToHeight(10))
+            image.setPixmap(defaultView.scaledToHeight(200))
             # ADD TO GRID LAYOUT
-            self.mosaic_grid_layout.addWidget(image, (index * 2), 0)
-            self.mosaic_grid_layout.addWidget(button, (index * 2) + 1, 0)
-            button.clicked.connect(lambda _, index = index, buttonObject = button, imageObject = image: self.captureImage(index, buttonObject, imageObject))
+            self.layout.addWidget(image, (index * 2), 0)
+            self.layout.addWidget(button, (index * 2) + 1, 0)
+            button.clicked.connect(lambda state, index = index, buttonObject = button, imageObject = image: self.captureImage(index, buttonObject, imageObject))
 
         computeButton = QPushButton("Compute Mosaic")
-        self.mosaic_grid_layout.addWidget(computeButton, 10, 0)
+        self.layout.addWidget(computeButton, 10, 0)
         computeButton.clicked.connect(self.computeMosaic)
 
     def captureImage(self, index, buttonObject, imageObject):
@@ -93,6 +92,14 @@ class MOSAIC_POPUP_WINDOW(QWidget):
 
     def computeMosaic(self):
         pass
+
+    def imageResizeEvent(self):
+        cameraPixmap = QPixmap('graphics/blank.png')
+        for image in range(5):
+            widget = self.layout.itemAt(image*2).widget()
+            widgetSize = [widget.size().width(), widget.height()]
+            adjustedImage = cameraPixmap.scaled(widgetSize[0]*0.90, widgetSize[1]*0.90, Qt.KeepAspectRatio)
+            widget.setPixmap(adjustedImage)
 
 def guiInitiate(): 
     """
