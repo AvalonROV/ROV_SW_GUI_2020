@@ -4,10 +4,10 @@ from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, 
 from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
                             QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, 
                             QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
-                            QFileDialog, QGraphicsDropShadowEffect)
+                            QFileDialog, QGraphicsDropShadowEffect, QOpenGLWidget)
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette
 
-class VIEW(QWidget):
+class VIEW(QOpenGLWidget):
     def __init__(self):
         super(VIEW, self).__init__()
         self.setWindowTitle("Camera Capture View")
@@ -51,8 +51,13 @@ class CAMERA_CAPTURE(QThread):
     def run(self):
         # INITIATE CAMERA
         cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
+        #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
+        #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
+        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1024)
+        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 576)
+        #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 640)
+        #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 480)
+        
 
         while True:    
             # CAPTURE FRAME
@@ -72,7 +77,9 @@ class CAMERA_CAPTURE(QThread):
                 self.cameraNewFrameSignal.emit(cameraFrame)
             
             else:
-                self.cameraNewFrameSignal.emit(QImage("graphics/no_signal.png"))
+                self.cameraNewFrameSignal.emit(QPixmap("graphics/no_signal.png"))
+            
+            QThread.msleep(30)
 
     def exit(self):
         print("EXIT")

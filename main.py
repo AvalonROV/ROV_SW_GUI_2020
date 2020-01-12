@@ -25,6 +25,7 @@ from pygame.event import Event, get
 import serial
 import time
 import numpy as np
+import subprocess
 
 # CUSTOM LIBRARIES
 from avalonComms import ROV
@@ -464,6 +465,11 @@ class UI(QMainWindow):
         self.control_camera_3_list.activated.connect(lambda index, camera = 2: self.control.changeExternalCameraFeed(index, camera))
         self.control_camera_4_list.activated.connect(lambda index, camera = 3: self.control.changeExternalCameraFeed(index, camera))
 
+        # CAMERA FEED CLICK EVENT
+        self.primary_camera.mousePressEvent = lambda event, cameraFeed = 0: self.changeCameraFeed(event, cameraFeed)
+        self.secondary_camera_1.mousePressEvent = lambda event, cameraFeed = 1: self.changeCameraFeed(event, cameraFeed)
+        self.secondary_camera_2.mousePressEvent = lambda event, cameraFeed = 2: self.changeCameraFeed(event, cameraFeed)
+
     def linkConfigWidgets(self):
         """
         PURPOSE
@@ -546,22 +552,25 @@ class UI(QMainWindow):
         NONE
         """
         pass
+
+        self.cameraFeeds = [self.primary_camera, self.secondary_camera_1, self.secondary_camera_2]
+
         # INITIATE CAMERAS IN QTHREADS
         
         # PRIMARY CAMERA        
-        #self.camThread1 = CAMERA_CAPTURE(0)
-        #self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
-        #self.camThread1.start()
+        self.camThread1 = CAMERA_CAPTURE(0)
+        self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
+        self.camThread1.start()
         
         # SECONDARY CAMERA 1
-        #self.camThread2 = CAMERA_CAPTURE(1)
-        #self.camThread2.cameraNewFrameSignal.connect(self.updateCamera2Feed)
-        #self.camThread2.start()
+        self.camThread2 = CAMERA_CAPTURE(1)
+        self.camThread2.cameraNewFrameSignal.connect(self.updateCamera2Feed)
+        self.camThread2.start()
         
         # SECONDARY CAMERA 2
-        #self.camThread3 = CAMERA_CAPTURE(2)
-        #self.camThread3.cameraNewFrameSignal.connect(self.updateCamera3Feed)
-        #self.camThread3.start()
+        self.camThread3 = CAMERA_CAPTURE(2)
+        self.camThread3.cameraNewFrameSignal.connect(self.updateCamera3Feed)
+        self.camThread3.start()
 
     @pyqtSlot(QPixmap)
     def updateCamera1Feed(self, frame):
@@ -578,8 +587,8 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaledToHeight(self.primary_camera.size().height()*0.98)
-        self.primary_camera.setPixmap(pixmap)
+        pixmap = frame.scaledToHeight(self.cameraFeeds[0].size().height()*0.98)
+        self.cameraFeeds[0].setPixmap(pixmap)
 
     @pyqtSlot(QPixmap)
     def updateCamera2Feed(self, frame):
@@ -596,8 +605,8 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
-        self.secondary_camera_1.setPixmap(pixmap)
+        pixmap = frame.scaledToHeight(self.cameraFeeds[1].size().height()*0.98)
+        self.cameraFeeds[1].setPixmap(pixmap)
 
     @pyqtSlot(QPixmap)
     def updateCamera3Feed(self, frame):
@@ -614,8 +623,18 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
-        self.secondary_camera_2.setPixmap(pixmap)
+        pixmap = frame.scaledToHeight(self.cameraFeeds[2].size().height()*0.98)
+        self.cameraFeeds[2].setPixmap(pixmap)
+
+    def changeCameraFeed(self, event, cameraFeed):
+        if cameraFeed == 0:
+            pass
+
+        if cameraFeed == 1:
+            self.cameraFeeds[0], self.cameraFeeds[1] = self.cameraFeeds[1], self.cameraFeeds[0]
+              
+        if cameraFeed == 2:
+            self.cameraFeeds[0], self.cameraFeeds[2] = self.cameraFeeds[2], self.cameraFeeds[0]
 
     ###########################
     ##### OTHER FUNCTIONS #####
@@ -740,22 +759,21 @@ class UI(QMainWindow):
         self.changePixmapSize()
         
     def changePixmapSize(self): 
-        
         # UPDATE PIXMAP SIZE ON MOSAIC TASK POPUP WINDOW
         self.control.mosaicPopup.imageResizeEvent()
 
         cameraPixmap = QPixmap('graphics/no_signal.png')
 
         cam1Size = [self.primary_camera.size().width(), self.primary_camera.size().height()]
-        primaryCameraPixmap = cameraPixmap.scaled(cam1Size[0]*0.99, cam1Size[1]*0.99, Qt.KeepAspectRatio)
+        primaryCameraPixmap = self.primary_camera.pixmap().scaled(cam1Size[0]*0.99, cam1Size[1]*0.99, Qt.KeepAspectRatio)
         self.primary_camera.setPixmap(primaryCameraPixmap)  
 
         cam2Size = [self.secondary_camera_1.size().width(), self.secondary_camera_1.size().height()]
-        secondary1CameraPixmap = cameraPixmap.scaled(cam2Size[0]*0.99, cam2Size[1]*0.99, Qt.KeepAspectRatio)
+        secondary1CameraPixmap = self.secondary_camera_1.pixmap().scaled(cam2Size[0]*0.99, cam2Size[1]*0.99, Qt.KeepAspectRatio)
         self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
 
         cam3Size = [self.secondary_camera_2.size().width(), self.secondary_camera_2.size().height()]
-        secondary2CameraPixmap = cameraPixmap.scaled(cam3Size[0]*0.99, cam3Size[1]*0.99, Qt.KeepAspectRatio)
+        secondary2CameraPixmap = self.secondary_camera_2.pixmap().scaled(cam3Size[0]*0.99, cam3Size[1]*0.99, Qt.KeepAspectRatio)
         self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
 
 class CONTROL_PANEL():
@@ -2328,6 +2346,15 @@ class TOOLBAR():
         else:
             self.data.programTheme = False
             self.ui.changeTheme(False)
+
+        self.restartProgram()
+
+    def restartProgram(self):
+        """
+        """
+        self.saveSettings()
+        subprocess.Popen(['python', 'main.py'])
+        sys.exit(0)
             
 class DATABASE():
     """
