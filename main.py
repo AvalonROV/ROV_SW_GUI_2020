@@ -33,6 +33,7 @@ from libraries.controller.xboxController import CONTROLLER
 from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
 from libraries.computer_vision.transectLineTask.transectLinePopupWindow import TRANSECT_LINE_POPUP_WINDOW
 from libraries.camera.cameraCapture import CAMERA_CAPTURE
+#from libraries.camera.cameraCaptureTimer import CAMERA_CAPTURE
 from libraries.animation.slideAnimation import SLIDE_ANIMATION
 
 class UI(QMainWindow):
@@ -84,12 +85,12 @@ class UI(QMainWindow):
 
         # SET CAMERA FEED PLACE HOLDER
         cameraPixmap = QPixmap('graphics/no_signal.png')
-        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.primary_camera.size().height()*0.98)
-        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_1.size().height()*0.98)
-        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.secondary_camera_2.size().height()*0.98)
-        self.primary_camera.setPixmap(primaryCameraPixmap)
-        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
-        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
+        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.camera_feed_1.size().height()*0.98)
+        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.camera_feed_2.size().height()*0.98)
+        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.camera_feed_3.size().height()*0.98)
+        self.camera_feed_1.setPixmap(primaryCameraPixmap)
+        self.camera_feed_2.setPixmap(secondary1CameraPixmap)
+        self.camera_feed_3.setPixmap(secondary2CameraPixmap)
 
         # LINK GUI BUTTONS TO METHODS
         self.linkControlPanelWidgets()
@@ -140,6 +141,8 @@ class UI(QMainWindow):
             self.data.configActuatorLabelList,
             self.data.configSensorSelectedType,
             self.data.configDefaultCameraList,
+            self.data.configDigitalCameraLabels,
+            self.data.configDigitalDefaultCameraList,
             self.data.configKeyBindings) = self.readConfigFile(self.data.fileName, 
                                                                 self.data.programTheme,
                                                                 self.data.configThrusterPosition,
@@ -147,6 +150,8 @@ class UI(QMainWindow):
                                                                 self.data.configActuatorLabelList,
                                                                 self.data.configSensorSelectedType,
                                                                 self.data.configDefaultCameraList,
+                                                                self.data.configDigitalCameraLabels,
+                                                                self.data.configDigitalDefaultCameraList,
                                                                 self.data.configKeyBindings)       
         
         if configFileStatus == False:
@@ -174,7 +179,9 @@ class UI(QMainWindow):
         # UPDATE GUI WITH SENSOR DATA
         self.config.setSensorsNumber(True) 
         # UPDATE GUI WITH ANALOG CAMERA DATA
-        self.config.setCamerasNumber(True) 
+        self.config.setCamerasNumber() 
+        # UPDATE GUI WITH DIGITAL CAMERA DATA
+        self.config.setupDigitalCameras()
 
     def readConfigFile(self, fileName,
                         theme, 
@@ -183,6 +190,8 @@ class UI(QMainWindow):
                         actuatorLabelList, 
                         sensorSelectedType, 
                         defaultCameraList, 
+                        digitalCameraLabels,
+                        defaultDigitalCameras,
                         keyBindings):
         """
         PURPOSE
@@ -225,6 +234,9 @@ class UI(QMainWindow):
 
             for child in root:
 
+                ##############################
+                #### READ THEME SETTINGS #####
+                ##############################
                 if child.tag == 'theme':
                     theme = True if child.text == "dark" else False
 
@@ -282,9 +294,16 @@ class UI(QMainWindow):
                                     defaultCameraList[index - 1] = int(camera.text)
 
                         # DIGITAL CAMERAS
-                        if cameraType.tag == 'digital':
-                            pass
-
+                        if cameraType.tag == 'digital':                            
+                            for attr in cameraType:
+                                # SET NUMBER OF SENSORS AND SENSOR TYPE
+                                if attr.tag == 'labels':                                    
+                                    for index, item in enumerate(attr):                        
+                                        digitalCameraLabels[index] = str(item.text)   
+                                if attr.tag == 'defaultfeeds':
+                                    for index, item in enumerate(attr):                        
+                                        defaultDigitalCameras[index] = int(item.text)
+                                    
                 ##############################
                 ## READ KEYBINDING SETTINGS ##
                 ##############################
@@ -302,6 +321,8 @@ class UI(QMainWindow):
                 actuatorLabelList,
                 sensorSelectedType,
                 defaultCameraList,
+                digitalCameraLabels,
+                defaultDigitalCameras,
                 keyBindings)
 
     def resetConfig(self, resetStatus):
@@ -344,7 +365,7 @@ class UI(QMainWindow):
             # REMOVE ACTUATORS FROM CONFIG TAB
             self.config_actuator_form.removeRow(1) 
             # REMOVE ACTUATORS FROM CONTROL PANEL TAB
-            #self.control_panel_actuators.removeRow(0)
+            self.control_panel_actuators.removeRow(0)
         self.config_actuators_number.setValue(0)
         self.data.configActuatorNumber = 0
 
@@ -372,6 +393,7 @@ class UI(QMainWindow):
         ###############################
         #### RESET CAMERA SETTINGS ####
         ###############################
+        # ANALOG
         self.data.configDefaultCameraList = [0] * 4
         self.data.configCameraList = []
         self.config_cameras_number.setValue(0)
@@ -379,6 +401,11 @@ class UI(QMainWindow):
         self.config_camera_2_list.clear()
         self.config_camera_3_list.clear()
         self.config_camera_4_list.clear()
+        # DIGITAL
+        self.data.configDigitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
+        self.data.configDigitalDefaultCameraList = [0, 1, 2]
+        self.data.configDigitalSelectedList = [0, 1, 2]
+        self.config.setupDigitalCameras()
 
         ###############################
         ## RESET KEYBINDING SETTINGS ##
@@ -459,16 +486,32 @@ class UI(QMainWindow):
         self.control_vision_transect_line.clicked.connect(self.control.popupTransectLineTask)
         self.control_vision_coral_health.clicked.connect(self.control.popupCoralHealthTask)
 
-        # LINK EACH DEFAULT CAMERA DROP DOWN MANU TO THE SAME SLOT, PASSING THE CAMERA ID AS 1,2,3,4 ETC.
+        # CAMERA ENABLE CHECKBOX
+        self.camera_1_enable.setChecked(True)
+        self.camera_2_enable.setChecked(True)
+        self.camera_3_enable.setChecked(True)
+        self.camera_1_enable.toggled.connect(lambda state, camera = 0: self.toggleCameraFeed(state, camera))
+        self.camera_2_enable.toggled.connect(lambda state, camera = 1: self.toggleCameraFeed(state, camera))
+        self.camera_3_enable.toggled.connect(lambda state, camera = 2: self.toggleCameraFeed(state, camera))
+
+        # LINK EACH DEFAULT CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING CAMERA ID AS 1,2,3,4 ETC.
         self.control_camera_1_list.activated.connect(lambda index, camera = 0: self.control.changeExternalCameraFeed(index, camera))
         self.control_camera_2_list.activated.connect(lambda index, camera = 1: self.control.changeExternalCameraFeed(index, camera))
         self.control_camera_3_list.activated.connect(lambda index, camera = 2: self.control.changeExternalCameraFeed(index, camera))
         self.control_camera_4_list.activated.connect(lambda index, camera = 3: self.control.changeExternalCameraFeed(index, camera))
 
+        # LINK EACH DIGITAL CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING CAMERA ID AS 1,2,3,4 ETC.
+        self.camera_feed_1_menu.activated.connect(lambda index, camera = 0: self.changeCameraFeedMenu(index, camera))
+        self.camera_feed_2_menu.activated.connect(lambda index, camera = 1: self.changeCameraFeedMenu(index, camera))
+        self.camera_feed_3_menu.activated.connect(lambda index, camera = 2: self.changeCameraFeedMenu(index, camera))
+        self.camera_feed_1_menu.addItems(self.data.configDigitalCameraLabels)
+        self.camera_feed_2_menu.addItems(self.data.configDigitalCameraLabels)
+        self.camera_feed_3_menu.addItems(self.data.configDigitalCameraLabels)
+
         # CAMERA FEED CLICK EVENT
-        self.primary_camera.mousePressEvent = lambda event, cameraFeed = 0: self.changeCameraFeed(event, cameraFeed)
-        self.secondary_camera_1.mousePressEvent = lambda event, cameraFeed = 1: self.changeCameraFeed(event, cameraFeed)
-        self.secondary_camera_2.mousePressEvent = lambda event, cameraFeed = 2: self.changeCameraFeed(event, cameraFeed)
+        self.camera_feed_1.mousePressEvent = lambda event, cameraFeed = 0: self.changeCameraFeed(event, cameraFeed)
+        self.camera_feed_2.mousePressEvent = lambda event, cameraFeed = 1: self.changeCameraFeed(event, cameraFeed)
+        self.camera_feed_3.mousePressEvent = lambda event, cameraFeed = 2: self.changeCameraFeed(event, cameraFeed)
 
     def linkConfigWidgets(self):
         """
@@ -498,11 +541,18 @@ class UI(QMainWindow):
         self.config_com_port_list.activated.connect(self.config.changeComPort) 
         self.config_find_com_ports.clicked.connect(self.config.refreshComPorts)   
         self.config_sensors_number.editingFinished.connect(lambda: self.config.setSensorsNumber(False))
-        self.config_cameras_number.editingFinished.connect(lambda: self.config.setCamerasNumber(False))
+        self.config_cameras_number.editingFinished.connect(self.config.setCamerasNumber)
         self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
-        
-        # CREATE KEYBINDING FOR ACTUATOR
-        #self.config.addKeyBinding("Switch Orientation", 0, False)
+
+        # DIGITAL CAMERA CHANGE NAME
+        self.config_digital_name_1.textChanged.connect(lambda text, camera = 0: self.config.changeDigitalCameraName(text, camera))
+        self.config_digital_name_2.textChanged.connect(lambda text, camera = 1: self.config.changeDigitalCameraName(text, camera))
+        self.config_digital_name_3.textChanged.connect(lambda text, camera = 2: self.config.changeDigitalCameraName(text, camera))
+
+        # DIGITAL DEFAULT CAMERA FEEDS
+        self.config_digital_list_1.activated.connect(lambda index, camera = 0: self.config.changeDigitalDefault(index, camera))
+        self.config_digital_list_2.activated.connect(lambda index, camera = 1: self.config.changeDigitalDefault(index, camera))
+        self.config_digital_list_3.activated.connect(lambda index, camera = 2: self.config.changeDigitalDefault(index, camera))
 
         # CREATE INDICATORS FOR CONTROLLER VALUES
         self.controller.setupControllerValuesDisplay(self.config_controller_form)
@@ -553,7 +603,7 @@ class UI(QMainWindow):
         """
         pass
 
-        self.cameraFeeds = [self.primary_camera, self.secondary_camera_1, self.secondary_camera_2]
+        self.cameraFeeds = [self.camera_feed_1, self.camera_feed_2, self.camera_feed_3]
 
         # INITIATE CAMERAS IN QTHREADS
         
@@ -571,6 +621,26 @@ class UI(QMainWindow):
         self.camThread3 = CAMERA_CAPTURE(2)
         self.camThread3.cameraNewFrameSignal.connect(self.updateCamera3Feed)
         self.camThread3.start()
+
+    def toggleCameraFeed(self, status, feed):
+        """
+        """
+        if feed == 0:
+            if status:
+                self.camThread1.start()
+            else:
+                # NEED TO FIND OTHER SOLUTION!!!
+                self.camThread1.terminate()
+        if feed == 1:
+            if status:
+                self.camThread2.start()
+            else:
+                self.camThread2.terminate()
+        if feed == 2:
+            if status:
+                self.camThread3.start()
+            else:
+                self.camThread3.terminate()
 
     @pyqtSlot(QPixmap)
     def updateCamera1Feed(self, frame):
@@ -605,7 +675,8 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaledToHeight(self.cameraFeeds[1].size().height()*0.98)
+        #pixmap = frame.scaledToHeight(self.cameraFeeds[1].size().height()*0.98)
+        pixmap = QPixmap("graphics/blank.png").scaledToHeight(self.cameraFeeds[1].size().height()*0.98)
         self.cameraFeeds[1].setPixmap(pixmap)
 
     @pyqtSlot(QPixmap)
@@ -635,6 +706,9 @@ class UI(QMainWindow):
               
         if cameraFeed == 2:
             self.cameraFeeds[0], self.cameraFeeds[2] = self.cameraFeeds[2], self.cameraFeeds[0]
+
+    def changeCameraFeedMenu(self, index, cameraFeed):
+        pass
 
     ###########################
     ##### OTHER FUNCTIONS #####
@@ -762,19 +836,19 @@ class UI(QMainWindow):
         # UPDATE PIXMAP SIZE ON MOSAIC TASK POPUP WINDOW
         self.control.mosaicPopup.imageResizeEvent()
 
-        cameraPixmap = QPixmap('graphics/no_signal.png')
+        #cameraPixmap = QPixmap('graphics/no_signal.png')
 
-        cam1Size = [self.primary_camera.size().width(), self.primary_camera.size().height()]
-        primaryCameraPixmap = self.primary_camera.pixmap().scaled(cam1Size[0]*0.99, cam1Size[1]*0.99, Qt.KeepAspectRatio)
-        self.primary_camera.setPixmap(primaryCameraPixmap)  
+        cam1Size = [self.camera_feed_1.size().width(), self.camera_feed_1.size().height()]
+        primaryCameraPixmap = self.camera_feed_1.pixmap().scaled(cam1Size[0]*0.99, cam1Size[1]*0.99, Qt.KeepAspectRatio)
+        self.camera_feed_1.setPixmap(primaryCameraPixmap)  
 
-        cam2Size = [self.secondary_camera_1.size().width(), self.secondary_camera_1.size().height()]
-        secondary1CameraPixmap = self.secondary_camera_1.pixmap().scaled(cam2Size[0]*0.99, cam2Size[1]*0.99, Qt.KeepAspectRatio)
-        self.secondary_camera_1.setPixmap(secondary1CameraPixmap)
+        cam2Size = [self.camera_feed_2.size().width(), self.camera_feed_2.size().height()]
+        secondary1CameraPixmap = self.camera_feed_2.pixmap().scaled(cam2Size[0]*0.99, cam2Size[1]*0.99, Qt.KeepAspectRatio)
+        self.camera_feed_2.setPixmap(secondary1CameraPixmap)
 
-        cam3Size = [self.secondary_camera_2.size().width(), self.secondary_camera_2.size().height()]
-        secondary2CameraPixmap = self.secondary_camera_2.pixmap().scaled(cam3Size[0]*0.99, cam3Size[1]*0.99, Qt.KeepAspectRatio)
-        self.secondary_camera_2.setPixmap(secondary2CameraPixmap)
+        cam3Size = [self.camera_feed_3.size().width(), self.camera_feed_3.size().height()]
+        secondary2CameraPixmap = self.camera_feed_3.pixmap().scaled(cam3Size[0]*0.99, cam3Size[1]*0.99, Qt.KeepAspectRatio)
+        self.camera_feed_3.setPixmap(secondary2CameraPixmap)
 
 class CONTROL_PANEL():
     """
@@ -1872,7 +1946,7 @@ class CONFIG():
     #########################
     #### CAMERA SETTINGS ####
     #########################
-    def setCamerasNumber(self, configStatus):
+    def setCamerasNumber(self):
         """
         PURPOSE
 
@@ -1954,6 +2028,60 @@ class CONFIG():
             self.ui.control_camera_3_list.setCurrentIndex(self.data.configDefaultCameraList[2]) 
         if camera == 3:
             self.ui.control_camera_4_list.setCurrentIndex(self.data.configDefaultCameraList[3]) 
+  
+    def setupDigitalCameras(self):
+        """
+        """
+        # UPDATE CAMERA NAME TEXT BOXES
+        self.ui.config_digital_name_1.setText(self.data.configDigitalCameraLabels[0])
+        self.ui.config_digital_name_2.setText(self.data.configDigitalCameraLabels[1])
+        self.ui.config_digital_name_3.setText(self.data.configDigitalCameraLabels[2])
+
+        # REFRESH DROP DOWN MENUS
+        self.updateDigitalCameraMenus(self.data.configDigitalCameraLabels, 
+                                        self.data.configDigitalDefaultCameraList,
+                                        self.data.configDigitalSelectedList)
+
+    def changeDigitalDefault(self, index, camera):
+        """
+        """
+        # CAMERA VARIABLE REPRESENTS WHICH CAMERA FEED IS BEING MODIFIED (0,1,2,3)
+        # INDEX VARIABLE REPRESENTS THE MENU INDEX SELECTED
+        self.data.configDigitalDefaultCameraList[camera] = index
+
+    def changeDigitalCameraName(self, text, camera):
+        """
+        """
+        # CHANGE CAMERA NAME LABEL
+        self.data.configDigitalCameraLabels[camera] = text
+        # REFRESH DROP DOWN MENUS
+        self.updateDigitalCameraMenus(self.data.configDigitalCameraLabels, 
+                                        self.data.configDigitalDefaultCameraList,
+                                        self.data.configDigitalSelectedList)
+
+    def updateDigitalCameraMenus(self, items, defaultIndex, currentIndex):
+        """
+        """
+        # REFRESH DROP DOWN MENUS
+        self.ui.config_digital_list_1.clear()
+        self.ui.config_digital_list_1.addItems(items)
+        self.ui.config_digital_list_1.setCurrentIndex(items.index(items[defaultIndex[0]]))
+        self.ui.config_digital_list_2.clear()
+        self.ui.config_digital_list_2.addItems(items)
+        self.ui.config_digital_list_2.setCurrentIndex(items.index(items[defaultIndex[1]]))
+        self.ui.config_digital_list_3.clear()
+        self.ui.config_digital_list_3.addItems(items)
+        self.ui.config_digital_list_3.setCurrentIndex(items.index(items[defaultIndex[2]]))
+
+        self.ui.camera_feed_1_menu.clear()
+        self.ui.camera_feed_1_menu.addItems(items)
+        self.ui.camera_feed_1_menu.setCurrentIndex(items.index(items[currentIndex[0]]))
+        self.ui.camera_feed_2_menu.clear()
+        self.ui.camera_feed_2_menu.addItems(items)
+        self.ui.camera_feed_2_menu.setCurrentIndex(items.index(items[currentIndex[1]]))
+        self.ui.camera_feed_3_menu.clear()
+        self.ui.camera_feed_3_menu.addItems(items)
+        self.ui.camera_feed_3_menu.setCurrentIndex(items.index(items[currentIndex[2]]))
 
     #########################
     # KEY BINDING FUNCTIONS #
@@ -2158,6 +2286,8 @@ class TOOLBAR():
                             self.data.configSensorNumber,
                             self.data.configDefaultCameraList,
                             self.data.configCameraNumber,
+                            self.data.configDigitalCameraLabels,
+                            self.data.configDigitalDefaultCameraList,
                             self.data.configKeyBindings,
                             self.data.configKeyBindingsList)
 
@@ -2179,6 +2309,8 @@ class TOOLBAR():
                         sensorNumber, 
                         defaultCameraList,
                         cameraNumber,
+                        digitalCameraLabels,
+                        defaultDigitalList,
                         keyBindings,
                         keyBindingsList):
         """
@@ -2250,6 +2382,14 @@ class TOOLBAR():
         for index in range(4):
             SubElement(analog, "defaultfeed{}".format(index)).text = str(defaultCameraList[index])
 
+        digitalLabels = SubElement(digital, "labels")
+        for index in range(3):
+            SubElement(digitalLabels, "camera{}".format(index + 1)).text = str(digitalCameraLabels[index])
+
+        defaultFeeds = SubElement(digital, "defaultfeeds")
+        for index in range(3):
+            SubElement(defaultFeeds, "feed{}".format(index + 1)).text = str(defaultDigitalList[index])
+        
         ###################################
         ## CONFIGURATION FOR KEYBINDINGS ##
         ###################################
@@ -2287,7 +2427,7 @@ class TOOLBAR():
             self.ui.configSetup()
         else:
             # SET BACK TO DEFAULT NAME IF USER DOES NOT SELECT A FILE
-            self.data.fileName = 'config.xml'
+            self.data.fileName = 'config/config.xml'
 
     def openUserManual(self):
         """
@@ -2402,7 +2542,7 @@ class DATABASE():
     ###############################
     ######## CONFIGURATION ########
     ###############################
-    fileName = 'config.xml' # DEFAULT CONFIG FILE NAME
+    fileName = 'config/config.xml' # DEFAULT CONFIG FILE NAME
 
     # THRUSTER CONFIGURATION SETTINGS
     configThrusterNumber = 8
@@ -2420,9 +2560,14 @@ class DATABASE():
     configActuatorLabelList = []    # LABELS (NAME, DEFAULT STATE, ACTUATED STATE)
 
     # EXTERNAL CAMERA CONFIGURATION SETTINGS
+    # ANALOG
     configCameraNumber = 0 
     configCameraList = []   # LIST OF AVAILABLE CAMERAS
     configDefaultCameraList = [0] * 4   # DEFAULT CAMERAS TO SHOW ON STARTUP
+    # DIGITAL
+    configDigitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
+    configDigitalDefaultCameraList = [0, 1, 2]
+    configDigitalSelectedList = [0, 1, 2]
 
     # KEY BINDING CONFIGURATINO SETTINGS
     # KEY BINDING LIST FOR DROP DOWN MENU
@@ -2472,6 +2617,9 @@ def guiInitiate():
     app.setStyle("Fusion")
     program = UI(app)
     splash.finish(program)
+    app.setWindowIcon(QIcon('graphics/icon.ico'))
+    program.setWindowTitle("Avalon ROV Control Interface")
+    
     # START EVENT LOOP
     app.exec_()
 

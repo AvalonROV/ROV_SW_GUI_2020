@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>976</width>
-    <height>713</height>
+    <width>1952</width>
+    <height>1281</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -115,7 +115,11 @@
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QComboBox" name="control_primary_camera_list"/>
+                    <widget class="QComboBox" name="camera_feed_1_menu">
+                     <property name="sizeAdjustPolicy">
+                      <enum>QComboBox::AdjustToContents</enum>
+                     </property>
+                    </widget>
                    </item>
                    <item>
                     <spacer name="horizontalSpacer_9">
@@ -133,12 +137,12 @@
                   </layout>
                  </item>
                  <item row="1" column="0">
-                  <widget class="QLabel" name="primary_camera">
+                  <widget class="QLabel" name="camera_feed_1">
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
                    <property name="text">
-                    <string>Primary Camera</string>
+                    <string>Camera Feed 1</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -236,12 +240,12 @@
                  <item>
                   <layout class="QGridLayout" name="gridLayout" rowstretch="0,1">
                    <item row="1" column="0">
-                    <widget class="QLabel" name="secondary_camera_1">
+                    <widget class="QLabel" name="camera_feed_2">
                      <property name="frameShape">
                       <enum>QFrame::NoFrame</enum>
                      </property>
                      <property name="text">
-                      <string>Secondary Camera 1</string>
+                      <string>Camera Feed 2</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignCenter</set>
@@ -264,7 +268,11 @@
                       </spacer>
                      </item>
                      <item>
-                      <widget class="QComboBox" name="control_secondary1_camera_list"/>
+                      <widget class="QComboBox" name="camera_feed_2_menu">
+                       <property name="sizeAdjustPolicy">
+                        <enum>QComboBox::AdjustToContents</enum>
+                       </property>
+                      </widget>
                      </item>
                      <item>
                       <spacer name="horizontalSpacer_5">
@@ -297,7 +305,11 @@
                       </spacer>
                      </item>
                      <item>
-                      <widget class="QComboBox" name="control_secondary2_camera_list"/>
+                      <widget class="QComboBox" name="camera_feed_3_menu">
+                       <property name="sizeAdjustPolicy">
+                        <enum>QComboBox::AdjustToContents</enum>
+                       </property>
+                      </widget>
                      </item>
                      <item>
                       <spacer name="horizontalSpacer_7">
@@ -315,12 +327,12 @@
                     </layout>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QLabel" name="secondary_camera_2">
+                    <widget class="QLabel" name="camera_feed_3">
                      <property name="frameShape">
                       <enum>QFrame::NoFrame</enum>
                      </property>
                      <property name="text">
-                      <string>Secondary Camera 2</string>
+                      <string>Camera Feed 3</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignCenter</set>
@@ -358,7 +370,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>180</width>
-                 <height>620</height>
+                 <height>1188</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -722,6 +734,35 @@
               </property>
               <widget class="QWidget" name="page_3">
                <layout class="QGridLayout" name="gridLayout_35">
+                <item row="2" column="1">
+                 <spacer name="verticalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QWidget" name="widget_2" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
                 <item row="0" column="1">
                  <widget class="QGroupBox" name="group_box_minirov">
                   <property name="title">
@@ -776,34 +817,66 @@
                   </layout>
                  </widget>
                 </item>
-                <item row="0" column="0">
-                 <widget class="QWidget" name="widget_2" native="true">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>0</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
                 <item row="1" column="1">
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
+                 <widget class="QGroupBox" name="groupBox">
+                  <property name="title">
+                   <string>Enable/Disable Camera</string>
                   </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
-                 </spacer>
+                  <layout class="QGridLayout" name="gridLayout_40">
+                   <item row="0" column="0">
+                    <layout class="QFormLayout" name="formLayout">
+                     <property name="formAlignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_20">
+                       <property name="text">
+                        <string>Camera 1</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QCheckBox" name="camera_1_enable">
+                       <property name="text">
+                        <string>Enable</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_21">
+                       <property name="text">
+                        <string>Camera 2</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_22">
+                       <property name="text">
+                        <string>Camera 3</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QCheckBox" name="camera_2_enable">
+                       <property name="text">
+                        <string>Enable</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QCheckBox" name="camera_3_enable">
+                       <property name="text">
+                        <string>Enable</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -833,8 +906,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                        <rect>
                         <x>0</x>
                         <y>0</y>
-                        <width>150</width>
-                        <height>576</height>
+                        <width>98</width>
+                        <height>28</height>
                        </rect>
                       </property>
                      </widget>
@@ -938,274 +1011,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_9" rowstretch="1,1" columnstretch="1,1,1,1,1">
-          <item row="0" column="2">
-           <widget class="QGroupBox" name="group_box_actuator_config">
-            <property name="title">
-             <string>Actuator Configuration</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_22">
-             <item row="0" column="0">
-              <widget class="QScrollArea" name="config_actuator_scroll">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="lineWidth">
-                <number>0</number>
-               </property>
-               <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
-               </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QAbstractScrollArea::AdjustToContents</enum>
-               </property>
-               <property name="widgetResizable">
-                <bool>true</bool>
-               </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents_4">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>98</width>
-                  <height>32</height>
-                 </rect>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_23">
-                 <item row="0" column="0">
-                  <layout class="QFormLayout" name="config_actuator_form">
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="numberOfSensorsLabel_2">
-                     <property name="text">
-                      <string>Quantity</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QSpinBox" name="config_actuators_number"/>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </widget>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="4">
-           <widget class="QGroupBox" name="group_box_camera_config">
-            <property name="title">
-             <string>Camera Configuration</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_13">
-             <item row="0" column="0">
-              <layout class="QFormLayout" name="formLayout_13">
-               <item row="0" column="0">
-                <widget class="QLabel" name="numberOfCamerasLabel">
-                 <property name="text">
-                  <string>Quantity</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QSpinBox" name="config_cameras_number">
-                 <property name="value">
-                  <number>0</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="defaultCameraLabel">
-                 <property name="text">
-                  <string>Default Feed 1</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QComboBox" name="config_camera_1_list"/>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="secondaryCamera1Label">
-                 <property name="text">
-                  <string>Default Feed 2</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QComboBox" name="config_camera_2_list"/>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="secondaryCamera2Label">
-                 <property name="text">
-                  <string>Default Feed 3</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QComboBox" name="config_camera_3_list"/>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="secondaryCamera3Label">
-                 <property name="text">
-                  <string>Default Feed 4</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QComboBox" name="config_camera_4_list"/>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QGroupBox" name="group_box_sensor_config">
-            <property name="title">
-             <string>Sensor Configuration</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_21">
-             <item row="0" column="0">
-              <widget class="QScrollArea" name="config_sensor_scroll">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="lineWidth">
-                <number>0</number>
-               </property>
-               <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
-               </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QAbstractScrollArea::AdjustIgnored</enum>
-               </property>
-               <property name="widgetResizable">
-                <bool>true</bool>
-               </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents_2">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>164</width>
-                  <height>56</height>
-                 </rect>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_20">
-                 <item row="0" column="0">
-                  <layout class="QFormLayout" name="config_sensor_form">
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="numberOfSensorsLabel">
-                     <property name="text">
-                      <string>Quantity</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QSpinBox" name="config_sensors_number"/>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="measurementRateLabel">
-                     <property name="text">
-                      <string>Measurement Rate</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QComboBox" name="measurementRateComboBox"/>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </widget>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QGroupBox" name="group_box_thruster_config">
-            <property name="title">
-             <string>Thruster Configuration</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_16">
-             <item row="0" column="0">
-              <widget class="QScrollArea" name="scrollArea">
-               <property name="styleSheet">
-                <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
-</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="lineWidth">
-                <number>0</number>
-               </property>
-               <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
-               </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QAbstractScrollArea::AdjustToContents</enum>
-               </property>
-               <property name="widgetResizable">
-                <bool>true</bool>
-               </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
-                 </rect>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_15">
-                 <item row="0" column="0">
-                  <layout class="QFormLayout" name="config_thruster_form"/>
-                 </item>
-                </layout>
-               </widget>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="1" column="1">
            <widget class="QGroupBox" name="group_box_controller_config">
             <property name="title">
@@ -1242,8 +1047,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>365</width>
+                  <height>569</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_27">
@@ -1308,13 +1113,219 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>364</width>
+                  <height>569</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_17">
                  <item row="0" column="0">
                   <layout class="QFormLayout" name="config_keybindings_form"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QGroupBox" name="group_box_sensor_config">
+            <property name="title">
+             <string>Sensor Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_21">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="config_sensor_scroll">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustIgnored</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>365</width>
+                  <height>570</height>
+                 </rect>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_20">
+                 <item row="0" column="0">
+                  <layout class="QFormLayout" name="config_sensor_form">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="numberOfSensorsLabel">
+                     <property name="text">
+                      <string>Quantity</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QSpinBox" name="config_sensors_number">
+                     <property name="maximum">
+                      <number>10</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="measurementRateLabel">
+                     <property name="text">
+                      <string>Measurement Rate</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="measurementRateComboBox"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QGroupBox" name="group_box_thruster_config">
+            <property name="title">
+             <string>Thruster Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_16">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="scrollArea">
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
+</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>365</width>
+                  <height>570</height>
+                 </rect>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_15">
+                 <item row="0" column="0">
+                  <layout class="QFormLayout" name="config_thruster_form"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QGroupBox" name="group_box_actuator_config">
+            <property name="title">
+             <string>Actuator Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_22">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="config_actuator_scroll">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_4">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>364</width>
+                  <height>570</height>
+                 </rect>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_23">
+                 <item row="0" column="0">
+                  <layout class="QFormLayout" name="config_actuator_form">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="numberOfSensorsLabel_2">
+                     <property name="text">
+                      <string>Quantity</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QSpinBox" name="config_actuators_number">
+                     <property name="maximum">
+                      <number>10</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
                </widget>
@@ -1418,6 +1429,217 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
             </layout>
            </widget>
           </item>
+          <item row="0" column="4">
+           <widget class="QGroupBox" name="group_box_camera_config">
+            <property name="title">
+             <string>Camera Configuration</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="0">
+              <widget class="QScrollArea" name="scrollArea_5">
+               <property name="styleSheet">
+                <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="widgetResizable">
+                <bool>true</bool>
+               </property>
+               <widget class="QWidget" name="scrollAreaWidgetContents_8">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>364</width>
+                  <height>570</height>
+                 </rect>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_39">
+                 <item row="1" column="0">
+                  <layout class="QFormLayout" name="formLayout_13">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="numberOfCamerasLabel">
+                     <property name="text">
+                      <string>Quantity</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QSpinBox" name="config_cameras_number">
+                     <property name="maximum">
+                      <number>10</number>
+                     </property>
+                     <property name="value">
+                      <number>0</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="defaultCameraLabel">
+                     <property name="text">
+                      <string>Default Feed 1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="config_camera_1_list"/>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="secondaryCamera1Label">
+                     <property name="text">
+                      <string>Default Feed 2</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QComboBox" name="config_camera_2_list"/>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="secondaryCamera2Label">
+                     <property name="text">
+                      <string>Default Feed 3</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QComboBox" name="config_camera_3_list"/>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="secondaryCamera3Label">
+                     <property name="text">
+                      <string>Default Feed 4</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QComboBox" name="config_camera_4_list"/>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QLabel" name="label_15">
+                   <property name="text">
+                    <string>Digital Cameras</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="Line" name="line">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="0">
+                  <spacer name="verticalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_14">
+                   <property name="text">
+                    <string>Analog Cameras</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <layout class="QFormLayout" name="config_digital_camera_form">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_17">
+                     <property name="text">
+                      <string>Default Feed 1</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QComboBox" name="config_digital_list_1"/>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_18">
+                     <property name="text">
+                      <string>Default Feed 2</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="config_digital_list_2"/>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="label_19">
+                     <property name="text">
+                      <string>Default Feed 3</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QComboBox" name="config_digital_list_3"/>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="label_16">
+                     <property name="text">
+                      <string>Camera 1 Name</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QLineEdit" name="config_digital_name_1">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="label_23">
+                     <property name="text">
+                      <string>Camera 2 Name</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLineEdit" name="config_digital_name_2"/>
+                   </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="label_24">
+                     <property name="text">
+                      <string>Camera 3 Name</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="1">
+                    <widget class="QLineEdit" name="config_digital_name_3"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -1431,7 +1653,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>976</width>
+     <width>1952</width>
      <height>21</height>
     </rect>
    </property>

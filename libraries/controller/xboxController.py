@@ -221,6 +221,7 @@ class CONTROLLER_UPDATE(QThread):
         self.controllerNumber = controllerNumber
         # UPDATE CONTROLLER VALUES AT A RATE OF 60FPS
         self.timer = QTimer()
+        self.timer.setTimerType(Qt.PreciseTimer)
         self.timer.timeout.connect(self.run)
         self.timer.start(1000/60)
 

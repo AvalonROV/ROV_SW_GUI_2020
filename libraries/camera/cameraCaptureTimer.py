@@ -16,9 +16,9 @@ class VIEW(QWidget):
         layout.addWidget(self.view, 0, 0)
         self.setLayout(layout)
         # INITIATE CAMERA
-        camThread = CAMERA_CAPTURE(0)
-        camThread.cameraNewFrameSignal.connect(self.updateCameraFeed)
-        camThread.start()
+        self.camThread = CAMERA_CAPTURE(0)
+        self.camThread.cameraNewFrameSignal.connect(self.updateCameraFeed)
+        self.camThread.start()
         self.show()
         
     @pyqtSlot(QPixmap)
@@ -47,41 +47,37 @@ class CAMERA_CAPTURE(QThread):
         QThread.__init__(self)
         # CAMERA FEED SOURCE
         self.channel = channel
+        self.cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
+        self.cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1024)
+        self.cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 576)
+        
+        self.timer = QTimer()
+        self.timer.setTimerType(Qt.PreciseTimer)
+        self.timer.timeout.connect(self.run)
+        self.timer.start(40)
     
-    def run(self):
-        # INITIATE CAMERA
-        cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-        #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
-        #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1024)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 576)
-        # cameraFeed.set(CAP_PROP_FRAME_WIDTH, 256)
-        # cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 144)
+    def run(self): 
+        # CAPTURE FRAME
+        status, frame = self.cameraFeed.read()
+    
+        # IF FRAME IS CAPTURED            
+        if status:
+            # CONVERT TO RGB COLOUR
+            cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
+            # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
+            height, width, _ = cameraFrame.shape
+            # GENERATE QIMAGE
+            cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
+            # CONVERT TO PIXMAP
+            cameraFrame = QPixmap.fromImage(cameraFrame)
+            # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
+            self.cameraNewFrameSignal.emit(cameraFrame)
         
-
-        while True:    
-            # CAPTURE FRAME
-            status, frame = cameraFeed.read()
-        
-            # IF FRAME IS CAPTURED            
-            if status:
-                # CONVERT TO RGB COLOUR
-                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
-                # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
-                height, width, _ = cameraFrame.shape
-                # GENERATE QIMAGE
-                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
-                # CONVERT TO PIXMAP
-                cameraFrame = QPixmap.fromImage(cameraFrame)
-                # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
-                self.cameraNewFrameSignal.emit(cameraFrame)
-            
-            else:
-                self.cameraNewFrameSignal.emit(QPixmap("graphics/no_signal.png"))
-            
-            QThread.msleep(round(1000/24))
+        else:
+            self.cameraNewFrameSignal.emit(QPixmap("graphics/no_signal.png"))
 
     def exit(self):
+        self.timer.stop()
         print("EXIT")
 
 if __name__ == '__main__':
