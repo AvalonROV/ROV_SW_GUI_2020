@@ -466,7 +466,10 @@ class UI(QMainWindow):
         self.control_controller_connect.setFixedHeight(self.control_controller_connect.geometry().height() * 1.5)
         self.control_controller_connect.setStyleSheet(self.data.blueButtonDefault)
         # SWITCH CONTROL DIRECTION BUTTON
-        self.control_switch_direction.setIcon(QIcon('graphics/switch_direction.png'))
+        if self.data.programTheme:
+            self.control_switch_direction.setIcon(QIcon('graphics/switch_direction_white.png'))
+        else:
+            self.control_switch_direction.setIcon(QIcon('graphics/switch_direction_black.png'))
         self.control_switch_direction.clicked.connect(self.control.switchControlDirection)
         self.control_switch_direction.setFixedHeight(self.control_switch_direction.geometry().height() * 1.5)
         self.control_switch_direction.setIconSize(QSize(50,50))
@@ -475,7 +478,7 @@ class UI(QMainWindow):
         self.control_switch_direction_reverse.setStyleSheet(self.data.disabledText)
         # TIMER CONTROL BUTTONS
         self.control_timer_start.clicked.connect(self.control.toggleTimer)
-        self.control_timer_start.setStyleSheet(self.data.greenText)
+        self.control_timer_start.setStyleSheet(self.data.buttonGreen)
         self.control_timer_reset.clicked.connect(self.control.resetTimer)
         self.control_timer.setNumDigits(11)
         self.control_timer.display('00:00:00:00')
@@ -657,7 +660,7 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaledToHeight(self.cameraFeeds[0].size().height()*0.98)
+        pixmap = frame.scaled(self.cameraFeeds[0].size().width(), self.cameraFeeds[0].size().height(), Qt.KeepAspectRatio)
         self.cameraFeeds[0].setPixmap(pixmap)
 
     @pyqtSlot(QPixmap)
@@ -675,8 +678,7 @@ class UI(QMainWindow):
 
         NONE
         """
-        #pixmap = frame.scaledToHeight(self.cameraFeeds[1].size().height()*0.98)
-        pixmap = QPixmap("graphics/blank.png").scaledToHeight(self.cameraFeeds[1].size().height()*0.98)
+        pixmap = frame.scaled(self.cameraFeeds[1].size().width(), self.cameraFeeds[1].size().height(), Qt.KeepAspectRatio)
         self.cameraFeeds[1].setPixmap(pixmap)
 
     @pyqtSlot(QPixmap)
@@ -694,7 +696,7 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaledToHeight(self.cameraFeeds[2].size().height()*0.98)
+        pixmap = frame.scaled(self.cameraFeeds[2].size().width(), self.cameraFeeds[2].size().height(), Qt.KeepAspectRatio)
         self.cameraFeeds[2].setPixmap(pixmap)
 
     def changeCameraFeed(self, event, cameraFeed):
@@ -761,11 +763,13 @@ class UI(QMainWindow):
             self.avalon_logo.setPixmap(avalonPixmap)
 
             # DARK THEME STYLE SHEETS
-            self.data.greenText = 'background-color: #679e37'
-            self.data.redText = 'background-color: #c62828'
-            self.data.disabledText = 'color: rgba(0,0,0,25%);'
-            self.data.actuatorGreen = 'background-color: #679e37'
-            self.data.actuatorRed = 'background-color: #c62828'
+            self.data.greenText = 'color: #679e37'
+            self.data.redText = 'color: #c62828'
+            self.data.disabledText = 'color: rgba(0,0,0,40%);'
+            self.data.actuatorGreen = 'color: white; background-color: #679e37; border-radius: 20px'
+            self.data.actuatorRed = 'color: white; background-color: #c62828; border-radius: 20px'
+            self.data.buttonGreen = 'color: black; background-color: #679e37;'
+            self.data.buttonRed = 'color: blackl; background-color: #c62828;'
             self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
             self.data.blueButtonDefault = 'color: white; font-weight: bold;'
 
@@ -783,6 +787,7 @@ class UI(QMainWindow):
             
             # APPLY CUSTOM COLOR PALETTE
             self.app.setPalette(darkPalette)
+            self.group_box_mosaic_task.setPalette(darkPalette)
             
         # APPLY DEFAULT THEME
         else:
@@ -793,8 +798,8 @@ class UI(QMainWindow):
             self.avalon_logo.setPixmap(avalonPixmap)
 
             # DARK THEME STYLE SHEETS
-            self.data.greenText = 'background-color: #679e37'
-            self.data.redText = 'background-color: #c62828'
+            self.data.greenText = 'color: #679e37'
+            self.data.redText = 'color: #c62828'
             self.data.disabledText = 'color: rgba(0,0,0,25%);'
             self.data.actuatorGreen = 'background-color: #679e37'
             self.data.actuatorRed = 'background-color: #c62828'
@@ -802,7 +807,6 @@ class UI(QMainWindow):
             self.data.blueButtonDefault = 'color: #0D47A1; font-weight: bold;'
 
             self.app.setPalette(self.app.style().standardPalette())
-            pass
 
     def changeGroupBoxColor(self, color):
         self.gui_view_widget.setStyleSheet("""QGroupBox {
@@ -836,18 +840,16 @@ class UI(QMainWindow):
         # UPDATE PIXMAP SIZE ON MOSAIC TASK POPUP WINDOW
         self.control.mosaicPopup.imageResizeEvent()
 
-        #cameraPixmap = QPixmap('graphics/no_signal.png')
-
         cam1Size = [self.camera_feed_1.size().width(), self.camera_feed_1.size().height()]
-        primaryCameraPixmap = self.camera_feed_1.pixmap().scaled(cam1Size[0]*0.99, cam1Size[1]*0.99, Qt.KeepAspectRatio)
+        primaryCameraPixmap = self.camera_feed_1.pixmap().scaled(cam1Size[0], cam1Size[1], Qt.KeepAspectRatio)
         self.camera_feed_1.setPixmap(primaryCameraPixmap)  
 
         cam2Size = [self.camera_feed_2.size().width(), self.camera_feed_2.size().height()]
-        secondary1CameraPixmap = self.camera_feed_2.pixmap().scaled(cam2Size[0]*0.99, cam2Size[1]*0.99, Qt.KeepAspectRatio)
+        secondary1CameraPixmap = self.camera_feed_2.pixmap().scaled(cam2Size[0], cam2Size[1], Qt.KeepAspectRatio)
         self.camera_feed_2.setPixmap(secondary1CameraPixmap)
 
         cam3Size = [self.camera_feed_3.size().width(), self.camera_feed_3.size().height()]
-        secondary2CameraPixmap = self.camera_feed_3.pixmap().scaled(cam3Size[0]*0.99, cam3Size[1]*0.99, Qt.KeepAspectRatio)
+        secondary2CameraPixmap = self.camera_feed_3.pixmap().scaled(cam3Size[0], cam3Size[1], Qt.KeepAspectRatio)
         self.camera_feed_3.setPixmap(secondary2CameraPixmap)
 
 class CONTROL_PANEL():
@@ -1174,14 +1176,14 @@ class CONTROL_PANEL():
         if self.data.controlTimerEnabled == False:
             self.data.controlTimerEnabled = True
             self.ui.control_timer_start.setText('Stop')
-            self.ui.control_timer_start.setStyleSheet(self.data.redText)
+            self.ui.control_timer_start.setStyleSheet(self.data.buttonRed)
             self.startTime = datetime.now()
             # START TIMER
             self.readSystemTime()
         else:
             self.data.controlTimerEnabled = False
             self.ui.control_timer_start.setText('Start')
-            self.ui.control_timer_start.setStyleSheet(self.data.greenText)
+            self.ui.control_timer_start.setStyleSheet(self.data.buttonGreen)
 
     def resetTimer(self):
         """
@@ -1239,18 +1241,22 @@ class CONTROL_PANEL():
 
         NONE
         """
-        # READ SENSORS EVERY 1 SECOND
-        timer = Timer(0.5, self.getSensorReadings)
-        timer.daemon = True                 
-        timer.start()
+        # READ SENSORS AT 10HZ
+        self.timer = QTimer()
+        self.timer.setTimerType(Qt.PreciseTimer)
+        self.timer.timeout.connect(self.getSensorReadings)
+        self.timer.start(100)
         
         if self.data.rovCommsStatus == False:
-            timer.cancel()
+            self.timer.stop()
         
         else:
             #self.data.controlSensorValues = self.rov.getSensors([1]*self.data.configSensorNumber).tolist()
-
+            #beforeTime = datetime.now()
             sensorReadings = self.getSensors()
+            #afterTime = datetime.now()
+            #deltaTime = (afterTime - beforeTime).total_seconds() * 1000000
+            #print(deltaTime)
 
             # UPDATE GUI
             if len(self.data.controlSensorLabelObjects) > 0:
@@ -2527,6 +2533,8 @@ class DATABASE():
     disabledText = ""
     actuatorGreen = ""
     actuatorRed = ""
+    buttonGreen = ""
+    buttonRed = ""
     blueButtonClicked = ""
     blueButtonDefault = ""
 

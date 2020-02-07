@@ -19,6 +19,8 @@ class MOSAIC_POPUP_WINDOW(QWidget):
     Popup windows to complete the computer vision mosaic task. 
     Each side of the object can be captured, then an openCV algorithm will stitch them together.
     """
+    images = [None] * 5
+
     def __init__(self, viewWidget):
         QWidget.__init__(self) 
         self.mainLayout = QGridLayout()
@@ -50,8 +52,10 @@ class MOSAIC_POPUP_WINDOW(QWidget):
         defaultView = QPixmap('graphics/blank.png')
         # ADD CAMERA VIEW AND CAPTURE BUTTON FOR EACH SIDE OF THE UNDERWATER OBJECT
         for index in range(5):
+            self.images[index] = defaultView
             button = QPushButton("Capture {}".format(index + 1))
             image = QLabel()
+            image.setSizePolicy(QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored))
             image.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
             image.setPixmap(defaultView.scaledToHeight(200))
             # ADD TO GRID LAYOUT
@@ -60,6 +64,8 @@ class MOSAIC_POPUP_WINDOW(QWidget):
             button.clicked.connect(lambda state, index = index, buttonObject = button, imageObject = image: self.captureImage(index, buttonObject, imageObject))
 
         computeButton = QPushButton("Compute Mosaic")
+        computeButton.setFixedHeight(80)
+        computeButton.setStyleSheet('background-color: #0D47A1; color: white; font-weight: bold;')
         self.layout.addWidget(computeButton, 10, 0)
         computeButton.clicked.connect(self.computeMosaic)
 
@@ -86,20 +92,34 @@ class MOSAIC_POPUP_WINDOW(QWidget):
             # CONVERT TO QIMAGE
             cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
             # CONVERT TO PIXMAP
-            cameraFrame = QPixmap.fromImage(cameraFrame).scaledToHeight(10)
+            camSize = [imageObject.size().width(),imageObject.size().height()]
+            cameraFrame = QPixmap.fromImage(cameraFrame)
+            # SAVE PIXMAP
+            self.images[index] = cameraFrame
+            cameraFrame = cameraFrame.scaled(camSize[0]*0.99, camSize[1]*0.99, Qt.KeepAspectRatio)
             # VIEW IMAGE
             imageObject.setPixmap(cameraFrame)
 
     def computeMosaic(self):
-        pass
+        self.mosaicResult = MOSAIC_RESULT(self.images[0])
 
     def imageResizeEvent(self):
-        cameraPixmap = QPixmap('graphics/blank.png')
         for image in range(5):
             widget = self.layout.itemAt(image*2).widget()
+            cameraPixmap = self.images[image]
             widgetSize = [widget.size().width(), widget.height()]
-            adjustedImage = cameraPixmap.scaled(widgetSize[0]*0.90, widgetSize[1]*0.90, Qt.KeepAspectRatio)
+            adjustedImage = cameraPixmap.scaled(widgetSize[0], widgetSize[1], Qt.KeepAspectRatio)
             widget.setPixmap(adjustedImage)
+
+class MOSAIC_RESULT(QWidget):
+    def __init__(self, image):
+        QWidget.__init__(self)
+        imageShow = QLabel("Mosaic Result")
+        imageShow.setPixmap(image.scaledToHeight(1000, Qt.SmoothTransformation))
+        mainLayout = QGridLayout()
+        mainLayout.addWidget(imageShow)
+        self.setLayout(mainLayout)
+        self.show() 
 
 def guiInitiate(): 
     """

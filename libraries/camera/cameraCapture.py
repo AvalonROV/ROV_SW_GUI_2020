@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
 from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
@@ -49,37 +50,48 @@ class CAMERA_CAPTURE(QThread):
         self.channel = channel
     
     def run(self):
-        # INITIATE CAMERA
-        cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-        #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
-        #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1024)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 576)
-        # cameraFeed.set(CAP_PROP_FRAME_WIDTH, 256)
-        # cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 144)
-        
+        elapsedTime = 0
+        previousTime = datetime.now()
+        defaultImage = QPixmap("graphics/no_signal.png")
 
-        while True:    
-            # CAPTURE FRAME
-            status, frame = cameraFeed.read()
-        
-            # IF FRAME IS CAPTURED            
-            if status:
-                # CONVERT TO RGB COLOUR
-                cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
-                # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
-                height, width, _ = cameraFrame.shape
-                # GENERATE QIMAGE
-                cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
-                # CONVERT TO PIXMAP
-                cameraFrame = QPixmap.fromImage(cameraFrame)
-                # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
-                self.cameraNewFrameSignal.emit(cameraFrame)
-            
-            else:
-                self.cameraNewFrameSignal.emit(QPixmap("graphics/no_signal.png"))
-            
-            QThread.msleep(round(1000/24))
+        # ATTEMPT TO CONNECT TO CAMERA EVERY SECOND
+        while True:
+            # INITIATE CAMERA
+            cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
+            #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
+            #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
+            cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1024)
+            cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 576)
+            #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 256)
+            #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 144)
+
+            while True:
+                if elapsedTime > 1/30:
+                    # CAPTURE FRAME
+                    status, frame = cameraFeed.read()
+
+                    # IF FRAME IS CAPTURED            
+                    if status:
+                        previousTime = datetime.now()
+                        # CONVERT TO RGB COLOUR
+                        cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
+                        # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
+                        height, width, _ = cameraFrame.shape
+                        # GENERATE QIMAGE
+                        cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
+                        # CONVERT TO PIXMAP
+                        cameraFrame = QPixmap.fromImage(cameraFrame)
+                        # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
+                        self.cameraNewFrameSignal.emit(cameraFrame)
+                    
+                    else:
+                        self.cameraNewFrameSignal.emit(defaultImage)
+                        # EXIT WHILE LOOP AND ATTEMPT TO CONNECT TO CAMERA
+                        break
+
+                elapsedTime = (datetime.now() - previousTime).total_seconds()
+
+            QThread.msleep(500)
 
     def exit(self):
         print("EXIT")

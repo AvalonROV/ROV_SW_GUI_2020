@@ -138,6 +138,12 @@
                  </item>
                  <item row="1" column="0">
                   <widget class="QLabel" name="camera_feed_1">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -241,6 +247,12 @@
                   <layout class="QGridLayout" name="gridLayout" rowstretch="0,1">
                    <item row="1" column="0">
                     <widget class="QLabel" name="camera_feed_2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="frameShape">
                       <enum>QFrame::NoFrame</enum>
                      </property>
@@ -328,6 +340,12 @@
                    </item>
                    <item row="1" column="1">
                     <widget class="QLabel" name="camera_feed_3">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
                      <property name="frameShape">
                       <enum>QFrame::NoFrame</enum>
                      </property>
@@ -1047,8 +1065,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>365</width>
-                  <height>569</height>
+                  <width>100</width>
+                  <height>30</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_27">
@@ -1113,8 +1131,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>364</width>
-                  <height>569</height>
+                  <width>100</width>
+                  <height>30</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_17">
@@ -1170,8 +1188,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>365</width>
-                  <height>570</height>
+                  <width>164</width>
+                  <height>56</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_20">
@@ -1247,8 +1265,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>365</width>
-                  <height>570</height>
+                  <width>100</width>
+                  <height>30</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_15">
@@ -1304,8 +1322,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>364</width>
-                  <height>570</height>
+                  <width>98</width>
+                  <height>32</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_23">
@@ -1459,8 +1477,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>364</width>
-                  <height>570</height>
+                  <width>152</width>
+                  <height>317</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_39">
