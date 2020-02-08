@@ -48,6 +48,7 @@ class CAMERA_CAPTURE(QThread):
         QThread.__init__(self)
         # CAMERA FEED SOURCE
         self.channel = channel
+        self.runFeed = True
     
     def run(self):
         elapsedTime = 0
@@ -55,7 +56,7 @@ class CAMERA_CAPTURE(QThread):
         defaultImage = QPixmap("graphics/no_signal.png")
 
         # ATTEMPT TO CONNECT TO CAMERA EVERY SECOND
-        while True:
+        while self.runFeed:
             # INITIATE CAMERA
             cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
             #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
@@ -65,7 +66,7 @@ class CAMERA_CAPTURE(QThread):
             #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 256)
             #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 144)
 
-            while True:
+            while self.runFeed:
                 if elapsedTime > 1/30:
                     # CAPTURE FRAME
                     status, frame = cameraFeed.read()
@@ -93,8 +94,11 @@ class CAMERA_CAPTURE(QThread):
 
             QThread.msleep(500)
 
-    def exit(self):
-        print("EXIT")
+    def feedStop(self):
+        self.runFeed = False
+
+    def feedBegin(self):
+        self.runFeed = True
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -33,7 +33,6 @@ from libraries.controller.xboxController import CONTROLLER
 from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
 from libraries.computer_vision.transectLineTask.transectLinePopupWindow import TRANSECT_LINE_POPUP_WINDOW
 from libraries.camera.cameraCapture import CAMERA_CAPTURE
-#from libraries.camera.cameraCaptureTimer import CAMERA_CAPTURE
 from libraries.animation.slideAnimation import SLIDE_ANIMATION
 
 class UI(QMainWindow):
@@ -63,6 +62,9 @@ class UI(QMainWindow):
 
         # APP OBJECT TO ALLOW THEME CHANGING
         self.app = app
+
+        # PROGRAM CLOSE EVENT
+        self.app.aboutToQuit.connect(self.programExit)
 
         # CREATING OBJECTS AND PASSING OBJECTS TO THEM
         self.data = DATABASE()
@@ -630,20 +632,24 @@ class UI(QMainWindow):
         """
         if feed == 0:
             if status:
+                self.camThread1.feedBegin()
                 self.camThread1.start()
             else:
-                # NEED TO FIND OTHER SOLUTION!!!
-                self.camThread1.terminate()
+                self.camThread1.feedStop()
+                
         if feed == 1:
             if status:
+                self.camThread2.feedBegin()
                 self.camThread2.start()
             else:
-                self.camThread2.terminate()
+                self.camThread2.feedStop()
+
         if feed == 2:
             if status:
+                self.camThread3.feedBegin()
                 self.camThread3.start()
             else:
-                self.camThread3.terminate()
+                self.camThread3.feedStop()
 
     @pyqtSlot(QPixmap)
     def updateCamera1Feed(self, frame):
@@ -704,9 +710,11 @@ class UI(QMainWindow):
             pass
 
         if cameraFeed == 1:
+            print("CHANGE1")
             self.cameraFeeds[0], self.cameraFeeds[1] = self.cameraFeeds[1], self.cameraFeeds[0]
               
         if cameraFeed == 2:
+            print("CHANGE2")
             self.cameraFeeds[0], self.cameraFeeds[2] = self.cameraFeeds[2], self.cameraFeeds[0]
 
     def changeCameraFeedMenu(self, index, cameraFeed):
@@ -810,10 +818,13 @@ class UI(QMainWindow):
 
     def changeGroupBoxColor(self, color):
         self.gui_view_widget.setStyleSheet("""QGroupBox {
-                                            background-color: #212121; 
+                                            background-color: #212121;
                                             border-radius: 20px;
-                                            margin-top: 40px;
-                                            }""")
+                                            font-size: 20px;
+                                            margin-top: 1.2em
+                                            }
+                                            """)
+        # margin-top: 40px;
 
     def printTerminal(self, text):
         """
@@ -852,6 +863,14 @@ class UI(QMainWindow):
         secondary2CameraPixmap = self.camera_feed_3.pixmap().scaled(cam3Size[0], cam3Size[1], Qt.KeepAspectRatio)
         self.camera_feed_3.setPixmap(secondary2CameraPixmap)
 
+    def programExit(self):
+        # CLOSE CAMERA THREADS
+        self.toggleCameraFeed(False, 0)
+        self.toggleCameraFeed(False, 1)
+        self.toggleCameraFeed(False, 2)
+        # REQUIRED TO LET THREADS CLOSE BEFORE MAIN EVENT LOOP EXITS
+        time.sleep(1)
+        
 class CONTROL_PANEL():
     """
     PURPOSE
@@ -2174,6 +2193,7 @@ class CONFIG():
         self.data.configKeyBindings[index] = binding
 
         # PREVENT BINDING BEING ASSOCIATED WITH MULTIPLE CONTROLS
+        print(self.data.configKeyBindings)
         for i, item in enumerate(self.data.configKeyBindings):
             # CHECK IF BINDING ALREADY EXISTS
             if i != index:

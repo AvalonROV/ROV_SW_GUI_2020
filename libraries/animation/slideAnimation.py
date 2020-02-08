@@ -83,7 +83,7 @@ class SLIDE_ANIMATION(QWidget):
             idx = (idx + self.stackedWidget.count()) % self.stackedWidget.count()
         self.slideInWgt(self.stackedWidget.widget(idx))
 
-    def slideInWgt(self, newwidget):
+    def slideInWgt(self, newWidget):
 
         self.animationComplete = False
 
@@ -92,56 +92,64 @@ class SLIDE_ANIMATION(QWidget):
 
         self.m_active = True
 
-        _now = self.stackedWidget.currentIndex()
-        _next = self.stackedWidget.indexOf(newwidget)
+        # DEFINE WIDGETS TO TRANSITION BETWEEN
+        currentPage = self.stackedWidget.currentIndex()
+        nextPage = self.stackedWidget.indexOf(newWidget)
 
-        if _now == _next:
+        if currentPage == nextPage:
             self.m_active = False
             return
-
+        
+        # GET WIDGET DIMENSIONS
         offsetx, offsety = self.stackedWidget.frameRect().width(), self.stackedWidget.frameRect().height()
-        self.stackedWidget.widget(_next).setGeometry(self.stackedWidget.frameRect())
+        # SET NEW WIDGET DIMENSIONS
+        self.stackedWidget.widget(nextPage).setGeometry(self.stackedWidget.frameRect())
 
+        # HORIZONTAL SLIDE
         if not self.m_direction == Qt.Horizontal:
-            if _now < _next:
+            if currentPage < nextPage:
                 offsetx, offsety = 0, -offsety
             else:
                 offsetx = 0
+        # VERTICAL SLIDE
         else:
-            if _now < _next:
+            if currentPage < nextPage:
                 offsetx, offsety = -offsetx, 0
             else:
                 offsety = 0
 
-        pnext = self.stackedWidget.widget(_next).pos()
-        pnow = self.stackedWidget.widget(_now).pos()
-        self.m_pnow = pnow
+
+        posNext = self.stackedWidget.widget(nextPage).pos()         # GET QPOINT OF NEXT WIDGET
+        posCurrent = self.stackedWidget.widget(currentPage).pos()   # GET QPOINT OF CURRENT WIDGET
+        self.m_pnow = posCurrent
 
         offset = QPoint(offsetx, offsety)
-        self.stackedWidget.widget(_next).move(pnext - offset)
-        self.stackedWidget.widget(_next).show()
-        self.stackedWidget.widget(_next).raise_()
+        self.stackedWidget.widget(nextPage).move(posNext - offset)
+        self.stackedWidget.widget(nextPage).show()
+        self.stackedWidget.widget(nextPage).raise_()                # BRING WIDGET TO FRONT OF GUI
 
         anim_group = QParallelAnimationGroup(
             self, finished=self.animationDoneSlot
         )
 
-        for index, start, end in zip(
-            (_now, _next), (pnow, pnext - offset), (pnow + offset, pnext)
-        ):
-            animation = QPropertyAnimation(
-                self.stackedWidget.widget(index),
-                b"pos",
-                duration=self.m_speed,
-                easingCurve=self.m_animationtype,
-                startValue=start,
-                endValue=end,
-            )
+        for index, start, end in zip((currentPage, nextPage), 
+                                    (posCurrent, posNext - offset), 
+                                    (posCurrent + offset, posNext)):
+            
+            animation = QPropertyAnimation(self.stackedWidget.widget(index),
+                                            b"pos",
+                                            duration=self.m_speed,
+                                            easingCurve=self.m_animationtype,
+                                            startValue=start,
+                                            endValue=end)
+            
             anim_group.addAnimation(animation)
 
-        self.m_next = _next
-        self.m_now = _now
+        self.m_next = nextPage
+        self.m_now = currentPage
         self.m_active = True
+
+
         anim_group.start(QAbstractAnimation.DeleteWhenStopped)
 
     @pyqtSlot()

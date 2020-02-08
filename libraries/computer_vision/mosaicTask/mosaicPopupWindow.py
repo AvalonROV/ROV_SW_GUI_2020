@@ -69,10 +69,7 @@ class MOSAIC_POPUP_WINDOW(QWidget):
         self.layout.addWidget(computeButton, 10, 0)
         computeButton.clicked.connect(self.computeMosaic)
 
-    def captureImage(self, index, buttonObject, imageObject):
-        #cameraFrame = QPixmap.fromImage(self.data.primaryCameraImage).scaledToHeight(200)
-        #imageObject.setPixmap(cameraFrame)
-        
+    def captureImage(self, index, buttonObject, imageObject):        
         channel = 0
 
         # INITIATE PRIMARY CAMERA
