@@ -252,6 +252,114 @@ class SerialInterface():
     
     Acts as a general serial interface for communicating with devices across USB.
     """
+    #DEFINITIONS
+    numRetries = 5      #! The number of times a communication will be retried.
+    
+    def __init__(self, port, baudRate = 115200, bytesize = serial.Serial.EIGHTBITS, parity = serial.Serial.PARITY_NONE, stopbits = serial.Serial.STOPBITS_ONE, timeout = 2.0):
+        """
+        PURPOSE
+        
+        Constructor for the Serial Interface class, generates a new Serial Interface for communication.
+        """
+        #Creating a new Serial Adapter
+        self.serialAdapter = serial.Serial(port, baudrate = baudRate, bytesize = bytesize, parity = parity, stopbits = stopbits, timeout = timeout)
+        
+        #Attempting to open the Serial Port and Close it as a brief test
+        try:
+            self.serialAdapter.open()
+            self.serialAdapter.close()
+            
+        except serial.SerialException:
+            print("Could not open specified Serial Port {}, please ensure you have entered the port name correctly".format(port))
+        
+        #Saving the information for the port
+        self.port = port
+        self.baudRate = baudRate
+        self.bytesize = bytesize
+        self.parity = parity
+        self.stopbits = stopbits
+        self.timeout = timeout
+    
+    def send(self, stringToSend):
+        """
+        PURPOSE
+        
+        Sends a string over the serial interface.
+        
+        INPUT
+        
+        stringToSend = The string to be sent across the serial interface.
+        
+        OUTPUT
+        
+        communicationSuccess (bool) = Checks whether the string was successfully sent over the interface.
+        """
+        #Completing the communication over the serial interface
+        communicationSuccess = False
+        
+        try:
+            #Attempting to send the string over the serial port
+            for retryCount in range(1, self.numRetries + 1):
+                self.serialAdapter.open()
+                bytesWritten = self.serialAdapter.write(stringToSend)
+                self.serialAdapter.close()
+                
+                #If the string was written successfully
+                if bytesWritten > 0:
+                    communicationSuccess = True
+                    break
+                
+                #If the string was not written successfully
+                else:
+                    print("Could not write string successfully, retry count {}".format(retryCount))
+            
+            #If the communication failed
+            if communicationSuccess == False:
+                print("Count not write the string over the serial port")
+            
+        except serial.SerialException:
+            print("Failed to complete Serial Communication with String: {}".format(stringToSend))
+        
+        return communicationSuccess
+    
+    def receive(self):
+        """
+        PURPOSE
+        
+        Receives a string from the serial interface.
+        
+        INPUT
+        
+        NONE
+        
+        OUTPUT
+        
+        receivedString (string) = The string that was recieved over the serial port.
+        """
+        #Completing the recieve over the serial port
+        receivedString = ""
+        
+        try:
+            #Attempting to receive the string
+            for retryCount in range(1, self.numRetries + 1):
+                self.serialAdapter.open()
+                receivedString = self.serialAdapter.readline()
+                self.serialAdapter.close()
+                
+                #If a string was received
+                if len(receivedString) > 0:
+                    break
+                
+                #If no string was received
+                else:
+                    print("Did not receive string, retry count {}".format(retryCount))
+            
+            #If no string was received
+            if len(receivedString) == 0:
+                print("Could not received string after {} retrys".format(self.numRetries))
+        
+        except serial.SerialException:
+            print("Failed to complete Serial Receive")
     #Definitions
     RETRY_COUNT = 5        #The number of times a serial communication is retried before it is abandoned
     
@@ -370,4 +478,5 @@ class SerialInterface():
             print("Failed to read message from device")
             self.logFile.addLogEntry("Failed to read message from device")
             return False
-            
+        
+        return receivedString            
