@@ -252,7 +252,25 @@ class SerialInterface():
     
     Acts as a general serial interface for communicating with devices across USB.
     """
+    #Definitions
+    RETRY_COUNT = 5        #The number of times a serial communication is retried before it is abandoned
+    
+    #Methods
     def __init__(self, port, baudRate = 115200, bytesize = serial.Serial.EIGHTBITS, parity = serial.Serial.PARITY_NONE, stopbits = serial.Serial.STOPBITS_ONE, timeout = 2.0):
+        """
+        PURPOSE
+        
+        Creates a new serial interface instance with the given paramters.
+        
+        INPUT
+        
+        - port = The communication port to send messages over
+        - baudrate = The bit rate to send messages at (use as high as possible)
+        - bytesize = The number of bits to use in a byte for each message
+        - parity = Wether or not the serial communication uses a parity bit (advisable for more secure communications)
+        - stopbits = An indication of how many stop bits the communication uses
+        - timeout = The amount of time it takes for the serial communication to timeout
+        """
         #Creating a new Serial Adapter
         self.serialAdapter = serial.Serial(port, baudrate = baudRate, bytesize = bytesize, parity = parity, stopbits = stopbits, timeout = timeout)
         
@@ -271,3 +289,85 @@ class SerialInterface():
         self.parity = parity
         self.stopbits = stopbits
         self.timeout = timeout
+        
+        #Creating a new logging file for the serial interface and adding the information
+        self.logFile = logger.LogFile("Serial Interface Log {}".format(self.port), fileFolder = "Log Files")
+        self.logFile.addLogEntry("Port: {}".format(self.port))
+        self.logFile.addLogEntry("Baud Rate: {}".format(self.baudRate))
+        self.logFile.addLogEntry("Byte Size: {}".format(self.bytesize))
+        self.logFile.addLogEntry("Parity: {}".format(self.parity))
+        self.logFile.addLogEntry("Stopbits : {}".format(self.stopbits))
+        self.logFile.addLogEntry("Timeout : {}".format(self.timeout))
+
+    def send(self, commandToSend):
+        """
+        PURPOSE
+        
+        Writes a command to the device via the serial port.
+        
+        INPUT
+        
+        - commandToSend = The text of the command to be sent over the serial port.
+        
+        OUTPUT
+        
+        - Boolean that indicates if the communication completed successfully or not. True for successful, false for otherwise.
+        """
+        try:
+            self.serialAdapter.open()       #Opening the serial port for communication
+            self.serialAdapter.flush()      #Flushing the communication buffer of any prior messages that did not send
+            
+        except serial.SerialException:
+            print("Failed to open serial port, ensure that the configuration is correct and the device is connected.")
+            self.logFile.addLogEntry("Failed to open serial port")
+            return False
+            
+        #Attempting the communication with the device, using the specified number of retries
+        for numberOfRetrys in range(1, self.RETRY_COUNT + 2):
+            try:
+                commandToSend = commandToSend + "\n"        #Adding line ending characters to message
+                self.serialAdapter.write(commandToSend)     #Sending message over the serial port
+                return True
+                
+            except serial.SerialException:
+                print("Failed to send command {}, retry number {}".format(commandToSend, numberOfRetrys))
+                self.logFile.addLogEntry("Failed to send command {}, retry number {}".format(commandToSend, numberOfRetrys))
+                
+        #Communication has failed after retry's returning false to indicate failure and logging incident
+        print("Communication failed after {} retrys on command {}".format(self.RETRY_COUNT, commandToSend))
+        self.logFile.addLogEntry("Communication failed after {} retrys on command {}".format(self.RETRY_COUNT, commandToSend))
+        return False
+                
+                
+    def receive(self):
+        """
+        PURPOSE
+        
+        Receives a message from the device via the serial port.
+        
+        INPUT
+        
+        NONE
+        
+        OUTPUT
+        
+        The message sent by the device. Returns False if a failure occured.
+        """
+        try:
+            self.serialAdapter.open()       #Opening the serial port for communication
+            self.serialAdapter.flush()      #Flushing the communication buffer of any prior messages that did not send
+            
+        except serial.SerialException:
+            print("Failed to open serial port, ensure that the configuration is correct and the device is connected.")
+            self.logFile.addLogEntry("Failed to open serial port")
+            return False
+        
+        try:
+            messageFromDevice = self.serialAdapter.read_until(expected = "\n")
+            return messageFromDevice
+        
+        except serial.SerialException:
+            print("Failed to read message from device")
+            self.logFile.addLogEntry("Failed to read message from device")
+            return False
+            
