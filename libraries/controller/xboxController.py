@@ -337,7 +337,7 @@ class CONTROLLER_UPDATE(QThread):
                                     else number 
                                     for number in filteredJoystickValues]
         # ROUND TO 1 DECIMAL PLACE
-        filteredJoystickValues = [round(number, 1) for number in filteredJoystickValues]
+        filteredJoystickValues = [round(number, 2) for number in filteredJoystickValues]
 
         return(filteredJoystickValues)
 

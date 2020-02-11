@@ -6,7 +6,7 @@
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
 from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QGroupBox, QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
-                            QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, 
+                            QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QLabel, QSlider, 
                             QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
                             QFileDialog, QGraphicsDropShadowEffect)
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QFont, QColor, QPalette, QPainter
@@ -34,6 +34,7 @@ from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_
 from libraries.computer_vision.transectLineTask.transectLinePopupWindow import TRANSECT_LINE_POPUP_WINDOW
 from libraries.camera.cameraCapture import CAMERA_CAPTURE
 from libraries.animation.slideAnimation import SLIDE_ANIMATION
+from libraries.simulation.rovModel import ROV_SIMULATION
 
 class UI(QMainWindow):
     """
@@ -87,9 +88,9 @@ class UI(QMainWindow):
 
         # SET CAMERA FEED PLACE HOLDER
         cameraPixmap = QPixmap('graphics/no_signal.png')
-        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.camera_feed_1.size().height()*0.98)
-        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.camera_feed_2.size().height()*0.98)
-        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.camera_feed_3.size().height()*0.98)
+        primaryCameraPixmap = cameraPixmap.scaledToHeight(self.camera_feed_1.size().height())
+        secondary1CameraPixmap = primaryCameraPixmap.scaledToHeight(self.camera_feed_2.size().height())
+        secondary2CameraPixmap = primaryCameraPixmap.scaledToHeight(self.camera_feed_3.size().height())
         self.camera_feed_1.setPixmap(primaryCameraPixmap)
         self.camera_feed_2.setPixmap(secondary1CameraPixmap)
         self.camera_feed_3.setPixmap(secondary2CameraPixmap)
@@ -156,11 +157,6 @@ class UI(QMainWindow):
                                                                 self.data.configDigitalDefaultCameraList,
                                                                 self.data.configKeyBindings)       
         
-        if configFileStatus == False:
-            self.printTerminal('Configuration file not found.')
-        else:
-            self.printTerminal('Configuration file settings applied.')
-        
         #############################
         ### APPLY SETTINGS TO GUI ###
         #############################
@@ -168,8 +164,18 @@ class UI(QMainWindow):
         # APPLY THEME
         self.changeTheme(self.data.programTheme)
 
-        # ADD KEYBINDING FOR SWITCHING CONTROL ORIENTATION
-        self.config.addKeyBinding("Switch Orientation", 0, False)
+        if configFileStatus == False:
+            self.printTerminal('Configuration file not found.')
+            # ADD DEFAULT KEYBINDINGS IF NO CONFIG FILE EXISTS (SET TO NONE BINDING AS DEFAULT)
+            self.config.addKeyBinding("Switch Orientation", 0, False)
+            self.config.addKeyBinding("Change Sensitivity", 1, False)
+            
+        else:
+            self.printTerminal('Configuration file settings applied.')
+            # ADD DEFAULT KEY BINDINGS (SETS TO BINDINGS FOUND IN CONFIG FILE)
+            self.config.addKeyBinding("Switch Orientation", 0, True)
+            self.config.addKeyBinding("Change Sensitivity", 1, True)
+
         # UPDATE GUI WITH THRUSTER DATA
         self.config.setThrustersNumber(self.data.configThrusterNumber, 
                                         self.config_thruster_form,
@@ -439,20 +445,21 @@ class UI(QMainWindow):
         """
         # CHANGE GUI VIEW BUTTONS
         self.change_gui_control.clicked.connect(lambda state, view = 0: self.changeView(view))
-        self.change_gui_control.setFixedHeight(self.change_gui_control.geometry().height() * 1.5)
-        self.change_gui_control.setFixedWidth(self.change_gui_control.geometry().width() * 4)
+        #self.change_gui_control.setFixedHeight(self.change_gui_control.geometry().height() * 1.5)
+        #self.change_gui_control.setFixedWidth(self.change_gui_control.geometry().width() * 4)
         self.applyGlow(self.change_gui_control, "#0D47A1", 10)
         self.change_gui_control.setStyleSheet(self.data.blueButtonClicked)
 
         self.change_gui_config.clicked.connect(lambda statem, view = 1: self.changeView(view))
         self.applyGlow(self.change_gui_config, "#0D47A1", 10)
-        self.change_gui_config.setFixedHeight(self.change_gui_config.geometry().height() * 1.5)
-        self.change_gui_config.setFixedWidth(self.change_gui_config.geometry().width() * 4)
+        #self.change_gui_config.setFixedHeight(self.change_gui_config.geometry().height() * 1.5)
+        #self.change_gui_config.setFixedWidth(self.change_gui_config.geometry().width() * 4)
         self.change_gui_config.setStyleSheet(self.data.blueButtonDefault)
 
         # TAB CHANGE SLIDE ANIMATION
         self.animation = SLIDE_ANIMATION(self.gui_view_widget)
         self.animation.setSpeed(500)
+        self.animation.setDirection(Qt.Vertical)
 
         # SPITTER
         self.control_panel_splitter.splitterMoved.connect(self.splitterEvent)
@@ -462,11 +469,13 @@ class UI(QMainWindow):
         self.applyGlow(self.control_rov_connect, "#0D47A1", 10)
         self.control_rov_connect.setFixedHeight(self.control_rov_connect.geometry().height() * 1.5)
         self.control_rov_connect.setStyleSheet(self.data.blueButtonDefault)
+        
         # CONTROLLER CONNECT BUTTON
         self.control_controller_connect.clicked.connect(self.control.controllerConnect)
         self.applyGlow(self.control_controller_connect, "#0D47A1", 10)
         self.control_controller_connect.setFixedHeight(self.control_controller_connect.geometry().height() * 1.5)
         self.control_controller_connect.setStyleSheet(self.data.blueButtonDefault)
+        
         # SWITCH CONTROL DIRECTION BUTTON
         if self.data.programTheme:
             self.control_switch_direction.setIcon(QIcon('graphics/switch_direction_white.png'))
@@ -478,6 +487,7 @@ class UI(QMainWindow):
         self.applyGlow(self.control_switch_direction, "#679e37", 10)
         self.control_switch_direction_forward.setStyleSheet(self.data.greenText)
         self.control_switch_direction_reverse.setStyleSheet(self.data.disabledText)
+        
         # TIMER CONTROL BUTTONS
         self.control_timer_start.clicked.connect(self.control.toggleTimer)
         self.control_timer_start.setStyleSheet(self.data.buttonGreen)
@@ -485,6 +495,7 @@ class UI(QMainWindow):
         self.control_timer.setNumDigits(11)
         self.control_timer.display('00:00:00:00')
         self.control_timer.setMinimumHeight(48)
+        
         # MACHINE VISION TASK BUTTONS
         self.control_vision_mosaic.clicked.connect(self.control.popupMosaicTask)
         self.control_vision_shape_detection.clicked.connect(self.control.popupShapeDetectionTask)
@@ -498,6 +509,10 @@ class UI(QMainWindow):
         self.camera_1_enable.toggled.connect(lambda state, camera = 0: self.toggleCameraFeed(state, camera))
         self.camera_2_enable.toggled.connect(lambda state, camera = 1: self.toggleCameraFeed(state, camera))
         self.camera_3_enable.toggled.connect(lambda state, camera = 2: self.toggleCameraFeed(state, camera))
+
+        # CONTROLLER SENSITIVITY SETTINGS
+        self.control_sensitivity_slider.valueChanged.connect(self.control.changeSensitivity)
+        self.control.changeSensitivity(2)
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING CAMERA ID AS 1,2,3,4 ETC.
         self.control_camera_1_list.activated.connect(lambda index, camera = 0: self.control.changeExternalCameraFeed(index, camera))
@@ -568,6 +583,10 @@ class UI(QMainWindow):
         self.config_camera_3_list.activated.connect(lambda index, camera = 2: self.config.changeDefaultCameras(index, camera))
         self.config_camera_4_list.activated.connect(lambda index, camera = 3: self.config.changeDefaultCameras(index, camera))
 
+        # ADD OPENGL ROV SIMULATION
+        rovModel = ROV_SIMULATION()
+        self.config_simulation_graph.addWidget(rovModel)
+
     def linkToolbarWidgets(self):
         """
         PURPOSE
@@ -606,8 +625,6 @@ class UI(QMainWindow):
 
         NONE
         """
-        pass
-
         self.cameraFeeds = [self.camera_feed_1, self.camera_feed_2, self.camera_feed_3]
 
         # INITIATE CAMERAS IN QTHREADS
@@ -707,15 +724,18 @@ class UI(QMainWindow):
 
     def changeCameraFeed(self, event, cameraFeed):
         if cameraFeed == 0:
+            print(self.cameraFeeds)
             pass
 
         if cameraFeed == 1:
             print("CHANGE1")
             self.cameraFeeds[0], self.cameraFeeds[1] = self.cameraFeeds[1], self.cameraFeeds[0]
+            print(self.cameraFeeds)
               
         if cameraFeed == 2:
             print("CHANGE2")
             self.cameraFeeds[0], self.cameraFeeds[2] = self.cameraFeeds[2], self.cameraFeeds[0]
+            print(self.cameraFeeds)
 
     def changeCameraFeedMenu(self, index, cameraFeed):
         pass
@@ -732,7 +752,23 @@ class UI(QMainWindow):
                 self.change_gui_control.setStyleSheet(self.data.blueButtonClicked)
                 self.change_gui_config.setStyleSheet(self.data.blueButtonDefault)
 
+                # RESTART CAMERA FEEDS
+                if self.camera_1_enable.isChecked():
+                    self.camThread1.feedBegin()
+                    self.camThread1.start()
+                if self.camera_1_enable.isChecked():
+                    self.camThread2.feedBegin()
+                    self.camThread2.start()
+                if self.camera_1_enable.isChecked():
+                    self.camThread3.feedBegin()
+                    self.camThread3.start()
+
             if view == 1:
+                # PAUSE CAMERA FEEDS
+                self.camThread1.feedStop()
+                self.camThread2.feedStop()
+                self.camThread3.feedStop()
+
                 self.animation.screenNext()
                 self.change_gui_control.setStyleSheet(self.data.blueButtonDefault)
                 self.change_gui_config.setStyleSheet(self.data.blueButtonClicked)
@@ -820,8 +856,12 @@ class UI(QMainWindow):
         self.gui_view_widget.setStyleSheet("""QGroupBox {
                                             background-color: #212121;
                                             border-radius: 20px;
-                                            font-size: 20px;
-                                            margin-top: 1.2em
+                                            font-size: 12pt;
+                                            margin-top: 1.2em;
+                                            padding-top: 10px;
+                                            padding-bottom: 10px;
+                                            padding-left: 10px;
+                                            padding-right: 10px;
                                             }
                                             """)
         # margin-top: 40px;
@@ -918,23 +958,16 @@ class CONTROL_PANEL():
         NONE
         """
         if self.data.rovConnectButtonStatus == False:
-            self.data.rovConnectButtonStatus = True
-            # MODIFY BUTTON STYLE
-            self.ui.control_rov_connect.setText('DISCONNECT')
-            self.ui.config_rov_connect.setText('DISCONNECT')
-            self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonClicked)
-            self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonClicked)
-            
-            # ROV SERIAL LIBRARY
-            #self.rov.initialiseConnection('AVALON',self.data.rovComPort, 115200)
+
+            self.ui.control_rov_connect.setEnabled(False)
+            self.ui.config_rov_connect.setEnabled(False)
             
             # FIND ALL AVAILABLE COM PORTS
             self.ui.printTerminal('Searching for available COM ports...')
             availableComPorts, rovComPort, identity = self.findComPorts(self.ui.config_com_port_list, self.data.rovCommsStatus, 115200, self.data.rovID)
+            self.data.rovComPort = rovComPort
             self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts)))
             self.ui.printTerminal('Device Identity: {}'.format(identity))
-            
-            self.data.rovComPort = rovComPort
             
             # ATTEMPT CONNECTION TO ROV COM PORT
             status, message = self.serialConnect(rovComPort, 115200)
@@ -942,13 +975,18 @@ class CONTROL_PANEL():
 
             # IF CONNECTION IS SUCCESSFUL
             if status == True:
+                self.data.rovConnectButtonStatus = True
+                # MODIFY BUTTON STYLE
+                self.ui.control_rov_connect.setText('DISCONNECT')
+                self.ui.config_rov_connect.setText('DISCONNECT')
+                self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonClicked)
+                self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonClicked)
                 self.data.rovCommsStatus = True
-                # START REQUESTING SENSOR READINGS
-                self.getSensorReadings()
-            
-            else:
-                # DISCONNECT ROV
-                self.rovConnect()       
+                # CALL INITIAL ROV FUNCTIONS
+                self.startupProcedure()
+
+            self.ui.control_rov_connect.setEnabled(True)
+            self.ui.config_rov_connect.setEnabled(True)      
 
         else:
             self.data.rovConnectButtonStatus = False
@@ -981,22 +1019,27 @@ class CONTROL_PANEL():
         NONE
         """
         if self.data.controllerConnectButtonStatus == False:
-            # UPDATE BUTTON STYLE
-            self.data.controllerConnectButtonStatus = True
-            self.ui.control_controller_connect.setText('DISCONNECT')
-            self.ui.config_controller_connect.setText('DISCONNECT')
-            self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonClicked)
-            self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonClicked)
             
+            self.ui.control_controller_connect.setEnabled(False)
+            self.ui.config_controller_connect.setEnabled(False)
+
             # INITIATE COMMUNICATION WITH THE CONTROLLER
             connectionStatus, controllerNumber, message = self.controller.findController("Controller (Xbox One For Windows)")
             self.ui.printTerminal(message)
             
             if connectionStatus == True:
-                # READ CONTROLLER INPUTS IN A TIMED THREAD, RETURN VALUES TO PROCESSING FUNCTIONS
+                # START READING CONTROLLER INPUTS IN A TIMED THREAD, RETURN VALUES TO PROCESSING FUNCTIONS
                 self.controller.startControllerEventLoop(controllerNumber, self.processButtons, self.processJoysticks)
-            else:
-                self.controllerConnect()
+                # UPDATE BUTTON STYLE
+                self.data.controllerConnectButtonStatus = True
+                self.ui.control_controller_connect.setText('DISCONNECT')
+                self.ui.config_controller_connect.setText('DISCONNECT')
+                self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonClicked)
+                self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonClicked)
+
+            self.ui.control_controller_connect.setEnabled(True)
+            self.ui.config_controller_connect.setEnabled(True)
+
         else:
             self.data.controllerConnectButtonStatus = False
             self.ui.control_controller_connect.setText('CONNECT')
@@ -1047,6 +1090,14 @@ class CONTROL_PANEL():
                     # IF ROV CONTROL ORIENTATION IS BEING TOGGLED (SPECIAL CASE)
                     if whichControl == 0:
                         self.switchControlDirection()
+
+                    # IF ROV CONTROLLER SENSITIVITY IS BEING CHANGED (SPECIAL CASE)
+                    if whichControl == 1:
+                        currentValue = self.ui.control_sensitivity_slider.value()
+                        if currentValue < 3:
+                            self.changeSensitivity(currentValue + 1)
+                        else:
+                            self.changeSensitivity(1)
                     
                     # IF ROV ACTUATOR IS BEING TOGGLED
                     else:
@@ -1071,8 +1122,52 @@ class CONTROL_PANEL():
         RETURNS
         - motorSpeeds = array containing the speed of each thruster
         """
-        self.changeThrusters()
+        filteredThrusterSpeeds = [0] * self.data.configThrusterNumber
+        
+        if joystickValues != self.data.configJoystickValues:
+            
+            # DECOMPOSE JOYSTICKS INTO MOTION AXIS
+            right_left = joystickValues[0]
+            forward_backward = -joystickValues[1]
+            up_down = -joystickValues[2]
+            yaw = joystickValues[4]
 
+            #yaw = LB & RB buttons
+            # = -joystickValues[3]
+            #roll = joystickValues[4]
+            
+            # CALCULATE CONTRIBUTION TO MOTION FROM EACH THRUSTER
+            speed_A = - right_left + forward_backward + up_down - yaw
+            speed_B = right_left + forward_backward + up_down + yaw
+            speed_C = right_left - forward_backward + up_down - yaw
+            speed_D = - right_left - forward_backward + up_down + yaw
+            speed_E = - right_left + forward_backward - up_down - yaw
+            speed_F = right_left + forward_backward - up_down + yaw
+            speed_G = right_left - forward_backward - up_down - yaw
+            speed_H = - right_left - forward_backward - up_down + yaw
+
+            filteredThrusterSpeeds = [speed_A, speed_B, speed_C, speed_D, speed_E, speed_F, speed_G, speed_H]
+            
+            # FIND THRUSTER WITH HIGHEST SPEED AND PEAK JOYSTICK VALUE
+            maxSpeed = max((abs(speed) for speed in filteredThrusterSpeeds))
+            maxJoystick = max((abs(position) for position in joystickValues))
+            
+            # CONTROLLER SENSITIVITY SCALING FACTOR
+            controllerSensitivity = self.data.controllerSensitivity 
+
+            # NORMALISE ALL THRUSTER SPEEDS W.R.T THE FASTEST THRUSTER AND THE MAXIMUM JOYSTICK POSITION (MAX = 1)
+            for i in range(len(filteredThrusterSpeeds)):
+                if maxSpeed > 0:
+                    filteredThrusterSpeeds[i] = round(controllerSensitivity * maxJoystick * filteredThrusterSpeeds[i] / maxSpeed, 3)
+
+            # CONVERT -1 -> 1 TO 1 -> 999 FOR ARDUINO MICROSECONDS SERVO SIGNAL
+            for i in range(len(filteredThrusterSpeeds)):
+                filteredThrusterSpeeds[i] = int(500 + filteredThrusterSpeeds[i]*499)
+
+            self.changeThrusters(filteredThrusterSpeeds)
+        
+        self.data.configJoystickValues = joystickValues
+        
     ###########################
     ## ROV CONTROL FUNCTIONS ##
     ###########################
@@ -1107,7 +1202,7 @@ class CONTROL_PANEL():
         # SEND COMMANDS TO ROV
         self.setActuators(self.data.controlActuatorStates)
 
-    def changeThrusters(self):
+    def changeThrusters(self, thrusterSpeeds):
         """
         PURPOSE
 
@@ -1121,7 +1216,7 @@ class CONTROL_PANEL():
 
         NONE
         """
-        pass
+        self.setThrusters(thrusterSpeeds)
 
     def switchControlDirection(self):
         """
@@ -1139,12 +1234,34 @@ class CONTROL_PANEL():
         """
         if self.data.controlControlDirection == True:
             self.data.controlControlDirection = False
-            self.ui.control_switch_direction_forward.setStyleSheet(self.data.disabledText)
+            self.ui.control_switch_direction_forward.setStyleSheet("")
             self.ui.control_switch_direction_reverse.setStyleSheet(self.data.greenText)
         else:
             self.data.controlControlDirection = True
             self.ui.control_switch_direction_forward.setStyleSheet(self.data.greenText)
-            self.ui.control_switch_direction_reverse.setStyleSheet(self.data.disabledText)
+            self.ui.control_switch_direction_reverse.setStyleSheet("")
+
+    def changeSensitivity(self, value):
+        if value == 1:
+            self.data.controllerSensitivity = 1/3
+            self.ui.control_sensitivity_slider.setValue(1)
+            self.ui.control_sensitivity_low.setStyleSheet(self.data.greenText)
+            self.ui.control_sensitivity_medium.setStyleSheet("")
+            self.ui.control_sensitivity_high.setStyleSheet("")
+
+        if value == 2:
+            self.data.controllerSensitivity = 2/3
+            self.ui.control_sensitivity_slider.setValue(2)
+            self.ui.control_sensitivity_low.setStyleSheet("")
+            self.ui.control_sensitivity_medium.setStyleSheet(self.data.greenText)
+            self.ui.control_sensitivity_high.setStyleSheet("")
+
+        if value == 3:
+            self.data.controllerSensitivity = 1
+            self.ui.control_sensitivity_slider.setValue(3)
+            self.ui.control_sensitivity_low.setStyleSheet("")
+            self.ui.control_sensitivity_medium.setStyleSheet("")
+            self.ui.control_sensitivity_high.setStyleSheet(self.data.greenText)
 
     ###########################
     ##### TIMER FUNCTIONS #####
@@ -1246,6 +1363,15 @@ class CONTROL_PANEL():
     ###########################
     ##### OTHER FUNCTIONS #####
     ###########################
+    def startupProcedure(self):
+        """
+        """
+        # ARM THE THRUSTER ESCs
+        self.armThrusters()
+
+        # START POLLING SENSORS VALUES
+        self.getSensorReadings()
+
     def getSensorReadings(self):
         """
         PURPOSE
@@ -1270,12 +1396,8 @@ class CONTROL_PANEL():
             self.timer.stop()
         
         else:
-            #self.data.controlSensorValues = self.rov.getSensors([1]*self.data.configSensorNumber).tolist()
-            #beforeTime = datetime.now()
+            # REQEST SINGLE READING
             sensorReadings = self.getSensors()
-            #afterTime = datetime.now()
-            #deltaTime = (afterTime - beforeTime).total_seconds() * 1000000
-            #print(deltaTime)
 
             # UPDATE GUI
             if len(self.data.controlSensorLabelObjects) > 0:
@@ -1325,13 +1447,6 @@ class CONTROL_PANEL():
         if rovComPort != None:
             try:
                 self.comms = serial.Serial(rovComPort, baudRate, timeout = 1)
-                # WAIT FOR ROV TO WAKE UP
-
-                #--------------------------------------------------#
-                # WHY DOES THIS INSTANCE OF GET IDENTITY NOT WORK? #
-                #--------------------------------------------------#
-
-                #self.getIdentity(self.comms, self.data.rovID)
                 message = "Connection to ROV successful."
                 status = True
             except:
@@ -1370,34 +1485,30 @@ class CONTROL_PANEL():
         # CLEAR CURRENT MENU LIST
         menuObject.clear()
 
-        # CHECK WHICH COM PORTS ARE AVAILABLE
+        identity = ""
+        rovComPort = None
         availableComPorts = []
+        
+        # CHECK WHICH COM PORTS ARE AVAILABLE
         for port in ports:
             try:
-                comms = serial.Serial(port)
-                comms.close()
-
-                # ADD AVAILABLE COM PORTS TO MENU LIST
+                comms = serial.Serial(port, baudRate, timeout = 1)
+                # ADD AVAILABLE COM PORT TO MENU LIST
                 availableComPorts.append(port)
                 menuObject.addItem(port)
-            
+                self.data.rovCommsStatus = True
+                # REQUEST IDENTITY FROM COM PORT
+                identity = self.getIdentity(comms, self.data.rovID)
+                comms.close()
+                self.data.rovCommsStatus = False
+                # FIND WHICH COM PORT IS THE ROV
+                if identity == rovIdentity:
+                    rovComPort = port
+                    break
+                    
             # SKIP COM PORT IF UNAVAILABLE
             except (OSError, serial.SerialException):
                 pass
-        
-        # REQUEST IDENTITY FROM EACH AVALIABLE COME PORT
-        rovComPort = None
-        identity = ""
-        for port in availableComPorts:
-            comms = serial.Serial(port, baudRate, timeout = 1)
-            self.data.rovCommsStatus = True
-            identity = self.getIdentity(comms, self.data.rovID)
-            comms.close()
-            self.data.rovCommsStatus = False
-            # FIND WHICH COM PORT IS THE ROV
-            if identity == rovIdentity:
-                rovComPort = port
-                break
 
         return availableComPorts, rovComPort, identity
 
@@ -1420,7 +1531,7 @@ class CONTROL_PANEL():
         startTime = datetime.now()
         elapsedTime = 0
         # TRY TO EXTRACT IDENTIFICATION FROM DEVICE FOR UP TO 3 SECONDS
-        while (identity == "") and (elapsedTime < 5):
+        while (identity == "") and (elapsedTime < 3):
             self.serialSend("?I", serialInterface)
             identity = self.serialReceive(serialInterface)
             elapsedTime = (datetime.now() - startTime).total_seconds()
@@ -1448,6 +1559,36 @@ class CONTROL_PANEL():
             # CONVERT TRUE/FALSE TO '1'/'0'
             transmitActuatorStates += ('1' if state == True else '0')
         self.serialSend(transmitActuatorStates, self.comms)
+
+    def setThrusters(self, thrusterSpeeds):
+        """
+        PURPOSE
+
+        Generates command to send to ROV with the desired thruster speeds.
+
+        INPUT
+
+        - thrusterSpeeds = array containing the desired speed of each thruster.
+
+        RETURNS
+
+        NONE
+        """
+        # COMMAND INITIALISATION  
+        transmitThrusterSpeeds = '?RT'
+        # ADD ACTUATOR STATES ONTO THE END OF STRING
+        for speed in thrusterSpeeds:
+            # CONVERT TO 'xxx' format (PAD EMPTY SPACES WITH ZEROS)
+            transmitThrusterSpeeds += ('{0:03d}'.format(speed))
+
+        self.serialSend(transmitThrusterSpeeds, self.comms)
+
+    def armThrusters(self):
+        """
+        """
+        # COMMAND INITIALISATION  
+        transmitArmThrusters = '?RX'
+        self.serialSend(transmitArmThrusters, self.comms) 
 
     def getSensors(self):
         """
@@ -1508,7 +1649,12 @@ class CONTROL_PANEL():
         NONE
         """
         received = ""
-        received = serialInterface.readline().decode('ascii').strip()
+        try:
+            received = serialInterface.readline().decode('ascii').strip()
+        except:
+            self.ui.printTerminal("Failed to receive data.")
+            self.rovConnect()
+            
         return(received)
 
     ###############################
@@ -1834,7 +1980,7 @@ class CONFIG():
                 actuatorToggle.clicked.connect(lambda state, actuator = (oldNumber + number), buttonObject = actuatorToggle: self.control.changeActuators(actuator, buttonObject))
 
                 # CREATE KEYBINDING FOR ACTUATOR
-                self.addKeyBinding("Actuator {}".format((oldNumber + number + 1)), oldNumber + number + 1, configStatus)
+                self.addKeyBinding("Actuator {}".format((oldNumber + number + 1)), oldNumber + number + 2, configStatus)
 
         # REMOVE ACTUATORS IF NEW NUMBER IS LOWER
         if newNumber < oldNumber:
@@ -2130,7 +2276,7 @@ class CONFIG():
         # SET DEFAULT KEY BINDING IF NO CONFIG FILE IS FOUND
         if configStatus == False:
             self.data.configKeyBindings.append(0)
-        
+
         # CREATE CONFIG TAB KEYBINDING WIDGETS
         keybindingLabel = QLabel(label)
         keybindingLabel.setStyleSheet("font-weight: bold;")
@@ -2138,6 +2284,10 @@ class CONFIG():
         currentBinding = QComboBox()
         currentBinding.addItems(self.data.configKeyBindingsList)
         currentBinding.setCurrentIndex(self.data.configKeyBindings[index])
+
+        # --- FIND WAY TO DISABLE SCROLLING THROUGH BINDINGS --- #
+        currentBinding.setFocusPolicy(Qt.StrongFocus)
+        
         setBinding = QPushButton('Auto Binding')
 
         # CREATE CONFIG TAB KEYBINDINGS LAYOUT
@@ -2193,11 +2343,10 @@ class CONFIG():
         self.data.configKeyBindings[index] = binding
 
         # PREVENT BINDING BEING ASSOCIATED WITH MULTIPLE CONTROLS
-        print(self.data.configKeyBindings)
         for i, item in enumerate(self.data.configKeyBindings):
             # CHECK IF BINDING ALREADY EXISTS
             if i != index:
-                if item == binding:
+                if item == binding and item != 0:
                     # SET BINDING TO NONE
                     self.data.configKeyBindings[i] = 0
                     # FIND BINDING MENU WIDGET
@@ -2228,6 +2377,8 @@ class CONFIG():
         if bindingFound == False:
             # CHANGE BUTTON STYLE
             buttonObject.setStyleSheet(self.data.blueButtonClicked)
+            # DISABLED AUTOBINDING BUTTONS UNTIL BINDING HAS BEEN FOUND
+            #for layout in self.ui.
             # INITIATE SEARCH FOR PRESSED BUTTON
             startTime = datetime.now()
             self.findKeyBinding(index, buttonObject, menuObject, startTime)
@@ -2423,10 +2574,13 @@ class TOOLBAR():
 
         # KEYBINDING TO SWITCH ROV CONTROL ORIENTATION
         SubElement(keybindings, "switch_control_direction".format(index)).text = str(keyBindingsList[keyBindings[0]])
+
+        # KEYBINDING TO CHANGE CONTROLLER SENSITIVITY
+        SubElement(keybindings, "controller_sensitivity".format(index)).text = str(keyBindingsList[keyBindings[1]])
         
         # KEYBINDINGS TO ACTUATE EACH ACTUATOR
         for index in range(actuatorNumber):
-            SubElement(keybindings, "actuator{}".format(index)).text = str(keyBindingsList[keyBindings[index + 1]])
+            SubElement(keybindings, "actuator{}".format(index)).text = str(keyBindingsList[keyBindings[index + 2]])
 
         # SAVE TO XML FILE                                                           
         tree = ElementTree(root)
@@ -2559,6 +2713,7 @@ class DATABASE():
     blueButtonDefault = ""
 
     controlControlDirection = True          # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
+    controllerSensitivity = 2/3             # 1/3, 2/3 or 3/3 controller sensitivity
 
     controlTimerEnabled = False             # TIMER START/STOP BUTTON
     controlTimerNew = True                  # FALSE IF TIMER IS STARTED AGAIN AFTER BEING PAUSED
@@ -2583,7 +2738,7 @@ class DATABASE():
     configSensorTypeList = ['None','Temperature (°C)','Depth (m)', 'Yaw (°)', 'Pitch (°)', 'Roll (°)']
     configSensorSelectedType = []
     
-    # ACTUATOS CONFIGURATION SETTINGS
+    # ACTUATOR CONFIGURATION SETTINGS
     configActuatorNumber = 0
     configActuatorLabelList = []    # LABELS (NAME, DEFAULT STATE, ACTUATED STATE)
 
@@ -2597,14 +2752,16 @@ class DATABASE():
     configDigitalDefaultCameraList = [0, 1, 2]
     configDigitalSelectedList = [0, 1, 2]
 
-    # KEY BINDING CONFIGURATINO SETTINGS
+    # KEY BINDING CONFIGURATION SETTINGS
     # KEY BINDING LIST FOR DROP DOWN MENU
     configKeyBindingsList = ['None','A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
     # THE ORDER THAT BUTTONS APPEAR IN THE BUTTON STATES ARRAY
     configControllerButtons = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
     configControllerButtonReleased = [True] * 14    # USED FOR DEBOUNCING CONTROLLER BUTTONS
     configKeyBindings = []  # STORES SELECTED BINDINGS
+    
     configButtonStates = [] # STORES CONTROLLER BUTTON STATES
+    configJoystickValues = [] # STORES CONTROLLER JOYSTICK STATES
 
     ###############################
     ############ OTHER ############

@@ -387,8 +387,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>180</width>
-                 <height>1188</height>
+                 <width>248</width>
+                 <height>1153</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -752,19 +752,6 @@
               </property>
               <widget class="QWidget" name="page_3">
                <layout class="QGridLayout" name="gridLayout_35">
-                <item row="2" column="1">
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item row="0" column="0">
                  <widget class="QWidget" name="widget_2" native="true">
                   <property name="sizePolicy">
@@ -846,9 +833,6 @@
                   <layout class="QGridLayout" name="gridLayout_40">
                    <item row="0" column="0">
                     <layout class="QFormLayout" name="formLayout">
-                     <property name="formAlignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_20">
                        <property name="text">
@@ -896,6 +880,78 @@
                   </layout>
                  </widget>
                 </item>
+                <item row="4" column="1">
+                 <spacer name="verticalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QGroupBox" name="groupBox_2">
+                  <property name="title">
+                   <string>Controller Sensitivity</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_41">
+                   <item row="1" column="0">
+                    <layout class="QHBoxLayout" name="horizontalLayout_5">
+                     <item>
+                      <widget class="QLabel" name="control_sensitivity_low">
+                       <property name="text">
+                        <string>LOW</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="control_sensitivity_medium">
+                       <property name="text">
+                        <string>MEDIUM</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="control_sensitivity_high">
+                       <property name="text">
+                        <string>HIGH</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QSlider" name="control_sensitivity_slider">
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
+                     <property name="maximum">
+                      <number>3</number>
+                     </property>
+                     <property name="pageStep">
+                      <number>1</number>
+                     </property>
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
                </layout>
               </widget>
               <widget class="QWidget" name="page_4">
@@ -924,8 +980,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                        <rect>
                         <x>0</x>
                         <y>0</y>
-                        <width>98</width>
-                        <height>28</height>
+                        <width>31</width>
+                        <height>16</height>
                        </rect>
                       </property>
                      </widget>
@@ -1065,8 +1121,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>351</width>
+                  <height>543</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_27">
@@ -1090,7 +1146,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_31">
              <item row="0" column="0">
-              <widget class="QWidget" name="config_simulation_graph" native="true"/>
+              <layout class="QGridLayout" name="config_simulation_graph"/>
              </item>
             </layout>
            </widget>
@@ -1131,8 +1187,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>352</width>
+                  <height>543</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_17">
@@ -1188,8 +1244,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>164</width>
-                  <height>56</height>
+                  <width>351</width>
+                  <height>543</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_20">
@@ -1265,8 +1321,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>351</width>
+                  <height>543</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_15">
@@ -1322,8 +1378,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>32</height>
+                  <width>352</width>
+                  <height>543</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_23">
@@ -1477,8 +1533,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>152</width>
-                  <height>317</height>
+                  <width>352</width>
+                  <height>543</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_39">
@@ -1672,7 +1728,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
      <x>0</x>
      <y>0</y>
      <width>1952</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
