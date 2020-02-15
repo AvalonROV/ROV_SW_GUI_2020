@@ -167,14 +167,20 @@ class UI(QMainWindow):
         if configFileStatus == False:
             self.printTerminal('Configuration file not found.')
             # ADD DEFAULT KEYBINDINGS IF NO CONFIG FILE EXISTS (SET TO NONE BINDING AS DEFAULT)
-            self.config.addKeyBinding("Switch Orientation", 0, False)
-            self.config.addKeyBinding("Change Sensitivity", 1, False)
+            self.config.addKeyBinding("Switch Orientation", False)
+            self.config.addKeyBinding("Change Sensitivity", False)
+            self.config.addKeyBinding("Yaw Right", False)
+            self.config.addKeyBinding("Yaw Left", False)
+            self.config.addKeyBinding("Yaw Sensitivity", False)
             
         else:
             self.printTerminal('Configuration file settings applied.')
             # ADD DEFAULT KEY BINDINGS (SETS TO BINDINGS FOUND IN CONFIG FILE)
-            self.config.addKeyBinding("Switch Orientation", 0, True)
-            self.config.addKeyBinding("Change Sensitivity", 1, True)
+            self.config.addKeyBinding("Switch Orientation", True)
+            self.config.addKeyBinding("Change Sensitivity", True)
+            self.config.addKeyBinding("Yaw Right", True)
+            self.config.addKeyBinding("Yaw Left", True)
+            self.config.addKeyBinding("Yaw Sensitivity", True)
 
         # UPDATE GUI WITH THRUSTER DATA
         self.config.setThrustersNumber(self.data.configThrusterNumber, 
@@ -424,7 +430,11 @@ class UI(QMainWindow):
 
         # RE-ADD DEFAULT KEY BINDING TO SWITCH ROV ORIENTATION IF RESET BUTTON IS PRESSED
         if resetStatus == True:
-            self.config.addKeyBinding("Switch Orientation", 0, False)
+            self.config.addKeyBinding("Switch Orientation", False)
+            self.config.addKeyBinding("Change Sensitivity", False)
+            self.config.addKeyBinding("Yaw Right", False)
+            self.config.addKeyBinding("Yaw Left", False)
+            self.config.addKeyBinding("Yaw Sensitivity", False)
         
     #################################
     ##### GUI LINKING FUNCTIONS #####
@@ -513,6 +523,10 @@ class UI(QMainWindow):
         # CONTROLLER SENSITIVITY SETTINGS
         self.control_sensitivity_slider.valueChanged.connect(self.control.changeSensitivity)
         self.control.changeSensitivity(2)
+
+        # CONTROLLER SENSITIVITY SETTINGS
+        self.yaw_sensitivity_slider.valueChanged.connect(self.control.changeYawSensitivity)
+        self.control.changeYawSensitivity(2)
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING CAMERA ID AS 1,2,3,4 ETC.
         self.control_camera_1_list.activated.connect(lambda index, camera = 0: self.control.changeExternalCameraFeed(index, camera))
@@ -724,18 +738,13 @@ class UI(QMainWindow):
 
     def changeCameraFeed(self, event, cameraFeed):
         if cameraFeed == 0:
-            print(self.cameraFeeds)
             pass
 
         if cameraFeed == 1:
-            print("CHANGE1")
             self.cameraFeeds[0], self.cameraFeeds[1] = self.cameraFeeds[1], self.cameraFeeds[0]
-            print(self.cameraFeeds)
               
         if cameraFeed == 2:
-            print("CHANGE2")
             self.cameraFeeds[0], self.cameraFeeds[2] = self.cameraFeeds[2], self.cameraFeeds[0]
-            print(self.cameraFeeds)
 
     def changeCameraFeedMenu(self, index, cameraFeed):
         pass
@@ -864,7 +873,6 @@ class UI(QMainWindow):
                                             padding-right: 10px;
                                             }
                                             """)
-        # margin-top: 40px;
 
     def printTerminal(self, text):
         """
@@ -989,6 +997,7 @@ class CONTROL_PANEL():
             self.ui.config_rov_connect.setEnabled(True)      
 
         else:
+            self.armThrusters()
             self.data.rovConnectButtonStatus = False
             self.ui.control_rov_connect.setText('CONNECT')
             self.ui.config_rov_connect.setText('CONNECT')
@@ -1060,7 +1069,7 @@ class CONTROL_PANEL():
 
         INPUT
 
-        NONE
+        - buttonStates = array containined the state of each button on the XBOX controller (1 or 0).
 
         RETURNS
 
@@ -1068,22 +1077,24 @@ class CONTROL_PANEL():
         """
         self.data.configButtonStates = buttonStates
 
+        # CYCLE THROUGH EACH BUTTON
         for index, button in enumerate(buttonStates):
+            
+            # FIND THE NAME OF THE BUTTON IN QUESTION ('A', 'B', 'X', 'Y' ETC.)
+            whichButton = self.data.configControllerButtons[index]
+            # FIND THE BUTTONS INDEX ON THE KEYBINDINGS DROP DOWN MENU
+            whichMenuIndex = self.data.configKeyBindingsList.index(whichButton)
+            # FIND WHICH ROV CONTROL USES THAT KEYBINDING
+            try:
+                whichControl = self.data.configKeyBindings.index(whichMenuIndex)
+                buttonExists = True
+            except:
+                buttonExists = False
+
             # IF BUTTON IS PRESSED
             if button == 1:
-                # FIND THE NAME OF THE BUTTON THAT HAS BEEN PRESSED ('A', 'B' ETC.)
-                whichButton = self.data.configControllerButtons[index]
-                # FIND THE BUTTONS INDEX ON THE KEYBINDINGS MENU
-                whichMenuIndex = self.data.configKeyBindingsList.index(whichButton)
-                # FIND WHICH ACTUATOR USES THAT KEYBINDING
-                try:
-                    whichControl = self.data.configKeyBindings.index(whichMenuIndex)
-                    buttonExists = True
-                except:
-                    buttonExists = False
-
                 # IF KEYBINDING EXISTS AND HAS PREVIOUSLY BEEN RELEASED
-                if buttonExists == True & self.data.configControllerButtonReleased[index] == True:
+                if buttonExists == True and self.data.configControllerButtonReleased[index] == True:
                     # PREVENT ACTUATOR BEING TOGGLED AGAIN UNTILL BUTTON IS RELEASED
                     self.data.configControllerButtonReleased[index] = False
                     
@@ -1098,17 +1109,44 @@ class CONTROL_PANEL():
                             self.changeSensitivity(currentValue + 1)
                         else:
                             self.changeSensitivity(1)
+
+                    # IF ROV YAW IS ACTIVATED (SPECIAL CASE)
+                    # RIGHT YAW
+                    if whichControl == 2:
+                        self.data.yawButtonStates[0] = 1                    
+                    # LEFT YAW
+                    if whichControl == 3:
+                        self.data.yawButtonStates[1] = 1
+
+                    # IF ROV YAW SENSITIVITY IS BEING CHANGED (SPECIAL CASE)
+                    if whichControl == 4:
+                        currentValue = self.ui.yaw_sensitivity_slider.value()
+                        if currentValue < 3:
+                            self.changeYawSensitivity(currentValue + 1)
+                        else:
+                            self.changeYawSensitivity(1)
                     
                     # IF ROV ACTUATOR IS BEING TOGGLED
-                    else:
+                    else: 
+                        whichActuator = whichControl - 5
                         # FIND POINTER TO THE BUTTON WIDGET CORRESPONDING TO THE ACTUATOR
-                        widget = self.ui.control_panel_actuators.itemAt((2*whichControl)-1).widget()
+                        widgetPosition = (whichActuator * 2) + 1
+                        widget = self.ui.control_panel_actuators.itemAt(widgetPosition).widget()
                         # TOGGLES ACTUATORS AND CHANGES APPEARANCE OF GUI BUTTON
-                        self.changeActuators(whichControl - 1, widget)
-            
+                        self.changeActuators(whichActuator, widget)
+
             # WAIT FOR BUTTON TO BE RELEASED
             else:
                 self.data.configControllerButtonReleased[index] = True
+
+                #IF ROV YAW IS DE-ACTIVATED (SPECIAL CASE)
+                if buttonExists == True:
+                    #RIGHT YAW
+                    if whichControl == 2:
+                        self.data.yawButtonStates[0] = 0
+                    # LEFT YAW
+                    if whichControl == 3:
+                        self.data.yawButtonStates[1] = 0
         
     def processJoysticks(self, joystickValues):
         """
@@ -1123,34 +1161,55 @@ class CONTROL_PANEL():
         - motorSpeeds = array containing the speed of each thruster
         """
         filteredThrusterSpeeds = [0] * self.data.configThrusterNumber
+
+        # YAW DIRECTION FROM BUTTONS
+        if self.data.yawButtonStates[0] != self.data.yawButtonStates[1]:
+            yawActive = True
+            # RIGHT YAW
+            if self.data.yawButtonStates[0] == 1:
+                yawDirection = 1
+            # LEFT YAW
+            elif self.data.yawButtonStates[1] == 1:
+                yawDirection = -1
+            # NEUTRAL YAW
+            else:
+                yawDirection = 0
+        else:
+            yawDirection = 0
+            # CHECK IF YAW HAS CHANGED FROM PREVIOUS STATE
+            if self.data.yawButtonStatesPrevious != self.data.yawButtonStates:
+                yawActive = True
+            else:
+                yawActive = False
         
-        if joystickValues != self.data.configJoystickValues:
-            
+        if joystickValues != self.data.configJoystickValues or yawActive == True:
             # DECOMPOSE JOYSTICKS INTO MOTION AXIS
             right_left = joystickValues[0]
             forward_backward = -joystickValues[1]
             up_down = -joystickValues[2]
-            yaw = joystickValues[4]
+            pitch = joystickValues[3]
+            roll = joystickValues[4]
+            yaw = yawDirection * self.data.yawSensitivity
 
-            #yaw = LB & RB buttons
-            # = -joystickValues[3]
-            #roll = joystickValues[4]
-            
             # CALCULATE CONTRIBUTION TO MOTION FROM EACH THRUSTER
-            speed_A = - right_left + forward_backward + up_down - yaw
-            speed_B = right_left + forward_backward + up_down + yaw
-            speed_C = right_left - forward_backward + up_down - yaw
-            speed_D = - right_left - forward_backward + up_down + yaw
-            speed_E = - right_left + forward_backward - up_down - yaw
-            speed_F = right_left + forward_backward - up_down + yaw
-            speed_G = right_left - forward_backward - up_down - yaw
-            speed_H = - right_left - forward_backward - up_down + yaw
+            speed_A = right_left + forward_backward - up_down - pitch - roll + yaw
+            speed_B = - right_left + forward_backward - up_down - pitch + roll - yaw
+            speed_C = - right_left - forward_backward - up_down + pitch + roll + yaw
+            speed_D = right_left - forward_backward - up_down + pitch - roll - yaw
+            speed_E = right_left + forward_backward + up_down + pitch + roll + yaw
+            speed_F = - right_left + forward_backward + up_down + pitch - roll - yaw
+            speed_G = - right_left - forward_backward + up_down - pitch - roll + yaw
+            speed_H = right_left - forward_backward + up_down - pitch + roll - yaw
 
             filteredThrusterSpeeds = [speed_A, speed_B, speed_C, speed_D, speed_E, speed_F, speed_G, speed_H]
             
             # FIND THRUSTER WITH HIGHEST SPEED AND PEAK JOYSTICK VALUE
             maxSpeed = max((abs(speed) for speed in filteredThrusterSpeeds))
             maxJoystick = max((abs(position) for position in joystickValues))
+
+            # SET FIXED SPEED FOR YAW CONTROL
+            if yaw != 0 and maxJoystick == 0:
+                maxJoystick = 0.5
             
             # CONTROLLER SENSITIVITY SCALING FACTOR
             controllerSensitivity = self.data.controllerSensitivity 
@@ -1166,7 +1225,9 @@ class CONTROL_PANEL():
 
             self.changeThrusters(filteredThrusterSpeeds)
         
+        # SAVE VALUES TO BE COMPARED IN THE NEXT CYCLE
         self.data.configJoystickValues = joystickValues
+        self.data.yawButtonStatesPrevious = self.data.yawButtonStates.copy()
         
     ###########################
     ## ROV CONTROL FUNCTIONS ##
@@ -1206,17 +1267,23 @@ class CONTROL_PANEL():
         """
         PURPOSE
 
-        Sends commmand to ROV with thruster speeds.
+        Prepares and sends desired thruster speeds to the serial library function.
 
         INPUT
 
-        NONE
+        - thrusterSpeed = array containing the desired speed of each thruster. (1 - 999).
 
         RETURNS
 
         NONE
         """
-        self.setThrusters(thrusterSpeeds)
+        tempThrusterSpeeds = thrusterSpeeds.copy()
+
+        # CHECK WHICH THRUSTER NEED TO BE REVERSED
+        for i, speed in enumerate(tempThrusterSpeeds):
+            if self.data.configThrusterReverse[i] == True:
+                tempThrusterSpeeds[i] = 1000 - speed
+        self.setThrusters(tempThrusterSpeeds)
 
     def switchControlDirection(self):
         """
@@ -1262,6 +1329,28 @@ class CONTROL_PANEL():
             self.ui.control_sensitivity_low.setStyleSheet("")
             self.ui.control_sensitivity_medium.setStyleSheet("")
             self.ui.control_sensitivity_high.setStyleSheet(self.data.greenText)
+
+    def changeYawSensitivity(self, value):
+        if value == 1:
+            self.data.yawSensitivity = 1/3
+            self.ui.yaw_sensitivity_slider.setValue(1)
+            self.ui.yaw_sensitivity_low.setStyleSheet(self.data.greenText)
+            self.ui.yaw_sensitivity_medium.setStyleSheet("")
+            self.ui.yaw_sensitivity_high.setStyleSheet("")
+
+        if value == 2:
+            self.data.yawSensitivity = 2/3
+            self.ui.yaw_sensitivity_slider.setValue(2)
+            self.ui.yaw_sensitivity_low.setStyleSheet("")
+            self.ui.yaw_sensitivity_medium.setStyleSheet(self.data.greenText)
+            self.ui.yaw_sensitivity_high.setStyleSheet("")
+
+        if value == 3:
+            self.data.yawSensitivity = 1
+            self.ui.yaw_sensitivity_slider.setValue(3)
+            self.ui.yaw_sensitivity_low.setStyleSheet("")
+            self.ui.yaw_sensitivity_medium.setStyleSheet("")
+            self.ui.yaw_sensitivity_high.setStyleSheet(self.data.greenText)
 
     ###########################
     ##### TIMER FUNCTIONS #####
@@ -1853,11 +1942,12 @@ class CONFIG():
             thrusterLayout.addRow(thrusterLabel, layout)
 
             # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
-            thrusterLocation.activated.connect(lambda index, thruster = thruster, setting = 0, controlObject = None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
-            thrusterReverseCheck.toggled.connect(lambda index, thruster = thruster, setting = 1, controlObject = thrusterReverseCheck: self.setROVThrusterSettings(index, thruster, setting, controlObject))
-            thrusterTest.clicked.connect(lambda index, thruster = thruster, setting = 2, controlObject= None: self.setROVThrusterSettings(index, thruster, setting, controlObject))
+            thrusterLocation.activated.connect(lambda index, thruster = thruster: self.thrusterPosition(index, thruster)) 
+            thrusterReverseCheck.toggled.connect(lambda state, thruster = thruster, controlObject = thrusterReverseCheck: self.thrusterReverse(thruster, controlObject))
+            thrusterTest.pressed.connect(lambda state = True, thruster = thruster, controlObject = thrusterTest: self.thrusterTest(state, thruster, controlObject))
+            thrusterTest.released.connect(lambda state = False, thruster = thruster, controlObject = thrusterTest: self.thrusterTest(state, thruster, controlObject))
 
-    def setROVThrusterSettings(self, index, thruster, setting, controlObject):
+    def thrusterPosition(self, index, thruster):
         """
         PURPOSE
 
@@ -1868,35 +1958,44 @@ class CONFIG():
         - index = menu index of the ROV location selected.
         - thruster = the thruster being modified.
         - setting = the thruster setting that has been modified (0 = position, 1 = reverse state, 2 = test).
-        - controlObject = pointer to the checkbox object.
+        - controlObject = pointer to the combobox/checkbox/button object.
 
         RETURNS
 
         NONE
         """
-        # THRUSTER POSITION
-        if setting == 0:
-            self.data.configThrusterPosition[thruster] = self.data.configThrusterPositionList[index]
+        self.data.configThrusterPosition[thruster] = self.data.configThrusterPositionList[index]
 
-            # PREVENT MULTIPLE THRUSTERS PER ROV LOCATION
-            for i, item in enumerate(self.data.configThrusterPosition):
-                if item == self.data.configThrusterPosition[thruster] and i != thruster:
-                    # SET BINDING TO NONE
-                    self.data.configThrusterPosition[i] = self.data.configThrusterPositionList[0]
-                    # FIND BINDING MENU WIDGET
-                    layout = self.ui.config_thruster_form.itemAt((2 * i) + 1).layout()
-                    widget = layout.itemAt(1).widget()
-                    # SET TO NONE
-                    widget.setCurrentIndex(0)
+        # PREVENT MULTIPLE THRUSTERS PER ROV LOCATION
+        for i, item in enumerate(self.data.configThrusterPosition):
+            if item == self.data.configThrusterPosition[thruster] and i != thruster:
+                # SET BINDING TO NONE
+                self.data.configThrusterPosition[i] = self.data.configThrusterPositionList[0]
+                # FIND BINDING MENU WIDGET
+                layout = self.ui.config_thruster_form.itemAt((2 * i) + 1).layout()
+                widget = layout.itemAt(1).widget()
+                # SET TO NONE
+                widget.setCurrentIndex(0)
 
-        # THRUSTER REVERSE
-        if setting == 1:
-            self.data.configThrusterReverse[thruster] = controlObject.isChecked()
+    def thrusterReverse(self, thruster, checkboxObject):
+        """
+        """
+        self.data.configThrusterReverse[thruster] = checkboxObject.isChecked()
 
-        # THRUSTER TEST
-        if setting == 2:
-            pass  
-
+    def thrusterTest(self, state, thruster, buttonObject):
+        """
+        """
+        if state:
+            buttonObject.setStyleSheet(self.data.blueButtonClicked)
+            speeds = [500] * self.data.configThrusterNumber
+            speeds[thruster] = 550
+            self.control.changeThrusters(speeds)
+            
+        else:
+            speeds = [500] * self.data.configThrusterNumber
+            self.control.changeThrusters(speeds)
+            buttonObject.setStyleSheet("")
+            
     #########################
     ### ACTUATOR SETTINGS ###
     #########################
@@ -1980,7 +2079,7 @@ class CONFIG():
                 actuatorToggle.clicked.connect(lambda state, actuator = (oldNumber + number), buttonObject = actuatorToggle: self.control.changeActuators(actuator, buttonObject))
 
                 # CREATE KEYBINDING FOR ACTUATOR
-                self.addKeyBinding("Actuator {}".format((oldNumber + number + 1)), oldNumber + number + 2, configStatus)
+                self.addKeyBinding("Actuator {}".format((oldNumber + number + 1)), configStatus)
 
         # REMOVE ACTUATORS IF NEW NUMBER IS LOWER
         if newNumber < oldNumber:
@@ -2257,7 +2356,7 @@ class CONFIG():
     #########################
     # KEY BINDING FUNCTIONS #
     #########################
-    def addKeyBinding(self, label, index, configStatus):
+    def addKeyBinding(self, label, configStatus):
         """
         PURPOSE
 
@@ -2276,6 +2375,9 @@ class CONFIG():
         # SET DEFAULT KEY BINDING IF NO CONFIG FILE IS FOUND
         if configStatus == False:
             self.data.configKeyBindings.append(0)
+
+        # FIND INDEX OF NEW KEY BINDING ON THE KEYBINDINGS TAB
+        index = int(self.ui.config_keybindings_form.count() / 2)
 
         # CREATE CONFIG TAB KEYBINDING WIDGETS
         keybindingLabel = QLabel(label)
@@ -2297,7 +2399,7 @@ class CONFIG():
 
         # ADD TO CONFIG TAB KEYBINDINGS FORM
         self.ui.config_keybindings_form.addRow(keybindingLabel, keybindingLayout)
-
+        
         # LINK KEYBINDING WIDGETS TO SLOT - PASS LAYOUT INDEX NUMBER, THE OBJECT, AND AN INDENTIFIER
         currentBinding.activated.connect(lambda binding, index = index: self.setKeyBindings(binding, index))
         setBinding.clicked.connect(lambda bindingFound = False, 
@@ -2377,8 +2479,10 @@ class CONFIG():
         if bindingFound == False:
             # CHANGE BUTTON STYLE
             buttonObject.setStyleSheet(self.data.blueButtonClicked)
+            
             # DISABLED AUTOBINDING BUTTONS UNTIL BINDING HAS BEEN FOUND
             #for layout in self.ui.
+            
             # INITIATE SEARCH FOR PRESSED BUTTON
             startTime = datetime.now()
             self.findKeyBinding(index, buttonObject, menuObject, startTime)
@@ -2523,7 +2627,7 @@ class TOOLBAR():
         for index in range(8):
             thruster = SubElement(thrusters, "thruster{}".format(index))
             SubElement(thruster, "location").text = thrusterPosition[index]
-            SubElement(thruster, "reversed").text = thrusterReverse[index]
+            SubElement(thruster, "reversed").text = "True" if thrusterReverse[index] else "False"
         
         ###################################
         ### CONFIGURATION FOR ACTUATORS ###
@@ -2577,10 +2681,19 @@ class TOOLBAR():
 
         # KEYBINDING TO CHANGE CONTROLLER SENSITIVITY
         SubElement(keybindings, "controller_sensitivity".format(index)).text = str(keyBindingsList[keyBindings[1]])
+
+        # KEYBINDING TO YAW RIGHT
+        SubElement(keybindings, "right_yaw".format(index)).text = str(keyBindingsList[keyBindings[2]])
+        
+        # KEYBINDING TO YAW LEFT
+        SubElement(keybindings, "right_left".format(index)).text = str(keyBindingsList[keyBindings[3]])
+
+        # KEYBINDING TO YAW SENSITIVITY
+        SubElement(keybindings, "yaw_sensitivity".format(index)).text = str(keyBindingsList[keyBindings[4]])
         
         # KEYBINDINGS TO ACTUATE EACH ACTUATOR
         for index in range(actuatorNumber):
-            SubElement(keybindings, "actuator{}".format(index)).text = str(keyBindingsList[keyBindings[index + 2]])
+            SubElement(keybindings, "actuator{}".format(index)).text = str(keyBindingsList[keyBindings[index + 5]])
 
         # SAVE TO XML FILE                                                           
         tree = ElementTree(root)
@@ -2714,6 +2827,7 @@ class DATABASE():
 
     controlControlDirection = True          # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
     controllerSensitivity = 2/3             # 1/3, 2/3 or 3/3 controller sensitivity
+    yawSensitivity = 2/3                    # 1/3, 2/3 or 3/3 yaw sensitivity
 
     controlTimerEnabled = False             # TIMER START/STOP BUTTON
     controlTimerNew = True                  # FALSE IF TIMER IS STARTED AGAIN AFTER BEING PAUSED
@@ -2732,6 +2846,8 @@ class DATABASE():
     configThrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     configThrusterPosition = ['None'] * 8
     configThrusterReverse = [False] * 8
+    yawButtonStates = [0,0]
+    yawButtonStatesPrevious = [0,0]
 
     # SENSOR CONFIGURATION SETTINGS
     configSensorNumber = 0
