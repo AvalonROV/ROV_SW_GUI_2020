@@ -30,6 +30,7 @@ import subprocess
 # CUSTOM LIBRARIES
 from avalonComms import ROV
 from libraries.controller.xboxController import CONTROLLER
+from libraries.serial.rovComms import ROV_SERIAL
 from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
 from libraries.computer_vision.transectLineTask.transectLinePopupWindow import TRANSECT_LINE_POPUP_WINDOW
 from libraries.camera.cameraCapture import CAMERA_CAPTURE
@@ -71,9 +72,13 @@ class UI(QMainWindow):
         self.data = DATABASE()
         self.rov = ROV()
         self.controller = CONTROLLER()
-        self.control = CONTROL_PANEL(self, self.data, self.rov, self.controller)
-        self.config = CONFIG(self, self.data, self.control, self.rov, self.controller)
+        self.comms = ROV_SERIAL()
+        self.control = CONTROL_PANEL(self, self.data, self.rov, self.controller, self.comms)
+        self.config = CONFIG(self, self.data, self.control, self.rov, self.controller, self.comms)
         self.toolbar = TOOLBAR(self, self.data)
+
+        # TELL ROV_SERIAL LIBRARY WHICH UI FUNCTION TO CALL IF COMMS FAILS
+        self.comms.uiSerialFunction.connect(self.control.serialFailEvent)
         
         # FIND SCREEN SIZE
         self.data.sizeObject = QDesktopWidget().screenGeometry(-1)
@@ -455,7 +460,7 @@ class UI(QMainWindow):
         self.control_panel_splitter.splitterMoved.connect(self.splitterEvent)
 
         # ROV CONNECT BUTTON
-        self.control_rov_connect.clicked.connect(self.control.rovConnect)
+        self.control_rov_connect.clicked.connect(lambda buttonState = self.control_rov_connect: self.control.rovSerialConnection(buttonState))
         self.applyGlow(self.control_rov_connect, "#0D47A1", 10)
         self.control_rov_connect.setFixedHeight(self.control_rov_connect.geometry().height() * 1.5)
         self.control_rov_connect.setStyleSheet(self.data.blueButtonDefault)
@@ -541,7 +546,7 @@ class UI(QMainWindow):
         NONE
         """
         # ROV CONNECT BUTTON
-        self.config_rov_connect.clicked.connect(self.control.rovConnect)
+        self.config_rov_connect.clicked.connect(lambda buttonState = self.config_rov_connect: self.control.rovSerialConnection(buttonState))
         self.applyGlow(self.config_rov_connect, "#0D47A1", 10)
         self.config_rov_connect.setFixedHeight(self.config_rov_connect.geometry().height() * 1.5)
         self.config_rov_connect.setStyleSheet(self.data.blueButtonDefault)
@@ -1035,7 +1040,7 @@ class CONTROL_PANEL():
     Handles everything that happens on the Control Panel tab.
     """
     # CONSTUCTOR
-    def __init__(self, Object1, Object2, Object3, Object4):
+    def __init__(self, Object1, Object2, Object3, Object4, Object5):
         """
         PURPOSE
 
@@ -1045,8 +1050,9 @@ class CONTROL_PANEL():
 
         - Object1 = 'UI' class
         - Object2 = 'DATABASE' class
-        - Object3 = 'ROV' clsss
+        - Object3 = 'ROV' class
         - Object4 = 'CONTROLLER' class
+        - Object5 = 'ROV_SERIAL' class
 
         RETURNS
 
@@ -1057,14 +1063,39 @@ class CONTROL_PANEL():
         self.data = Object2
         self.rov = Object3
         self.controller = Object4
+        self.comms = Object5
 
-        self.comms = None
+        #self.comms = None
+
+    def rovSerialConnection(self, buttonState):
+        """
+        PURPOSE
+
+        Determines whether to connect or disconnect from the ROV serial interface.
+
+        INPUT
+
+        - buttonState = the state of the button (checked or unchecked).
+
+        RETURNS
+
+        NONE
+        """
+        # CONNECT
+        if buttonState:
+            self.rovConnect()
+
+        # DISCONNECT
+        else:
+            self.rovDisconnect()
 
     def rovConnect(self):
         """
         PURPOSE
 
-        Initialises serial communication with the ROV and starts sensor reading requests.
+        Attempts to connect to the ROV using the comms library.
+        Changes the appearance of the connect buttons.
+        If connection is successful, the ROV startup procedure is initiated.
 
         INPUT
 
@@ -1074,50 +1105,87 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.rovConnectButtonStatus == False:
+        # DISABLE BUTTONS TO AVOID DOUBLE CLICKS
+        self.ui.control_rov_connect.setEnabled(False)
+        self.ui.config_rov_connect.setEnabled(False)
+        
+        # FIND ALL AVAILABLE COM PORTS
+        self.ui.printTerminal('Searching for available COM ports...')
+        
+        availableComPorts, rovComPort, identity = self.comms.findComPorts(self.ui.config_com_port_list, 115200, self.data.rovID)
+        self.data.rovComPort = rovComPort
+        
+        self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts)))
+        self.ui.printTerminal('Device Identity: {}'.format(identity))
+        
+        # ATTEMPT CONNECTION TO ROV COM PORT
+        status, message = self.comms.serialConnect(rovComPort, 115200)
+        self.ui.printTerminal(message)
 
-            self.ui.control_rov_connect.setEnabled(False)
-            self.ui.config_rov_connect.setEnabled(False)
-            
-            # FIND ALL AVAILABLE COM PORTS
-            self.ui.printTerminal('Searching for available COM ports...')
-            availableComPorts, rovComPort, identity = self.findComPorts(self.ui.config_com_port_list, self.data.rovCommsStatus, 115200, self.data.rovID)
-            self.data.rovComPort = rovComPort
-            self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts)))
-            self.ui.printTerminal('Device Identity: {}'.format(identity))
-            
-            # ATTEMPT CONNECTION TO ROV COM PORT
-            status, message = self.serialConnect(rovComPort, 115200)
-            self.ui.printTerminal(message)
+        # IF CONNECTION IS SUCCESSFUL
+        if status == True:
+            # MODIFY BUTTON STYLE
+            self.ui.control_rov_connect.setText('DISCONNECT')
+            self.ui.config_rov_connect.setText('DISCONNECT')
+            self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonClicked)
+            self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonClicked)
 
-            # IF CONNECTION IS SUCCESSFUL
-            if status == True:
-                self.data.rovConnectButtonStatus = True
-                # MODIFY BUTTON STYLE
-                self.ui.control_rov_connect.setText('DISCONNECT')
-                self.ui.config_rov_connect.setText('DISCONNECT')
-                self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonClicked)
-                self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonClicked)
-                self.data.rovCommsStatus = True
-                # CALL INITIAL ROV FUNCTIONS
-                self.startupProcedure()
-
-            self.ui.control_rov_connect.setEnabled(True)
-            self.ui.config_rov_connect.setEnabled(True)      
-
+            # CALL INITIAL ROV FUNCTIONS
+            self.startupProcedure()
+        
+        # IF CONNECTION IS UNSUCCESSFUL
         else:
-            self.armThrusters()
-            self.data.rovConnectButtonStatus = False
-            self.ui.control_rov_connect.setText('CONNECT')
-            self.ui.config_rov_connect.setText('CONNECT')
-            self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonDefault)
-            self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonDefault)
-            # CLOSE COM PORT
-            if self.data.rovCommsStatus:
-                self.ui.printTerminal("Disconnected from {}".format(self.data.rovComPort))
-                self.comms.close()
-                self.rov.disconnect()
-            self.data.rovCommsStatus = False
+            self.rovDisconnect()
+            
+        # RE-ENABLE CONNECT BUTTONS
+        self.ui.control_rov_connect.setEnabled(True)
+        self.ui.config_rov_connect.setEnabled(True)
+
+    def rovDisconnect(self):
+        """
+        PURPOSE
+
+        Disconnects from the ROV using the comms library.
+        Changes the appearance of the connect buttons
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # MODIFY BUTTON STYLE
+        self.ui.control_rov_connect.setText('CONNECT')
+        self.ui.control_rov_connect.setChecked(False)
+        self.ui.config_rov_connect.setText('CONNECT')
+        self.ui.config_rov_connect.setChecked(False)
+        self.ui.control_rov_connect.setStyleSheet(self.data.blueButtonDefault)
+        self.ui.config_rov_connect.setStyleSheet(self.data.blueButtonDefault)
+        
+        # CLOSE COM PORT
+        if self.comms.commsStatus:
+            self.ui.printTerminal("Disconnected from {}".format(self.data.rovComPort))
+            self.comms.comms.close()
+            self.comms.commsStatus = False
+
+    def serialFailEvent(self, message):
+        """
+        PURPOSE
+
+        This function is called from the comms library in the event of a communication failure.
+
+        INPUT
+
+        - message = string error message to show on the GUI.
+
+        RETURNS
+
+        NONE
+        """
+        self.rovDisconnect()
+        self.ui.printTerminal(message)
 
     ############################
     ### CONTROLLER FUNCTIONS ###
@@ -1138,6 +1206,7 @@ class CONTROL_PANEL():
         """
         if self.data.controllerConnectButtonStatus == False:
             
+            # DISABLE CONTROLLER CONNECT BUTTONS
             self.ui.control_controller_connect.setEnabled(False)
             self.ui.config_controller_connect.setEnabled(False)
 
@@ -1148,6 +1217,7 @@ class CONTROL_PANEL():
             if connectionStatus == True:
                 # START READING CONTROLLER INPUTS IN A TIMED THREAD, RETURN VALUES TO PROCESSING FUNCTIONS
                 self.controller.startControllerEventLoop(controllerNumber, self.processButtons, self.processJoysticks)
+                
                 # UPDATE BUTTON STYLE
                 self.data.controllerConnectButtonStatus = True
                 self.ui.control_controller_connect.setText('DISCONNECT')
@@ -1155,6 +1225,7 @@ class CONTROL_PANEL():
                 self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonClicked)
                 self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonClicked)
 
+            # ENABLE CONTROLLER CONNECT BUTTONS
             self.ui.control_controller_connect.setEnabled(True)
             self.ui.config_controller_connect.setEnabled(True)
 
@@ -1370,7 +1441,7 @@ class CONTROL_PANEL():
             self.data.controlActuatorStates[actuator] = False
 
         # SEND COMMAND TO ROV
-        self.setActuators(self.data.controlActuatorStates)
+        self.comms.setActuators(self.data.controlActuatorStates)
 
     def changeThrusters(self, thrusterSpeeds):
         """
@@ -1394,7 +1465,7 @@ class CONTROL_PANEL():
                 tempThrusterSpeeds[i] = 1000 - speed
         
         # SEND COMMAND TO ROV
-        self.setThrusters(tempThrusterSpeeds)
+        self.comms.setThrusters(tempThrusterSpeeds)
 
     def switchControlDirection(self):
         """
@@ -1609,7 +1680,7 @@ class CONTROL_PANEL():
         NONE
         """
         # ARM THE THRUSTER ESCs
-        self.armThrusters()
+        self.comms.armThrusters()
 
         # START POLLING SENSORS VALUES
         self.getSensorReadings()
@@ -1638,12 +1709,12 @@ class CONTROL_PANEL():
         self.timer.start(1000*1/refreshRate)
         
         # STOP REQUESTING SENSOR VALUES IF ROV IS DISCONNECTED
-        if self.data.rovCommsStatus == False:
+        if self.comms.commsStatus == False:
             self.timer.stop()
         
         else:
             # REQEST SINGLE READING
-            sensorReadings = self.getSensors()
+            sensorReadings = self.comms.getSensors()
 
             # UPDATE GUI
             for sensor, reading in enumerate(sensorReadings):
@@ -1673,252 +1744,6 @@ class CONTROL_PANEL():
         
         # STORE WHICH CAMERA HAS BEEN SELECTED FOR EACH FEED
         self.data.controlCameraViewList[display] = camera
-
-    ##############################
-    #### SERIAL LIBRARY MOCKS ####
-    ##############################
-    def serialConnect(self, rovComPort, baudRate):
-        """
-        PURPOSE
-
-        Attempts to initialise a serial communication interface with a desired COM port.
-
-        INPUT
-
-        - rovComPort = the COM port of the ROV.
-        - baudRate = the baud rate of the serial interface.
-
-        RETURNS
-
-        NONE
-        """
-        status = False
-        if rovComPort != None:
-            try:
-                self.comms = serial.Serial(rovComPort, baudRate, timeout = 1)
-                message = "Connection to ROV successful."
-                status = True
-            except:
-                message = "Failed to connect to {}.".format(rovComPort)
-        else:
-            message = "Failed to recognise device identity."
-
-        return status, message
-
-    def findComPorts(self, menuObject, commsStatus, baudRate, rovIdentity):
-        """
-        PURPOSE
-
-        Find all available COM ports and adds them to drop down menu.
-
-        INPUT
-
-        - menuObject = pointer to the drop down menu to display the available COM ports.
-        - commsStatus = current ROV communication status (True/False).
-        - baudRate = baud rate of the serial interface.
-        - rovIdentity = string containing the required device identity to connect to the ROV.
-
-        RETURNS
-
-        - availableComPorts = list of all the available COM ports.
-        - rovComPort = the COM port that belongs to the ROV.
-        - identity = the devices response from an identity request.
-        """
-        # DISCONNECTED FROM CURRENT COM PORT IF ALREADY CONNECTED
-        if commsStatus == True:
-            self.rovConnect()
-
-        # CREATE LIST OF ALL POSSIBLE COM PORTS
-        ports = ['COM%s' % (i + 1) for i in range(256)] 
-
-        # CLEAR CURRENT MENU LIST
-        menuObject.clear()
-
-        identity = ""
-        rovComPort = None
-        availableComPorts = []
-        
-        # CHECK WHICH COM PORTS ARE AVAILABLE
-        for port in ports:
-            try:
-                comms = serial.Serial(port, baudRate, timeout = 1)
-                
-                # ADD AVAILABLE COM PORT TO MENU LIST
-                availableComPorts.append(port)
-                menuObject.addItem(port)
-                
-                # REQUEST IDENTITY FROM COM PORT
-                self.data.rovCommsStatus = True
-                identity = self.getIdentity(comms, self.data.rovID)
-                comms.close()
-                self.data.rovCommsStatus = False
-                
-                # FIND WHICH COM PORT IS THE ROV
-                if identity == rovIdentity:
-                    rovComPort = port
-                    break
-                    
-            # SKIP COM PORT IF UNAVAILABLE
-            except (OSError, serial.SerialException):
-                pass
-
-        return availableComPorts, rovComPort, identity
-
-    def getIdentity(self, serialInterface, identity):
-        """
-        PURPOSE
-
-        Request identity from a defined COM port.
-
-        INPUT
-
-        - serialInterface = pointer to the serial interface object.
-        - identity = the desired identity response from the device connected to the COM port.
-
-        RETURNS
-
-        - identity = the devices response.
-        """
-        identity = ""
-        startTime = datetime.now()
-        elapsedTime = 0
-        # REPEATIDELY REQUEST IDENTIFICATION FROM DEVICE FOR UP TO 3 SECONDS
-        while (identity == "") and (elapsedTime < 3):
-            self.serialSend("?I", serialInterface)
-            identity = self.serialReceive(serialInterface)
-            elapsedTime = (datetime.now() - startTime).total_seconds()
-
-        return identity        
-
-    def setActuators(self, actuatorStates):
-        """
-        PURPOSE
-
-        Generates command to send to ROV with the desired actuator states.
-
-        INPUT
-
-        - actuatorStates = array containing the desired state of each actuator.
-
-        RETURNS
-
-        NONE
-        """
-        # COMMAND INITIALISATION  
-        transmitActuatorStates = '?RA'
-        # ADD ACTUATOR STATES ONTO THE END OF STRING
-        for state in actuatorStates:
-            # CONVERT TRUE/FALSE TO '1'/'0'
-            transmitActuatorStates += ('1' if state == True else '0')
-        self.serialSend(transmitActuatorStates, self.comms)
-
-    def setThrusters(self, thrusterSpeeds):
-        """
-        PURPOSE
-
-        Generates command to send to ROV with the desired thruster speeds.
-
-        INPUT
-
-        - thrusterSpeeds = array containing the desired speed of each thruster.
-
-        RETURNS
-
-        NONE
-        """
-        # COMMAND INITIALISATION  
-        transmitThrusterSpeeds = '?RT'
-        # ADD ACTUATOR STATES ONTO THE END OF STRING
-        for speed in thrusterSpeeds:
-            # CONVERT TO 'xxx' format (PAD EMPTY SPACES WITH ZEROS)
-            transmitThrusterSpeeds += ('{0:03d}'.format(speed))
-
-        self.serialSend(transmitThrusterSpeeds, self.comms)
-
-    def armThrusters(self):
-        """
-        PURPOSE
-
-        Sends command to ROV to arm the thruster ESCs.
-
-        INPUT
-
-        NONE
-
-        RETURN
-
-        NONE
-        """
-        # COMMAND INITIALISATION  
-        transmitArmThrusters = '?RX'
-        self.serialSend(transmitArmThrusters, self.comms) 
-
-    def getSensors(self):
-        """
-        PURPOSE
-
-        Send request to ROV to get sensor readings and return them.
-        
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        - results = array containing the sensor readings.
-        """
-        # REQUEST SENSOR READINGS
-        command = "?RS"
-        self.serialSend(command, self.comms)
-        # READ RESPONSE INTO AN ARRAY
-        results = self.serialReceive(self.comms).split(",")
-
-        return results
-
-    def serialSend(self, command, serialInterface):
-        """
-        PURPOSE
-
-        Sends a string down the serial interface to the ROV.
-
-        INPUT
-
-        - command = the command to send.
-        - serialInterface = pointer to the serial interface object..
-
-        RETURNS
-
-        NONE
-        """
-        if self.data.rovCommsStatus:
-            try:
-                serialInterface.write((command + '\n').encode('ascii'))
-            except:
-                self.ui.printTerminal("Failed to send command.")
-                self.rovConnect()
-
-    def serialReceive(self, serialInterface):
-        """
-        PURPOSE
-
-        Waits for data until a newline character is received.
-
-        INPUT
-
-        - serialInterface = pointer to the serial interface object.
-
-        RETURNS
-
-        NONE
-        """
-        received = ""
-        try:
-            received = serialInterface.readline().decode('ascii').strip()
-        except:
-            self.ui.printTerminal("Failed to receive data.")
-            self.rovConnect()
-            
-        return(received)
 
     ###############################
     #### COMPUTER VISION TASKS ####
@@ -2091,7 +1916,7 @@ class CONFIG():
     Handles everything that happens on the Configuration tab.
     """
     # CONSTUCTOR
-    def __init__(self, Object1, Object2, Object3, Object4, Object5):
+    def __init__(self, Object1, Object2, Object3, Object4, Object5, Object6):
         """
         PURPOSE
 
@@ -2104,6 +1929,7 @@ class CONFIG():
         - Object3 = 'CONTROL_PANEL' class
         - Object4 = 'ROV' clsss
         - Object5 = 'CONTROLLER' class
+        - Object6 = 'ROV_SERIAL' class
 
         RETURNS
 
@@ -2115,6 +1941,7 @@ class CONFIG():
         self.control = Object3
         self.rov = Object4
         self.controller = Object5
+        self.comms = Object6
 
     ##########################
     ##### COMMS SETTINGS #####
@@ -2150,7 +1977,7 @@ class CONFIG():
 
         NONE
         """
-        availableComPorts, rovComPort, identity = self.control.findComPorts(self.ui.config_com_port_list, self.data.rovCommsStatus, 115200, 'AVALONROV')
+        availableComPorts, rovComPort, identity = self.comms.findComPorts(self.ui.config_com_port_list, 115200, 'AVALONROV')
         self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts))) 
 
     #########################
@@ -3213,8 +3040,6 @@ class DATABASE():
     comPorts = []                           # LIST OF AVAILABLE COM PORTS
     rovID = "AVALONROV"                     # IDENTITY RESPONSE REQUIRED FROM COM PORT TO CONNECT
     rovComPort = None                       # ACTUAL COM PORT OF THE ROV
-    rovConnectButtonStatus = False          # TRUE WHEN CONNECT BUTTONS IS PRESSED
-    rovCommsStatus = False                  # TRUE WHEN CONNECTION TO COM PORT IS SUCCESSFUL
     controllerConnectButtonStatus = False   # TRUE WHEN CONNECTION TO CONTROLLER IS SUCCESSFUL
 
     controlActuatorStates = []              # STORES STATE OF EACH ACTUATOR

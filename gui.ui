@@ -387,8 +387,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>248</width>
-                 <height>1153</height>
+                 <width>180</width>
+                 <height>1188</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -442,6 +442,9 @@
                        </property>
                        <property name="text">
                         <string>CONNECT</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -1303,8 +1306,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>212</width>
-                  <height>73</height>
+                  <width>164</width>
+                  <height>56</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_20">
@@ -1437,8 +1440,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>116</width>
-                  <height>44</height>
+                  <width>98</width>
+                  <height>32</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_23">
@@ -1592,8 +1595,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>197</width>
-                  <height>399</height>
+                  <width>152</width>
+                  <height>317</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_39">
@@ -1787,7 +1790,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
      <x>0</x>
      <y>0</y>
      <width>1952</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
