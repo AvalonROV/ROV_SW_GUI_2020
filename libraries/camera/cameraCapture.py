@@ -94,6 +94,8 @@ class CAMERA_CAPTURE(QThread):
 
             QThread.msleep(500)
 
+        self.cameraNewFrameSignal.emit(defaultImage)
+
     def feedStop(self):
         self.runFeed = False
 

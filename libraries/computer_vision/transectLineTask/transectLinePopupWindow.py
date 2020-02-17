@@ -20,8 +20,12 @@ class TRANSECT_LINE_POPUP_WINDOW(QWidget):
     def __init__(self, viewWidget):
         QWidget.__init__(self) 
         self.layout = QGridLayout()
-        self.layout.addWidget(QPushButton("Start"))
+        initiateButton = QPushButton("Start")
+        self.layout.addWidget(initiateButton)
         viewWidget.setLayout(self.layout)
+
+    def processImage(self, frame):
+        pass
 
 def guiInitiate(): 
     """
