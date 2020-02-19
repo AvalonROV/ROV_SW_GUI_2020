@@ -9,8 +9,4 @@ digraph "main.CONTROL_PANEL.changeActuators"
   Node2 [label="main.CONTROL_PANEL.process\lButtons",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac543ebfd92abbbbcf50a27f25e48ef77",tooltip=" "];
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node3 [label="main.CONTROL_PANEL.controller\lConnect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#abd8e4b4f825d4c2dfa049937b2c6c814",tooltip="CONTROLLER FUNCTIONS ###."];
-  Node3 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="main.CONTROL_PANEL.controller\lEventLoop",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a85a2502e3a04f7f4c6108033ed7d71aa",tooltip=" "];
-  Node4 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
 }

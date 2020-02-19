@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1952</width>
-    <height>1281</height>
+    <width>1470</width>
+    <height>705</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -387,8 +387,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>180</width>
-                 <height>1188</height>
+                 <width>248</width>
+                 <height>594</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -1183,8 +1183,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>255</width>
+                  <height>225</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_27">
@@ -1249,8 +1249,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>255</width>
+                  <height>225</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_17">
@@ -1296,7 +1296,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <enum>Qt::ScrollBarAlwaysOff</enum>
                </property>
                <property name="sizeAdjustPolicy">
-                <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                <enum>QAbstractScrollArea::AdjustToContents</enum>
                </property>
                <property name="widgetResizable">
                 <bool>true</bool>
@@ -1306,13 +1306,13 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>164</width>
-                  <height>56</height>
+                  <width>255</width>
+                  <height>285</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_20">
                  <item row="0" column="0">
-                  <layout class="QFormLayout" name="config_sensor_form">
+                  <layout class="QFormLayout" name="formLayout_3">
                    <item row="0" column="0">
                     <widget class="QLabel" name="numberOfSensorsLabel">
                      <property name="text">
@@ -1338,6 +1338,22 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                     <widget class="QComboBox" name="measurementRateComboBox"/>
                    </item>
                   </layout>
+                 </item>
+                 <item row="1" column="0">
+                  <layout class="QFormLayout" name="config_sensor_form"/>
+                 </item>
+                 <item row="2" column="0">
+                  <spacer name="verticalSpacer_7">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
                  </item>
                 </layout>
                </widget>
@@ -1383,8 +1399,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>100</width>
-                  <height>30</height>
+                  <width>255</width>
+                  <height>285</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_15">
@@ -1440,15 +1456,18 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>32</height>
+                  <width>256</width>
+                  <height>285</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_23">
+                 <item row="1" column="0">
+                  <layout class="QFormLayout" name="config_actuator_form"/>
+                 </item>
                  <item row="0" column="0">
-                  <layout class="QFormLayout" name="config_actuator_form">
+                  <layout class="QFormLayout" name="formLayout_2">
                    <item row="0" column="0">
-                    <widget class="QLabel" name="numberOfSensorsLabel_2">
+                    <widget class="QLabel" name="quantityLabel">
                      <property name="text">
                       <string>Quantity</string>
                      </property>
@@ -1595,8 +1614,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>152</width>
-                  <height>317</height>
+                  <width>234</width>
+                  <height>399</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_39">
@@ -1789,8 +1808,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1952</width>
-     <height>21</height>
+     <width>1470</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

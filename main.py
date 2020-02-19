@@ -29,6 +29,7 @@ import subprocess
 
 # CUSTOM LIBRARIES
 from avalonComms import ROV
+from libraries.configuration_file. configurationFile import READ_CONFIG_FILE, WRITE_CONFIG_FILE
 from libraries.controller.xboxController import CONTROLLER
 from libraries.serial.rovComms import ROV_SERIAL
 from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
@@ -120,7 +121,7 @@ class UI(QMainWindow):
         """
         PURPOSE
 
-        Calls function to read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
+        Read the configuration file and configures the programs thruster, actuator, sensor, camera and controller settings.
         If no configuration file is found, the program will open with default settings. 
 
         INPUT
@@ -131,209 +132,95 @@ class UI(QMainWindow):
 
         NONE
         """
-        # GET CONFIGURATION SETTINGS FROM CONFIG FILE
-        (configFileStatus,
-            self.data.programTheme,
-            self.data.configThrusterPosition,
-            self.data.configThrusterReverse, 
-            self.data.configActuatorLabelList,
-            self.data.configSensorSelectedType,
-            self.data.configDefaultCameraList,
-            self.data.configDigitalCameraLabels,
-            self.data.configDigitalDefaultCameraList,
-            self.data.configKeyBindings) = self.readConfigFile(self.data.fileName, 
-                                                                self.data.programTheme,
-                                                                self.data.configThrusterPosition,
-                                                                self.data.configThrusterReverse, 
-                                                                self.data.configActuatorLabelList,
-                                                                self.data.configSensorSelectedType,
-                                                                self.data.configDefaultCameraList,
-                                                                self.data.configDigitalCameraLabels,
-                                                                self.data.configDigitalDefaultCameraList,
-                                                                self.data.configKeyBindings)       
-        
-        #############################
-        ### APPLY SETTINGS TO GUI ###
-        #############################
+        # READ CONFIGURATION FILE
+        self.readConfigFile()
 
-        # APPLY THEME
-        self.changeTheme(self.data.programTheme)
+        # APPLY SETTINGS TO GUI
+        self.programSetup()
 
-        if configFileStatus == False:
-            self.printTerminal('Configuration file not found.')
-            # ADD DEFAULT KEYBINDINGS IF NO CONFIG FILE EXISTS (SET TO NONE BINDING AS DEFAULT)
-            self.config.addKeyBinding("Switch Orientation", False)
-            self.config.addKeyBinding("Change Sensitivity", False)
-            self.config.addKeyBinding("Yaw Right", False)
-            self.config.addKeyBinding("Yaw Left", False)
-            self.config.addKeyBinding("Yaw Sensitivity", False)
-            
-        else:
-            self.printTerminal('Configuration file settings applied.')
-            # ADD DEFAULT KEY BINDINGS (SETS TO BINDINGS FOUND IN CONFIG FILE)
-            self.config.addKeyBinding("Switch Orientation", True)
-            self.config.addKeyBinding("Change Sensitivity", True)
-            self.config.addKeyBinding("Yaw Right", True)
-            self.config.addKeyBinding("Yaw Left", True)
-            self.config.addKeyBinding("Yaw Sensitivity", True)
-
-        # UPDATE GUI WITH THRUSTER DATA
-        self.config.setThrustersNumber(self.data.configThrusterNumber, 
-                                        self.config_thruster_form,
-                                        self.data.configThrusterPosition,
-                                        self.data.configThrusterPositionList,
-                                        self.data.configThrusterReverse)
-        # UPDATE GUI WITH ACTUATOR DATA
-        self.config.setActuatorsNumber(True)  
-        # UPDATE GUI WITH SENSOR DATA
-        self.config.setSensorsNumber(True) 
-        # UPDATE GUI WITH ANALOG CAMERA DATA
-        self.config.setCamerasNumber() 
-        # UPDATE GUI WITH DIGITAL CAMERA DATA
-        self.config.setupDigitalCameras()
-
-    def readConfigFile(self, fileName,
-                        theme, 
-                        thrusterPosition, 
-                        thrusterReverse, 
-                        actuatorLabelList, 
-                        sensorSelectedType, 
-                        defaultCameraList, 
-                        digitalCameraLabels,
-                        defaultDigitalCameras,
-                        keyBindings):
+    def readConfigFile(self):
         """
         PURPOSE
 
-        Reads a specified .xml configuration file that contains all the programs desired settings.
+        Reads the XML configuration file and stores the data in the DATABASE class.
 
         INPUT
 
-        - fileName = directory of the configuration file.
-        - thrusterPosition = array for the default thruster positions on the ROV.
-        - thrusterReverse = array for the default direction of the thrusters.
-        - actuatorLabelList = array for the default name, off and on state labels for the actuators.
-        - sensorSelectedType = array for the default sensor types.
-        - defaultCameraList = array for the default selection of cameras on the four feeds.
-        - keyBindings = array for the default controller keybindings for the actuators.
+        NONE
 
         RETURNS
 
-        - thrusterPosition = modified array for the thruster positions on the ROV.
-        - thrusterReverse = modified array for the default direction of the thrusters.
-        - actuatorLabelList = modified array for the default name, off and on state labels for the actuators.
-        - sensorSelectedType = modified array for the default sensor types.
-        - defaultCameraList = modified array for the default selection of cameras on the four feeds.
-        - keyBindings = modified array for the default controller keybindings for the actuators.
+        NONE
         """
-        # TRY TO FIND THE FILE SPECIFIED
-        try:
-            configFile = parse(fileName)
-            configFileStatus = True
-        except:
-            configFileStatus = False
+        # PARSE CONFIGURATION FILE
+        configFile = READ_CONFIG_FILE(self.data.fileName)
+        configFileStatus = configFile.parseFile()
 
-        # IF CONFIGURATION FILE IS FOUND
-        if configFileStatus == True:
+        if configFileStatus:
+            self.printTerminal('Configuration file found.')
+    
+            # READ THEME SETTINGS
+            self.data.programTheme = configFile.readTheme()
             
-            # FACTORY RESET GUI CONFIGURATION
-            self.resetConfig(False)
+            # READ THRUSTER SETTINGS
+            self.data.thrusterPosition, self.data.thrusterReverseList = configFile.readThruster() 
+            
+            # READ ACTUATOR SETTINGS
+            self.data.actuatorNumber, self.data.actuatorLabelList = configFile.readActuator()
 
-            root = configFile.getroot()
+            # READ KEYBINDING SETTINGS
+            self.data.keyBindings = configFile.readKeyBinding()
+            
+            # READ SENSOR SETTINGS
+            self.data.sensorNumber, self.data.sensorSelectedType = configFile.readSensor()
 
-            for child in root:
+            # READ ANALOG CAMERA SETTINGS
+            #self.data.analogDefaultCameraList
+            
+            # READ DIGITAL CAMERA SETTINGS
+            # self.data.digitalCameraLabels,
+            # self.data.digitalDefaultCameraList,
 
-                ##############################
-                #### READ THEME SETTINGS #####
-                ##############################
-                if child.tag == 'theme':
-                    theme = True if child.text == "dark" else False
+        else:
+            self.printTerminal('Configuration file not found.')
 
-                ##############################
-                ### READ THRUSTER SETTINGS ###
-                ##############################
-                if child.tag == 'thrusters':
-                    for index, thruster in enumerate(child):
-                        thrusterPosition[index] = thruster.find("location").text
-                        thrusterReverse[index] = True if thruster.find("reversed").text == 'True' else False
-       
-                ##############################
-                ### READ ACTUATOR SETTINGS ###
-                ##############################
-                if child.tag == 'actuators':
-                    for index1, actuator in enumerate(child):
-                        # SET NUMBER OF ACTUATORS
-                        if actuator.tag == 'quantity':
-                            self.config_actuators_number.setValue(int(actuator.text))
-                        # SET ACTUATOR LABELS
-                        else:
-                            actuatorLabelList.append([])
-                            actuatorLabelList[index1 - 1].append('')
-                            actuatorLabelList[index1 - 1].append('')
-                            actuatorLabelList[index1 - 1].append('')
+    def programSetup(self):
+        """
+        PURPOSE
 
-                            for index2, label in enumerate(actuator):
-                                actuatorLabelList[index1 - 1][index2] = label.text
+        Applies the configuration settings to the GUI.
 
-                ##############################
-                #### READ SENSOR SETTINGS ####
-                ##############################
-                if child.tag == 'sensors':
-                    for index, sensor in enumerate(child):
-                        # SET NUMBER OF SENSORS AND SENSOR TYPE
-                        if sensor.tag == 'quantity':
-                            self.config_sensors_number.setValue(int(sensor.text))
-                        else:
-                            sensorSelectedType.append(0)
-                            for sensorType in sensor:
-                                sensorSelectedType[index - 1] = int(sensorType.text)
-                    
-                ##############################
-                #### READ CAMERA SETTINGS ####
-                ##############################
-                if child.tag == 'cameras':
-                    for cameraType in child: 
-                        # ANALOG CAMERAS
-                        if cameraType.tag == 'analog':
-                            for index, camera in enumerate(cameraType):
-                                # SET NUMBER OF SENSORS AND SENSOR TYPE
-                                if camera.tag == 'quantity':
-                                    self.config_cameras_number.setValue(int(camera.text))
-                                else:
-                                    defaultCameraList[index - 1] = int(camera.text)
+        INPUT
 
-                        # DIGITAL CAMERAS
-                        if cameraType.tag == 'digital':                            
-                            for attr in cameraType:
-                                # SET NUMBER OF SENSORS AND SENSOR TYPE
-                                if attr.tag == 'labels':                                    
-                                    for index, item in enumerate(attr):                        
-                                        digitalCameraLabels[index] = str(item.text)   
-                                if attr.tag == 'defaultfeeds':
-                                    for index, item in enumerate(attr):                        
-                                        defaultDigitalCameras[index] = int(item.text)
-                                    
-                ##############################
-                ## READ KEYBINDING SETTINGS ##
-                ##############################
-                if child.tag == 'keybindings':
-                    for control in child:
-                        keyBindings.append(self.data.configKeyBindingsList.index(control.text))     
+        NONE
 
-        #############################
-        ### RETURN EXTRACTED DATA ###
-        #############################
-        return (configFileStatus,
-                theme,
-                thrusterPosition,
-                thrusterReverse, 
-                actuatorLabelList,
-                sensorSelectedType,
-                defaultCameraList,
-                digitalCameraLabels,
-                defaultDigitalCameras,
-                keyBindings)
+        RETURNS
 
+        NONE
+        """    
+        # SETUP THEME
+        self.changeTheme(self.data.programTheme)
+
+        # SETUP THRUSTERS
+        self.config.setupThrusters()
+
+        # SETUP KEYBINDINGS
+        self.config.setupKeybindings()
+
+        # UPDATE GUI WITH ACTUATOR DATA
+        self.config.setupActuators()  
+        
+        # UPDATE GUI WITH SENSOR DATA
+        self.config.setupSensors()
+        
+        # # UPDATE GUI WITH ANALOG CAMERA DATA
+        # self.config.setCamerasNumber() 
+        
+        # # UPDATE GUI WITH DIGITAL CAMERA DATA
+        # self.config.setupDigitalCameras()
+
+
+    #### FIX THIS ASAP ####
     def resetConfig(self, resetStatus):
         """
         PURPOSE
@@ -354,35 +241,34 @@ class UI(QMainWindow):
         for i in reversed(range(self.config_thruster_form.rowCount())): 
             self.config_thruster_form.removeRow(i)
 
-        self.data.configThrusterPosition = ['None'] * 8
-        self.data.configThrusterReverse = [False] * 8
+        self.data.thrusterPosition = ['None'] * 8
+        self.data.thrusterReverseList = [False] * 8
 
         # RETURN NUMBER OF THRUSTERS TO 8 IF RESET BUTTON IS PRESSED
         if resetStatus == True:
-            self.config.setThrustersNumber(self.data.configThrusterNumber, 
+            self.config.setupThrusters(self.data.thrusterNumber, 
                                             self.config_thruster_form,
-                                            self.data.configThrusterPosition,
-                                            self.data.configThrusterPositionList,
-                                            self.data.configThrusterReverse)
+                                            self.data.thrusterPosition,
+                                            self.data.thrusterPositionList,
+                                            self.data.thrusterReverseList)
 
         ###############################
         ### RESET ACTUATOR SETTINGS ###
         ###############################
-        self.data.configActuatorLabelList = []
+        self.data.actuatorLabelList = []
         # DELETE PREVIOUS ACTUATORS FROM GUI
-        for number in range(self.data.configActuatorNumber):
+        for number in range(self.data.actuatorNumber):
             # REMOVE ACTUATORS FROM CONFIG TAB
             self.config_actuator_form.removeRow(1) 
             # REMOVE ACTUATORS FROM CONTROL PANEL TAB
             self.control_panel_actuators.removeRow(0)
         self.config_actuators_number.setValue(0)
-        self.data.configActuatorNumber = 0
+        self.data.actuatorNumber = 0
 
         ###############################
         #### RESET SENSOR SETTINGS ####
         ###############################
-        self.data.controlSensorLabelObjects = []
-        self.data.configSensorSelectedType = []
+        self.data.sensorSelectedType = []
         # DELETE PREVIOUS SENSORS FROM GUI
         for i in reversed(range(self.control_panel_sensors.rowCount())): 
             self.control_panel_sensors.removeRow(i)
@@ -391,29 +277,29 @@ class UI(QMainWindow):
             pass
         
         self.config_sensors_number.setValue(0)
-        self.data.configSensorNumber = 0
+        self.data.sensorNumber = 0
 
         ###############################
         #### RESET CAMERA SETTINGS ####
         ###############################
         # ANALOG
-        self.data.configDefaultCameraList = [0] * 4
-        self.data.configCameraList = []
+        self.data.analogDefaultCameraList = [0] * 4
+        self.data.analogCameraList = []
         self.config_cameras_number.setValue(0)
         self.config_camera_1_list.clear()
         self.config_camera_2_list.clear()
         self.config_camera_3_list.clear()
         self.config_camera_4_list.clear()
         # DIGITAL
-        self.data.configDigitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
-        self.data.configDigitalDefaultCameraList = [0, 1, 2]
-        self.data.configDigitalSelectedList = [0, 1, 2]
+        self.data.digitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
+        self.data.digitalDefaultCameraList = [0, 1, 2]
+        self.data.digitalSelectedCameraList = [0, 1, 2]
         self.config.setupDigitalCameras()
 
         ###############################
         ## RESET KEYBINDING SETTINGS ##
         ###############################
-        numberDelete = len(self.data.configKeyBindings)
+        numberDelete = len(self.data.keyBindings)
         for index in range(numberDelete):
             self.config.removeKeyBinding(numberDelete - index - 1)
 
@@ -522,9 +408,9 @@ class UI(QMainWindow):
         self.camera_feed_1_menu.activated.connect(lambda index, camera = 0: self.changeCameraFeedMenu(index, camera))
         self.camera_feed_2_menu.activated.connect(lambda index, camera = 1: self.changeCameraFeedMenu(index, camera))
         self.camera_feed_3_menu.activated.connect(lambda index, camera = 2: self.changeCameraFeedMenu(index, camera))
-        self.camera_feed_1_menu.addItems(self.data.configDigitalCameraLabels)
-        self.camera_feed_2_menu.addItems(self.data.configDigitalCameraLabels)
-        self.camera_feed_3_menu.addItems(self.data.configDigitalCameraLabels)
+        self.camera_feed_1_menu.addItems(self.data.digitalCameraLabels)
+        self.camera_feed_2_menu.addItems(self.data.digitalCameraLabels)
+        self.camera_feed_3_menu.addItems(self.data.digitalCameraLabels)
 
         # CAMERA FEED CLICK EVENT
         self.camera_feed_1.mousePressEvent = lambda event, cameraFeed = 0: self.changeCameraFeed(event, cameraFeed)
@@ -550,6 +436,7 @@ class UI(QMainWindow):
         self.applyGlow(self.config_rov_connect, "#0D47A1", 10)
         self.config_rov_connect.setFixedHeight(self.config_rov_connect.geometry().height() * 1.5)
         self.config_rov_connect.setStyleSheet(self.data.blueButtonDefault)
+        
         # CONTROLLER CONNECT BUTTON
         self.config_controller_connect.clicked.connect(self.control.controllerConnect)
         self.applyGlow(self.config_controller_connect, "#0D47A1", 10)
@@ -558,9 +445,9 @@ class UI(QMainWindow):
             
         self.config_com_port_list.activated.connect(self.config.changeComPort) 
         self.config_find_com_ports.clicked.connect(self.config.refreshComPorts)   
-        self.config_sensors_number.editingFinished.connect(lambda: self.config.setSensorsNumber(False))
-        self.config_cameras_number.editingFinished.connect(self.config.setCamerasNumber)
-        self.config_actuators_number.editingFinished.connect(lambda: self.config.setActuatorsNumber(False))
+        self.config_sensors_number.editingFinished.connect(self.config.changeSensorsNumber)
+        self.config_cameras_number.editingFinished.connect(self.config.changeCamerasNumber)
+        self.config_actuators_number.editingFinished.connect(self.config.changeActuatorsNumber)
 
         # DIGITAL CAMERA CHANGE NAME
         self.config_digital_name_1.textChanged.connect(lambda text, camera = 0: self.config.changeDigitalCameraName(text, camera))
@@ -770,6 +657,126 @@ class UI(QMainWindow):
         # NOT YET IMPLEMENTED
         pass
 
+    #############################
+    ###### THEME FUNCTIONS ######
+    #############################
+    def changeTheme(self, theme):
+        """
+        PURPOSE
+
+        Change the program theme between light and dark.
+
+        INPUT
+
+        - theme = True for dark theme, False for light theme.
+
+        RETURNS 
+
+        NONE
+        """
+        # APPLY DARK THEME
+        if theme:
+
+            # LOAD AVALON LOGO
+            self.setLogo(True)
+
+            # APPLY CUSTOM STYLESHEETS
+            self.setStyleSheets(True)
+        
+            # CREATE QPALETTE
+            darkPalette = QPalette()
+            darkPalette.setColor(QPalette.Window, QColor("#161616"))        # MAIN WINDOW BACKGROUND COLOR
+            darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
+            darkPalette.setColor(QPalette.Base,QColor("#323232"))           # TEXT ENTRY BACKGROUND COLOR
+            darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
+            darkPalette.setColor(QPalette.Button,QColor("#353535"))         # BUTTON COLOR
+            darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR       
+
+            # MODIFY GROUP BOXES
+            self.changeGroupBoxColor()
+            
+            # APPLY CUSTOM COLOR PALETTE
+            self.app.setPalette(darkPalette)
+            
+        # APPLY DEFAULT THEME
+        else:
+            # LOAD AVALON LOGO
+            self.setLogo(False)
+
+            # APPLY CUSTOM STYLESHEETS
+            self.setStyleSheets(False)
+
+            # CREATE QPALETTE
+            lightPalette = self.app.style().standardPalette()
+            
+            self.app.setPalette(lightPalette)
+
+    def setStyleSheets(self, theme):
+        """
+        PURPOSE
+
+        Sets the widget stylesheets for either the light or dark theme.
+
+        INPUT
+
+        - theme = True for dark theme, False for light theme.
+
+        RETURNS
+
+        NONE
+        """
+        # DARK THEME
+        if theme:
+            self.data.greenText = 'color: #679e37'
+            self.data.redText = 'color: #c62828'
+            self.data.disabledText = 'color: rgba(0,0,0,40%);'
+            self.data.actuatorGreen = 'color: white; background-color: #679e37; border-radius: 20px'
+            self.data.actuatorRed = 'color: white; background-color: #c62828; border-radius: 20px'
+            self.data.buttonGreen = 'color: black; background-color: #679e37;'
+            self.data.buttonRed = 'color: black; background-color: #c62828;'
+            self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
+            self.data.blueButtonDefault = 'color: white; font-weight: bold;'
+
+        # LIGHT THEME
+        else:
+            self.data.greenText = 'color: #679e37'
+            self.data.redText = 'color: #c62828'
+            self.data.disabledText = 'color: rgba(0,0,0,25%);'
+            self.data.actuatorGreen = 'background-color: #679e37'
+            self.data.actuatorRed = 'background-color: #c62828'
+            self.data.buttonGreen = 'color: black; background-color: #679e37;'
+            self.data.buttonRed = 'color: black; background-color: #c62828;'
+            self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
+            self.data.blueButtonDefault = 'color: #0D47A1; font-weight: bold;'
+
+    def setLogo(self, theme):
+        """
+        PURPOSE
+
+        Loads the Avalon logo for either the light or dark theme.
+
+        INPUT
+
+        - theme = True for dark theme, False for light theme.
+
+        RETURNS
+
+        NONE
+        """
+        # DARK THEME
+        if theme:
+            self.avalon_logo.clear()
+            avalonPixmap = QPixmap('graphics/logo_white.png')
+            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
+            self.avalon_logo.setPixmap(avalonPixmap)
+
+        # LIGHT THEME
+        else:
+            self.avalon_logo.clear()
+            avalonPixmap = QPixmap('graphics/logo.png')
+            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
+            self.avalon_logo.setPixmap(avalonPixmap)
+
     ###########################
     ##### OTHER FUNCTIONS #####
     ###########################
@@ -840,73 +847,6 @@ class UI(QMainWindow):
         shadowEffect.setYOffset(0)
         # APPLY GLOW TO WIDGET
         widget.setGraphicsEffect(shadowEffect)
-
-    def changeTheme(self, theme):
-        """
-        PURPOSE
-
-        Change the program theme between light and dark.
-
-        INPUT
-
-        - theme = True for dark theme, False for light theme.
-
-        RETURNS 
-
-        NONE
-        """
-        # APPLY DARK THEME
-        if theme:
-            # AVALON LOGO
-            self.avalon_logo.clear()
-            avalonPixmap = QPixmap('graphics/logo_white.png')
-            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
-            self.avalon_logo.setPixmap(avalonPixmap)
-
-            # DARK THEME STYLE SHEETS
-            self.data.greenText = 'color: #679e37'
-            self.data.redText = 'color: #c62828'
-            self.data.disabledText = 'color: rgba(0,0,0,40%);'
-            self.data.actuatorGreen = 'color: white; background-color: #679e37; border-radius: 20px'
-            self.data.actuatorRed = 'color: white; background-color: #c62828; border-radius: 20px'
-            self.data.buttonGreen = 'color: black; background-color: #679e37;'
-            self.data.buttonRed = 'color: blackl; background-color: #c62828;'
-            self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
-            self.data.blueButtonDefault = 'color: white; font-weight: bold;'
-
-            # CREATE QPALETTE
-            darkPalette = QPalette()
-            darkPalette.setColor(QPalette.Window, QColor("#161616"))        # MAIN WINDOW BACKGROUND COLOR
-            darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
-            darkPalette.setColor(QPalette.Base,QColor("#323232"))           # TEXT ENTRY BACKGROUND COLOR
-            darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
-            darkPalette.setColor(QPalette.Button,QColor("#353535"))         # BUTTON COLOR
-            darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR       
-
-            # MODIFY GROUP BOXES
-            self.changeGroupBoxColor()
-            
-            # APPLY CUSTOM COLOR PALETTE
-            self.app.setPalette(darkPalette)
-            
-        # APPLY DEFAULT THEME
-        else:
-            # AVALON LOGO
-            self.avalon_logo.clear()
-            avalonPixmap = QPixmap('graphics/logo.png')
-            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
-            self.avalon_logo.setPixmap(avalonPixmap)
-
-            # LIGHT THEME STYLE SHEETS
-            self.data.greenText = 'color: #679e37'
-            self.data.redText = 'color: #c62828'
-            self.data.disabledText = 'color: rgba(0,0,0,25%);'
-            self.data.actuatorGreen = 'background-color: #679e37'
-            self.data.actuatorRed = 'background-color: #c62828'
-            self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
-            self.data.blueButtonDefault = 'color: #0D47A1; font-weight: bold;'
-
-            self.app.setPalette(self.app.style().standardPalette())
 
     def changeGroupBoxColor(self):
         """
@@ -1255,18 +1195,17 @@ class CONTROL_PANEL():
 
         NONE
         """
-        self.data.configButtonStates = buttonStates
+        self.data.buttonStates = buttonStates
 
         # CYCLE THROUGH EACH BUTTON
         for index, button in enumerate(buttonStates):
             
             # FIND THE NAME OF THE BUTTON IN QUESTION ('A', 'B', 'X', 'Y' ETC.)
-            whichButton = self.data.configControllerButtons[index]
-            # FIND THE BUTTONS INDEX ON THE KEYBINDINGS DROP DOWN MENU
-            whichMenuIndex = self.data.configKeyBindingsList.index(whichButton)
+            whichButton = self.data.controllerButtons[index]
+            
             # FIND WHICH ROV CONTROL USES THAT KEYBINDING
             try:
-                whichControl = self.data.configKeyBindings.index(whichMenuIndex)
+                whichControl = self.data.keyBindings.index(whichButton)
                 buttonExists = True
             except:
                 buttonExists = False
@@ -1274,9 +1213,9 @@ class CONTROL_PANEL():
             # IF BUTTON IS PRESSED
             if button == 1:
                 # IF KEYBINDING EXISTS AND HAS PREVIOUSLY BEEN RELEASED
-                if buttonExists == True and self.data.configControllerButtonReleased[index] == True:
+                if buttonExists == True and self.data.controllerButtonReleased[index] == True:
                     # PREVENT ACTUATOR BEING TOGGLED AGAIN UNTILL BUTTON IS RELEASED
-                    self.data.configControllerButtonReleased[index] = False
+                    self.data.controllerButtonReleased[index] = False
                     
                     # IF ROV CONTROL ORIENTATION IS BEING TOGGLED (SPECIAL CASE)
                     if whichControl == 0:
@@ -1317,7 +1256,7 @@ class CONTROL_PANEL():
 
             # WAIT FOR BUTTON TO BE RELEASED
             else:
-                self.data.configControllerButtonReleased[index] = True
+                self.data.controllerButtonReleased[index] = True
 
                 #IF ROV YAW IS DE-ACTIVATED (SPECIAL CASE)
                 if buttonExists == True:
@@ -1342,8 +1281,42 @@ class CONTROL_PANEL():
         
         NONE
         """
-        filteredThrusterSpeeds = [0] * self.data.configThrusterNumber
+        filteredThrusterSpeeds = [0] * self.data.thrusterNumber
 
+        # CHECK IF YAW BUTTONS HAVE BEEN PRESSED
+        yawDirection, yawActive = self.checkYaw()
+        
+        if joystickValues != self.data.joystickValues or yawActive == True:
+
+            controllerSensitivity = self.data.controllerSensitivity
+            yawSensitivity = self.data.yawSensitivity
+            
+            # APPLY THE THRUST VECTORING ALGORITHM
+            filteredThrusterSpeeds = self.thrustVectorAlgorithm(joystickValues, yawDirection, controllerSensitivity, yawSensitivity)
+        
+            # SEND THRUSTER SPEEDS TO ROV
+            self.changeThrusters(filteredThrusterSpeeds)
+        
+        # SAVE VALUES TO BE COMPARED IN THE NEXT CYCLE
+        self.data.joystickValues = joystickValues
+        self.data.yawButtonStatesPrevious = self.data.yawButtonStates.copy()
+        
+    def checkYaw(self):
+        """
+        PURPOSE
+
+        Checks if the yaw buttons are pressed.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        - yawDirection = 1 for right yaw, -1 for left yaw, 0 for neutral
+        - yawActive = True is the yaw has been activated or deactivated since previous controller update.
+
+        """
         # YAW DIRECTION FROM BUTTONS
         if self.data.yawButtonStates[0] != self.data.yawButtonStates[1]:
             yawActive = True
@@ -1363,54 +1336,66 @@ class CONTROL_PANEL():
                 yawActive = True
             else:
                 yawActive = False
+
+        return yawDirection, yawActive
+
+    def thrustVectorAlgorithm(self, joystickValues, yawDirection, controllerSensitivity, yawSensitivity):
+        """
+        PURPOSE 
+
+        Calculate the required speed of each thruster to achieve a desired movement.
+
+        INPUT
+
+        - joystickValues = array containing the values of the controllers joysticks.
+        - yawDirection = 1 for right yaw, -1 for left yaw, 0 for neutral.
+        - controllerSensitivity = the sensitivity of the controller (0 -> 1)
+        - yawSensitivity = the sensitivity of the yaw control (0 -> 1)
+
+        RETURNS
+
+        - filteredThrusterSpeeds = array containing the required speed of each thruster (001 -> 999)
+        """
+        # DECOMPOSE JOYSTICKS INTO MOTION AXIS
+        right_left = joystickValues[0]
+        forward_backward = -joystickValues[1]
+        up_down = -joystickValues[2]
+        pitch = joystickValues[3]
+        roll = joystickValues[4]
+        yaw = yawDirection * yawSensitivity
+
+        # CALCULATE CONTRIBUTION TO MOTION FROM EACH THRUSTER
+        speed_A = right_left + forward_backward - up_down - pitch - roll + yaw
+        speed_B = - right_left + forward_backward - up_down - pitch + roll - yaw
+        speed_C = - right_left - forward_backward - up_down + pitch + roll + yaw
+        speed_D = right_left - forward_backward - up_down + pitch - roll - yaw
+        speed_E = right_left + forward_backward + up_down + pitch + roll + yaw
+        speed_F = - right_left + forward_backward + up_down + pitch - roll - yaw
+        speed_G = - right_left - forward_backward + up_down - pitch - roll + yaw
+        speed_H = right_left - forward_backward + up_down - pitch + roll - yaw
+
+        filteredThrusterSpeeds = [speed_A, speed_B, speed_C, speed_D, speed_E, speed_F, speed_G, speed_H]
         
-        if joystickValues != self.data.configJoystickValues or yawActive == True:
-            # DECOMPOSE JOYSTICKS INTO MOTION AXIS
-            right_left = joystickValues[0]
-            forward_backward = -joystickValues[1]
-            up_down = -joystickValues[2]
-            pitch = joystickValues[3]
-            roll = joystickValues[4]
-            yaw = yawDirection * self.data.yawSensitivity
+        # FIND THRUSTER WITH HIGHEST SPEED AND PEAK JOYSTICK VALUE
+        maxSpeed = max((abs(speed) for speed in filteredThrusterSpeeds))
+        maxJoystick = max((abs(position) for position in joystickValues))
 
-            # CALCULATE CONTRIBUTION TO MOTION FROM EACH THRUSTER
-            speed_A = right_left + forward_backward - up_down - pitch - roll + yaw
-            speed_B = - right_left + forward_backward - up_down - pitch + roll - yaw
-            speed_C = - right_left - forward_backward - up_down + pitch + roll + yaw
-            speed_D = right_left - forward_backward - up_down + pitch - roll - yaw
-            speed_E = right_left + forward_backward + up_down + pitch + roll + yaw
-            speed_F = - right_left + forward_backward + up_down + pitch - roll - yaw
-            speed_G = - right_left - forward_backward + up_down - pitch - roll + yaw
-            speed_H = right_left - forward_backward + up_down - pitch + roll - yaw
+        # SET FIXED SPEED FOR YAW CONTROL
+        if yaw != 0 and maxJoystick == 0:
+            maxJoystick = 0.5
 
-            filteredThrusterSpeeds = [speed_A, speed_B, speed_C, speed_D, speed_E, speed_F, speed_G, speed_H]
-            
-            # FIND THRUSTER WITH HIGHEST SPEED AND PEAK JOYSTICK VALUE
-            maxSpeed = max((abs(speed) for speed in filteredThrusterSpeeds))
-            maxJoystick = max((abs(position) for position in joystickValues))
+        # NORMALISE ALL THRUSTER SPEEDS W.R.T THE FASTEST THRUSTER AND THE MAXIMUM JOYSTICK POSITION (MAX = 1)
+        for i in range(len(filteredThrusterSpeeds)):
+            if maxSpeed > 0:
+                normalisedSpeed = controllerSensitivity * maxJoystick / maxSpeed
+                filteredThrusterSpeeds[i] = round(normalisedSpeed * filteredThrusterSpeeds[i], 3)
 
-            # SET FIXED SPEED FOR YAW CONTROL
-            if yaw != 0 and maxJoystick == 0:
-                maxJoystick = 0.5
-            
-            # CONTROLLER SENSITIVITY SCALING FACTOR
-            controllerSensitivity = self.data.controllerSensitivity 
-
-            # NORMALISE ALL THRUSTER SPEEDS W.R.T THE FASTEST THRUSTER AND THE MAXIMUM JOYSTICK POSITION (MAX = 1)
-            for i in range(len(filteredThrusterSpeeds)):
-                if maxSpeed > 0:
-                    filteredThrusterSpeeds[i] = round(controllerSensitivity * maxJoystick * filteredThrusterSpeeds[i] / maxSpeed, 3)
-
-            # CONVERT -1 -> 1 TO 1 -> 999 FOR ARDUINO MICROSECONDS SERVO SIGNAL
-            for i in range(len(filteredThrusterSpeeds)):
-                filteredThrusterSpeeds[i] = int(500 + filteredThrusterSpeeds[i]*499)
-
-            self.changeThrusters(filteredThrusterSpeeds)
+        # CONVERT -1 -> 1 TO 1 -> 999 FOR ARDUINO MICROSECONDS SERVO SIGNAL
+        for i in range(len(filteredThrusterSpeeds)):
+            filteredThrusterSpeeds[i] = int(500 + filteredThrusterSpeeds[i]*499)
         
-        # SAVE VALUES TO BE COMPARED IN THE NEXT CYCLE
-        self.data.configJoystickValues = joystickValues
-        self.data.yawButtonStatesPrevious = self.data.yawButtonStates.copy()
-        
+        return filteredThrusterSpeeds
+
     ###########################
     ## ROV CONTROL FUNCTIONS ##
     ###########################
@@ -1430,18 +1415,18 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.controlActuatorStates[actuator] == False:
-            buttonObject.setText(self.data.configActuatorLabelList[actuator][2])
+        if self.data.actuatorStates[actuator] == False:
+            buttonObject.setText(self.data.actuatorLabelList[actuator][2])
             buttonObject.setStyleSheet(self.data.actuatorRed)
-            self.data.controlActuatorStates[actuator] = True
+            self.data.actuatorStates[actuator] = True
 
-        elif self.data.controlActuatorStates[actuator] == True:
-            buttonObject.setText(self.data.configActuatorLabelList[actuator][1])
+        elif self.data.actuatorStates[actuator] == True:
+            buttonObject.setText(self.data.actuatorLabelList[actuator][1])
             buttonObject.setStyleSheet(self.data.actuatorGreen)
-            self.data.controlActuatorStates[actuator] = False
+            self.data.actuatorStates[actuator] = False
 
         # SEND COMMAND TO ROV
-        self.comms.setActuators(self.data.controlActuatorStates)
+        self.comms.setActuators(self.data.actuatorStates)
 
     def changeThrusters(self, thrusterSpeeds):
         """
@@ -1461,7 +1446,7 @@ class CONTROL_PANEL():
 
         # REVERSE THE DIRECTION OF THRUSTERS WHERE NECCESSARY
         for i, speed in enumerate(tempThrusterSpeeds):
-            if self.data.configThrusterReverse[i] == True:
+            if self.data.thrusterReverseList[i] == True:
                 tempThrusterSpeeds[i] = 1000 - speed
         
         # SEND COMMAND TO ROV
@@ -1481,12 +1466,12 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.controlControlDirection == True:
-            self.data.controlControlDirection = False
+        if self.data.rovControlDirection == True:
+            self.data.rovControlDirection = False
             self.ui.control_switch_direction_forward.setStyleSheet("")
             self.ui.control_switch_direction_reverse.setStyleSheet(self.data.greenText)
         else:
-            self.data.controlControlDirection = True
+            self.data.rovControlDirection = True
             self.ui.control_switch_direction_forward.setStyleSheet(self.data.greenText)
             self.ui.control_switch_direction_reverse.setStyleSheet("")
 
@@ -1584,7 +1569,7 @@ class CONTROL_PANEL():
         """
         # CALCULATE SECONDS ELAPSED SINCE TIMER STARTED 
         currentTime = datetime.now()
-        currentSeconds = (currentTime - self.startTime).total_seconds() + self.data.controlTimerMem
+        currentSeconds = (currentTime - self.startTime).total_seconds() + self.data.timerMem
         self.updateTimer(currentSeconds)
     
         # READ SYSTEM TIME EVERY 1 SECOND (TO REDUCE CPU USAGE)
@@ -1593,9 +1578,9 @@ class CONTROL_PANEL():
         thread.start()
         
         # STOP THREAD IF STOP BUTTON CLICKED
-        if self.data.controlTimerEnabled == False:
+        if self.data.timerEnabled == False:
             thread.cancel()
-            self.data.controlTimerMem = currentSeconds
+            self.data.timerMem = currentSeconds
 
     def toggleTimer(self):
         """
@@ -1611,15 +1596,15 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.controlTimerEnabled == False:
-            self.data.controlTimerEnabled = True
+        if self.data.timerEnabled == False:
+            self.data.timerEnabled = True
             self.ui.control_timer_start.setText('Stop')
             self.ui.control_timer_start.setStyleSheet(self.data.buttonRed)
             self.startTime = datetime.now()
             # START TIMER
             self.readSystemTime()
         else:
-            self.data.controlTimerEnabled = False
+            self.data.timerEnabled = False
             self.ui.control_timer_start.setText('Start')
             self.ui.control_timer_start.setStyleSheet(self.data.buttonGreen)
 
@@ -1637,8 +1622,8 @@ class CONTROL_PANEL():
 
         NONE
         """
-        if self.data.controlTimerEnabled == False:
-            self.data.controlTimerMem = 0
+        if self.data.timerEnabled == False:
+            self.data.timerMem = 0
             self.updateTimer(0)
 
     def updateTimer(self, currentSeconds):
@@ -1718,7 +1703,7 @@ class CONTROL_PANEL():
 
             # UPDATE GUI
             for sensor, reading in enumerate(sensorReadings):
-                if sensor < self.data.configSensorNumber:
+                if sensor < self.data.sensorNumber:
                     # FIND INDEX OF SENSOR TEXTBOX WIDGET
                     widgetIndex = (sensor * 2) + 1
                     textWidget = self.ui.control_panel_sensors.itemAt(widgetIndex).widget()
@@ -1743,7 +1728,7 @@ class CONTROL_PANEL():
         # INDEX VARIABLE REPRESENTS WHICH CAMERA FEED IS BEING MODIFIED (0,1,2,3)
         
         # STORE WHICH CAMERA HAS BEEN SELECTED FOR EACH FEED
-        self.data.controlCameraViewList[display] = camera
+        self.data.analogCameraViewList[display] = camera
 
     ###############################
     #### COMPUTER VISION TASKS ####
@@ -1786,7 +1771,7 @@ class CONTROL_PANEL():
         # GROUP BOX CONTAINING THE START BUTTONS FOR EACH VISION TASK
         layout = self.ui.group_box_tasks.layout()
         
-        for i in range(len(self.data.controlVisionTaskStatus)):
+        for i in range(len(self.data.visionTaskStatus)):
             button = layout.itemAtPosition(i, 1).widget()
             if i == index:
                 if status:
@@ -1799,7 +1784,7 @@ class CONTROL_PANEL():
             else:
                 button.setText("Start")
                 button.setStyleSheet("")
-                self.data.controlVisionTaskStatus[i] = False
+                self.data.visionTaskStatus[i] = False
 
     def popupMosaicTask(self):
         """
@@ -1816,15 +1801,15 @@ class CONTROL_PANEL():
         NONE
         """
         if self.animation.animationComplete:
-            if self.data.controlVisionTaskStatus[0] == False:
+            if self.data.visionTaskStatus[0] == False:
                 # OPEN WIDGET
-                self.data.controlVisionTaskStatus[0] = True
+                self.data.visionTaskStatus[0] = True
                 self.changeVisionButtons(0, True)
                 self.animation.jumpTo(1)
                 
             else:
                 #CLOSE WIDGET
-                self.data.controlVisionTaskStatus[0] = False
+                self.data.visionTaskStatus[0] = False
                 self.changeVisionButtons(0, False)
                 self.animation.jumpTo(0)
             
@@ -1843,15 +1828,15 @@ class CONTROL_PANEL():
         NONE
         """
         if self.animation.animationComplete:
-            if self.data.controlVisionTaskStatus[1] == False:
+            if self.data.visionTaskStatus[1] == False:
                 # OPEN WIDGET
-                self.data.controlVisionTaskStatus[1] = True
+                self.data.visionTaskStatus[1] = True
                 self.changeVisionButtons(1, True)
                 self.animation.jumpTo(2)
                 
             else:
                 # CLOSE WIDGET
-                self.data.controlVisionTaskStatus[1] = False
+                self.data.visionTaskStatus[1] = False
                 self.changeVisionButtons(1, False)
                 self.animation.jumpTo(0)
             
@@ -1870,15 +1855,15 @@ class CONTROL_PANEL():
         NONE
         """
         if self.animation.animationComplete:
-            if self.data.controlVisionTaskStatus[2] == False:
+            if self.data.visionTaskStatus[2] == False:
                 # OPEN WIDGET
-                self.data.controlVisionTaskStatus[2] = True
+                self.data.visionTaskStatus[2] = True
                 self.changeVisionButtons(2, True)
                 self.animation.jumpTo(3)
                 
             else:
                 # CLOSE WIDGET
-                self.data.controlVisionTaskStatus[2] = False
+                self.data.visionTaskStatus[2] = False
                 self.changeVisionButtons(2, False)
                 self.animation.jumpTo(0)
 
@@ -1897,15 +1882,15 @@ class CONTROL_PANEL():
         NONE
         """
         if self.animation.animationComplete:
-            if self.data.controlVisionTaskStatus[3] == False:
+            if self.data.visionTaskStatus[3] == False:
                 # OPEN WIDGET
-                self.data.controlVisionTaskStatus[3] = True
+                self.data.visionTaskStatus[3] = True
                 self.changeVisionButtons(3, True)
                 self.animation.jumpTo(4)
                 
             else:
                 # CLOSE WIDGET
-                self.data.controlVisionTaskStatus[3] = False
+                self.data.visionTaskStatus[3] = False
                 self.changeVisionButtons(3, False)
                 self.animation.jumpTo(0)
 
@@ -1983,7 +1968,7 @@ class CONFIG():
     #########################
     ### THRUSTER SETTINGS ###
     #########################
-    def setThrustersNumber(self, thrusterNumber, thrusterLayout, thrusterPosition, thrusterPositionList, thrusterReverse):
+    def setupThrusters(self):
         """
         PURPOSE
 
@@ -1994,48 +1979,76 @@ class CONFIG():
         - thrusterNumber = the number of thrusters to add.
         - thrusterLayout = the form layout widget to add the widgets to.
         - thrusterPosition = array containing the ROV position of each thruster.
-        - thusterPosition = array containing all the possible ROV thruster locaitons.
+        - thrusterPositionList = array containing all the possible ROV thruster locations.
         - thrusterReverse = array containing the direction of each thruster.
 
         RETURNS
 
         NONE 
         """
-        for thruster in range(thrusterNumber):
-            # CREATE THRUSTER NUMBER LABEL
-            thrusterLabel = QLabel("Thruster {}".format(thruster + 1))
-            thrusterLabel.setStyleSheet("font-weight: bold;")
-            thrusterLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            # CREATE ROV LOCATION DROP DOWN MENU AND ADD ITEMS
-            thrusterLocation = QComboBox()
-            thrusterLocation.addItems(thrusterPositionList)           
-            thrusterLocation.setCurrentIndex(thrusterPositionList.index(thrusterPosition[thruster]))
-            # CREATE THRUSTER REVERSE CHECKBOX
-            thrusterReverseCheck = QCheckBox()
-            thrusterReverseCheck.setChecked(thrusterReverse[thruster])
-            # CREATE THRUSTER TEST BUTTON
-            thrusterTest = QPushButton("Test")
+        # NUMBER OF THRUSTERS TO ADD
+        thrusterNumber = self.data.thrusterNumber
+
+        for i in range(thrusterNumber):
+            self.addThruster(self.ui.config_thruster_form,
+                                self.data.thrusterPosition,
+                                self.data.thrusterPositionList,
+                                self.data.thrusterReverseList)
             
-            # CREATE GRID LAYOUT
-            layout = QGridLayout()
-            label1 = QLabel('ROV Location')
-            label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            layout.addWidget(label1,0,0)
-            layout.addWidget(thrusterLocation,0,1)
-            label2 = QLabel('Reversed')
-            label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            layout.addWidget(label2,1,0)
-            layout.addWidget(thrusterReverseCheck,1,1)
-            layout.addWidget(thrusterTest,2,1)
+    def addThruster(self, thrusterLayout, thrusterPosition, thrusterPositionList, thrusterReverse):
+        """
+        PURPOSE
 
-            # ADD TO CONFIG TAB FORM LAYOUT
-            thrusterLayout.addRow(thrusterLabel, layout)
+        Adds a single thruster to the configuration tab.
 
-            # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
-            thrusterLocation.activated.connect(lambda index, thruster = thruster: self.thrusterPosition(index, thruster)) 
-            thrusterReverseCheck.toggled.connect(lambda state, thruster = thruster, controlObject = thrusterReverseCheck: self.thrusterReverse(thruster, controlObject))
-            thrusterTest.pressed.connect(lambda state = True, thruster = thruster, controlObject = thrusterTest: self.thrusterTest(state, thruster, controlObject))
-            thrusterTest.released.connect(lambda state = False, thruster = thruster, controlObject = thrusterTest: self.thrusterTest(state, thruster, controlObject))
+        INPUT
+
+        - thrusterLayout = the form layout widget to add the widgets to.
+        - thrusterPosition = array containing the ROV position of each thruster.
+        - thrusterPositionList = array containing all the possible ROV thruster locations.
+        - thrusterReverse = array containing the direction of each thruster.
+
+        RETURNS
+
+        NONE
+        """
+        # INDEX OF THE NEXT THRUSTER
+        thrusterNumber = thrusterLayout.rowCount()
+
+        # CREATE THRUSTER NUMBER LABEL
+        thrusterLabel = QLabel("Thruster {}".format(thrusterNumber + 1))
+        thrusterLabel.setStyleSheet("font-weight: bold;")
+        thrusterLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # CREATE ROV LOCATION DROP DOWN MENU AND ADD ITEMS
+        thrusterLocation = QComboBox()
+        thrusterLocation.addItems(thrusterPositionList)           
+        thrusterLocation.setCurrentIndex(thrusterPositionList.index(thrusterPosition[thrusterNumber]))
+        # CREATE THRUSTER REVERSE CHECKBOX
+        thrusterReverseCheck = QCheckBox()
+        thrusterReverseCheck.setChecked(thrusterReverse[thrusterNumber])
+        # CREATE THRUSTER TEST BUTTON
+        thrusterTest = QPushButton("Test")
+        
+        # CREATE GRID LAYOUT
+        layout = QGridLayout()
+        label1 = QLabel('ROV Location')
+        label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        layout.addWidget(label1,0,0)
+        layout.addWidget(thrusterLocation,0,1)
+        label2 = QLabel('Reversed')
+        label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        layout.addWidget(label2,1,0)
+        layout.addWidget(thrusterReverseCheck,1,1)
+        layout.addWidget(thrusterTest,2,1)
+
+        # ADD TO CONFIG TAB FORM LAYOUT
+        thrusterLayout.addRow(thrusterLabel, layout)
+
+        # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
+        thrusterLocation.activated.connect(lambda index, thruster = thrusterNumber: self.thrusterPosition(index, thruster)) 
+        thrusterReverseCheck.toggled.connect(lambda state, thruster = thrusterNumber, controlObject = thrusterReverseCheck: self.thrusterReverse(thruster, controlObject))
+        thrusterTest.pressed.connect(lambda state = True, thruster = thrusterNumber, controlObject = thrusterTest: self.thrusterTest(state, thruster, controlObject))
+        thrusterTest.released.connect(lambda state = False, thruster = thrusterNumber, controlObject = thrusterTest: self.thrusterTest(state, thruster, controlObject))
 
     def thrusterPosition(self, index, thruster):
         """
@@ -2054,13 +2067,13 @@ class CONFIG():
 
         NONE
         """
-        self.data.configThrusterPosition[thruster] = self.data.configThrusterPositionList[index]
+        self.data.thrusterPosition[thruster] = self.data.thrusterPositionList[index]
 
         # PREVENT MULTIPLE THRUSTERS PER ROV LOCATION
-        for i, item in enumerate(self.data.configThrusterPosition):
-            if item == self.data.configThrusterPosition[thruster] and i != thruster:
+        for i, item in enumerate(self.data.thrusterPosition):
+            if item == self.data.thrusterPosition[thruster] and i != thruster:
                 # SET BINDING TO NONE
-                self.data.configThrusterPosition[i] = self.data.configThrusterPositionList[0]
+                self.data.thrusterPosition[i] = self.data.thrusterPositionList[0]
                 # FIND BINDING MENU WIDGET
                 layout = self.ui.config_thruster_form.itemAt((2 * i) + 1).layout()
                 widget = layout.itemAt(1).widget()
@@ -2082,7 +2095,7 @@ class CONFIG():
 
         NONE
         """
-        self.data.configThrusterReverse[thruster] = checkboxObject.isChecked()
+        self.data.thrusterReverseList[thruster] = checkboxObject.isChecked()
 
     def thrusterTest(self, state, thruster, buttonObject):
         """
@@ -2106,21 +2119,21 @@ class CONFIG():
         if state:
             buttonObject.setStyleSheet(self.data.blueButtonClicked)
             # SET ALL THRUSTER SPEEDS TO ZERO
-            speeds = [500] * self.data.configThrusterNumber
+            speeds = [500] * self.data.thrusterNumber
             # SET DESIRED THRUSTER TO TEST SPEED
             speeds[thruster] = testSpeed
             self.control.changeThrusters(speeds)
             
         else:
             # SET ALL THRUSTER SPEEDS TO ZERO
-            speeds = [500] * self.data.configThrusterNumber
+            speeds = [500] * self.data.thrusterNumber
             self.control.changeThrusters(speeds)
             buttonObject.setStyleSheet("")
             
     #########################
     ### ACTUATOR SETTINGS ###
     #########################
-    def setActuatorsNumber(self, configStatus):
+    def setupActuators(self):
         """
         PURPOSE
 
@@ -2128,96 +2141,158 @@ class CONFIG():
 
         INPUT
 
-        - configStatus = true if function is called by the configSetup function.
+        NONE
 
         RETURNS
 
         NONE
         """
-        oldNumber = self.data.configActuatorNumber
+        actuatorNumber = self.data.actuatorNumber
+
+        self.ui.config_actuators_number.setValue(actuatorNumber)
+
+        for i in range(actuatorNumber):
+            self.addActuator()
+        
+    def changeActuatorsNumber(self):
+        """
+        PURPOSE
+
+        Sets the number of actuators based on the user entered value in the configuration tab.
+
+        INPUT
+
+        NONE
+
+        RETURN
+
+        NONE
+        """
         newNumber = self.ui.config_actuators_number.value()
-        self.data.configActuatorNumber = newNumber
-    
-        # ADD ACTUATORS IF NEW NUMBER IS HIGHER
-        if newNumber > oldNumber:
-            # CALCULATE NUMBER OF ACTUATORS TO ADD ON TOP OF CURRENT NUMBER
-            delta = newNumber - oldNumber
-            for number in range(delta):
-                
-                # DEFAULT VALUES WHEN NO CONFIG FILE IS FOUND
-                if configStatus == False:
-                    # CREATE 2-DIMENSIONAL ARRAY TO STORE NAME, DEFAULT AND ACTUATED LABELS FOR EACH ACTUATOR
-                    self.data.configActuatorLabelList.append([])
-                    self.data.configActuatorLabelList[oldNumber + number].append('Actuator {}'.format(oldNumber + number + 1))
-                    self.data.configActuatorLabelList[oldNumber + number].append('OFF')
-                    self.data.configActuatorLabelList[oldNumber + number].append('ON')
+        oldNumber = self.ui.config_actuator_form.rowCount()
 
-                # CREATE ARRAY TO STORE DEFAULT ACTUATOR STATES
-                self.data.controlActuatorStates.append(False)
+        self.data.actuatorNumber = newNumber
 
-                # CREATE CONFIG TAB ACTUATOR WIDGETS
-                actuatorNumber = QLabel("Actuator {}".format((oldNumber + number + 1)))
-                actuatorNumber.setStyleSheet("font-weight: bold;")
-                actuatorNumber.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                actuatorLabel = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][0])
-                state1 = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][1])
-                state2 = QLineEdit(self.data.configActuatorLabelList[oldNumber + number][2])
-                
-                # CREATE CONTROL PANEL TAB ACTUATOR WIDGETS
-                actuatorToggle = QPushButton(self.data.configActuatorLabelList[oldNumber + number][1])
-                actuatorToggle.setFixedHeight(50)
-                actuatorName = QLabel(self.data.configActuatorLabelList[oldNumber + number][0])
-                actuatorName.setFixedHeight(50)
+        delta = newNumber - oldNumber
 
-                # CREATE CONFIG TAB ACTUATORS LAYOUT
-                actuatorLayout = QGridLayout()
-                label1 = QLabel('Actuator Name')
-                label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                actuatorLayout.addWidget(label1,0,0)
-                actuatorLayout.addWidget(actuatorLabel,0,1)
-                label2 = QLabel('Default State')
-                label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                actuatorLayout.addWidget(label2,1,0)
-                actuatorLayout.addWidget(state1,1,1)
-                label3 = QLabel('Actuated State')
-                label3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-                actuatorLayout.addWidget(label3,2,0)
-                actuatorLayout.addWidget(state2,2,1)
+        # ADD ACTUATORS
+        if delta > 0:
+            for i in range(delta):
+                self.addActuator()
 
-                # SET DEFAULT STYLE SHEET
-                actuatorToggle.setStyleSheet(self.data.actuatorGreen)
+        # REMOVE ACTUATORS
+        if delta < 0:
+            for i in range(-delta):
+                self.removeActuator()
 
-                # ADD TO CONFIG TAB ACTUATORS FORM
-                self.ui.config_actuator_form.addRow(actuatorNumber, actuatorLayout)
-                # ADD TO CONTROL PANEL TAB ACTUATORS FORM
-                self.ui.control_panel_actuators.addRow(actuatorName, actuatorToggle)
+    def addActuator(self):
+        """
+        PURPOSE
 
-                # LINK CONFIG ACTUATOR TEXT FIELDS TO SLOT - PASS OBJECT, ACTUATOR NUMBER AND WHICH TEXT FIELD HAS BEEN EDITED
-                actuatorLabel.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 0, controlObject = actuatorName: self.changeActuatorType(text, actuator, label, controlObject))
-                state1.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 1, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
-                state2.textChanged.connect(lambda text, actuator = (oldNumber + number), label = 2, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
-                # LINK CONTROL PANEL ACTUATOR BUTTONS TO SLOT - PASS ACTUATOR NUMBER
-                actuatorToggle.clicked.connect(lambda state, actuator = (oldNumber + number), buttonObject = actuatorToggle: self.control.changeActuators(actuator, buttonObject))
+        Add a single actuators to the program.
 
-                # CREATE KEYBINDING FOR ACTUATOR
-                self.addKeyBinding("Actuator {}".format((oldNumber + number + 1)), configStatus)
+        INPUT
 
-        # REMOVE ACTUATORS IF NEW NUMBER IS LOWER
-        if newNumber < oldNumber:
-            # CALCULATE NUMBER OF ACTUATORS TO REMOVE FROM CURRENT NUMBER
-            delta = oldNumber - newNumber
-            for number in range(delta):
-                # REMOVE ACTUATORS FROM CONFIG TAB
-                totalRows = self.ui.config_actuator_form.rowCount()
-                self.ui.config_actuator_form.removeRow(totalRows - 1) 
-                
-                # REMOVE ACTUATORS FROM CONTROL PANEL TAB
-                totalRows = self.ui.control_panel_actuators.rowCount()
-                self.ui.control_panel_actuators.removeRow(totalRows - 1)
+        NONE
 
-                # REMOVE KEYBINDINGS FROM CONFIG TAB
-                totalBindings = self.ui.config_keybindings_form.rowCount()
-                self.removeKeyBinding(totalBindings - 1)
+        RETURNS
+
+        NONE
+        """   
+        # THE INDEX OF THE NEXT ACTUATOR
+        nextActuator = self.ui.config_actuator_form.rowCount()
+
+        # TRY TO SET LABELS FROM CONFIG FILE
+        try:
+            labelList = self.data.actuatorLabelList[nextActuator]
+
+        # OTHERWISE, SET DEFAULT LABELS
+        except:
+            labelList = []
+            labelList.append('Actuator {}'.format(nextActuator + 1))
+            labelList.append('OFF')
+            labelList.append('ON')
+            self.data.actuatorLabelList.append(labelList)
+
+        # STORE ACTUATOR STATE
+        self.data.actuatorStates.append(False)
+
+        # CREATE WIDGETS ON CONFIG TAB
+        actuatorNumber = QLabel("Actuator {}".format(nextActuator + 1))
+        actuatorNumber.setStyleSheet("font-weight: bold;")
+        actuatorNumber.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        actuatorLabel = QLineEdit(labelList[0])
+        state1 = QLineEdit(labelList[1])
+        state2 = QLineEdit(labelList[2])
+        
+        # CREATE WIDGETS ON CONTROL PANEL TAB
+        actuatorName = QLabel(labelList[0])
+        actuatorName.setFixedHeight(50)
+        actuatorToggle = QPushButton(labelList[1])
+        actuatorToggle.setFixedHeight(50)
+        actuatorToggle.setStyleSheet(self.data.actuatorGreen)
+        
+        # CREATE CONFIG TAB ACTUATORS LAYOUT
+        actuatorLayout = QGridLayout()
+        label1 = QLabel('Actuator Name')
+        label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        actuatorLayout.addWidget(label1,0,0)
+        actuatorLayout.addWidget(actuatorLabel,0,1)
+        label2 = QLabel('Default State')
+        label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        actuatorLayout.addWidget(label2,1,0)
+        actuatorLayout.addWidget(state1,1,1)
+        label3 = QLabel('Actuated State')
+        label3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        actuatorLayout.addWidget(label3,2,0)
+        actuatorLayout.addWidget(state2,2,1)
+
+        # ADD TO CONFIGURATION TAB
+        self.ui.config_actuator_form.addRow(actuatorNumber, actuatorLayout)
+        
+        # ADD TO CONTROL PANEL TAB
+        self.ui.control_panel_actuators.addRow(actuatorName, actuatorToggle)
+
+        # LINK CONFIG ACTUATOR TEXT FIELDS TO SLOT - PASS OBJECT, ACTUATOR NUMBER AND WHICH TEXT FIELD HAS BEEN EDITED
+        actuatorLabel.textChanged.connect(lambda text, actuator = nextActuator, label = 0, controlObject = actuatorName: self.changeActuatorType(text, actuator, label, controlObject))
+        state1.textChanged.connect(lambda text, actuator = nextActuator, label = 1, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
+        state2.textChanged.connect(lambda text, actuator = nextActuator, label = 2, controlObject = actuatorToggle: self.changeActuatorType(text, actuator, label, controlObject))
+        
+        # LINK CONTROL PANEL ACTUATOR BUTTONS TO SLOT - PASS ACTUATOR NUMBER
+        actuatorToggle.clicked.connect(lambda state, actuator = nextActuator, buttonObject = actuatorToggle: self.control.changeActuators(actuator, buttonObject))
+
+        # CREATE KEYBINDING FOR ACTUATOR
+        label = "Actuator {}".format(nextActuator + 1)
+        self.addKeyBinding(label)
+
+    def removeActuator(self):
+        """
+        PURPOSE
+
+        Remove a single actuator from the program.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # REMOVE ACTUATOR FROM CONFIGURATION TAB
+        actuatorNumber = self.ui.config_actuator_form.rowCount() - 1
+        self.ui.config_actuator_form.removeRow(actuatorNumber) 
+        
+        # REMOVE ACTUATOR FROM CONTROL PANEL TAB
+        actuatorNumber = self.ui.control_panel_actuators.rowCount() - 1
+        self.ui.control_panel_actuators.removeRow(actuatorNumber)
+
+        # REMOVE ACTUATOR STATE DATA
+        del self.data.actuatorLabelList[actuatorNumber]
+        del self.data.actuatorStates[actuatorNumber]
+
+        # REMOVE KEYBINDING FROM CONFIGURATION TAB
+        self.removeKeyBinding()
 
     def changeActuatorType(self, text, actuator, label, controlObject):
         """
@@ -2237,7 +2312,7 @@ class CONFIG():
         NONE
         """
         # STORE NEW LABEL
-        self.data.configActuatorLabelList[actuator][label] = text
+        self.data.actuatorLabelList[actuator][label] = text
 
         # IF NAME IS CHANGED
         if label == 0:
@@ -2247,90 +2322,153 @@ class CONFIG():
         # IF DEFAULT STATE IS CHANGED
         if label == 1:
             # CHANGE LABEL ON CONTROL PANEL
-            if self.data.controlActuatorStates[actuator] == False:
+            if self.data.actuatorStates[actuator] == False:
                 controlObject.setText(text)                
 
         # IF ACTUATED STATE IS CHANGED
         if label == 2:
             # CHANGE LABEL ON CONTROL PANEL
-            if self.data.controlActuatorStates[actuator] == True:
+            if self.data.actuatorStates[actuator] == True:
                 controlObject.setText(text)  
 
     #########################
     #### SENSOR SETTINGS ####
     #########################
-    def setSensorsNumber(self, configStatus):
+    def setupSensors(self):
         """
         PURPOSE
 
-        Adds specific number of sensors to the GUI configration tab, with a drop down menu containing the sensor types.
+        Adds specific number of sensors to the GUI.
 
         INPUT
-
-        - configStatus = True if function is called by the configSetup function.
+        
+        NONE
 
         RETURNS
 
         NONE
         """
-        oldNumber = self.data.configSensorNumber
+        sensorNumber = self.data.sensorNumber
+
+        self.ui.config_sensors_number.setValue(sensorNumber)
+
+        for i in range(sensorNumber):
+            self.addSensor()
+
+    def changeSensorsNumber(self):
+        """
+        PURPOSE
+
+        Sets the number of seneors based on the user entered value in the configuration tab.
+
+        INPUT
+
+        NONE
+
+        RETURN
+
+        NONE
+        """
         newNumber = self.ui.config_sensors_number.value()
-        self.data.configSensorNumber = newNumber
+        oldNumber = self.ui.config_sensor_form.rowCount()
 
-        # ADD SENSORS IF NEW NUMBER IS HIGHER
-        if newNumber > oldNumber:
-            
-            # CALCULATE NUMBER OF SENSORS TO ADD ON TOP OF CURRENT NUMBER
-            delta = newNumber - oldNumber
-            
-            for number in range(delta):
-                # CREATE SENSOR TYPE STORAGE ARRAY IF NO CONFIG FILE IS FOUND
-                if configStatus == False:
-                    self.data.configSensorSelectedType.append(0)
-                
-                # CREATE SENSOR TYPE DROP DOWN MENU AND ADD ITEMS
-                sensorType = QComboBox()
-                sensorType.addItems(self.data.configSensorTypeList)
-                sensorType.setCurrentIndex(self.data.configSensorSelectedType[oldNumber + number])
-                
-                # CREATE SENSOR READINGS TEXT BOX
-                sensorView = QLineEdit()
-                sensorView.setReadOnly(True)
-                sensorView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-                
-                # CREATE SENSOR LABEL
-                sensorLabel = QLabel(self.data.configSensorTypeList[self.data.configSensorSelectedType[oldNumber + number]])
-                
-                # CREATE FORM LAYOUT
-                layout = QFormLayout()
-                layout.addRow(QLabel("Type"), sensorType)
-                
-                # ADD TO CONFIG TAB
-                self.ui.config_sensor_form.addRow(QLabel("Sensor {}".format((oldNumber + number + 1))), layout)
-                
-                # ADD TO CONTROL PANEL TAB
-                self.ui.control_panel_sensors.addRow(sensorLabel, sensorView)
-                
-                # LINK DROP DOWN MENU TO SLOT - PASS SENSOR NUMBER AND MENU INDEX SELECTED
-                sensorType.activated.connect(lambda index, 
-                                                    sensor = (oldNumber + number + 1), 
-                                                    sensorSelected = sensorLabel: 
-                                                    self.changeSensorType(index, sensor, sensorSelected))
+        self.data.sensorNumber = newNumber
 
-        # REMOVE SENSORS IF NEW NUMBER IS LOWER
-        if newNumber < oldNumber:
-            # CALCULATE NUMBER OF SENSORS TO REMOVE FROM CURRENT NUMBER
-            delta = oldNumber - newNumber
-            for number in range(delta):
-                # REMOVE SENSORS FROM CONFIG TAB
-                totalRows = self.ui.config_sensor_form.rowCount()
-                self.ui.config_sensor_form.removeRow(totalRows - 1) 
+        delta = newNumber - oldNumber
+
+        # ADD ACTUATORS
+        if delta > 0:
+            for i in range(delta):
+                self.addSensor()
+
+        # REMOVE ACTUATORS
+        if delta < 0:
+            for i in range(-delta):
+                self.removeSensor()
+
+    def addSensor(self):
+        """
+        PURPOSE
+
+        Adds a single sensor to the program.
+
+        INPUT
+
+        NONE
+
+        RETURN
+
+        NONE
+        """
+        # THE INDEX OF THE NEXT SENSOR
+        nextSensor = self.ui.config_sensor_form.rowCount()
+
+        # TRY TO SET SENSOR TYPE FROM CONFIG FILE
+        try:
+            selectedType = self.data.sensorSelectedType[nextSensor]
+        
+        # OTHERWISE, SET DEFAULT AS NONE
+        except:
+            selectedType = 0
+            self.data.sensorSelectedType.append(selectedType)
+        
+        # CREATE SENSOR TYPE DROP DOWN MENU AND ADD ITEMS
+        sensorType = QComboBox()
+        sensorType.addItems(self.data.sensorTypeList)
+
+        sensorType.setCurrentIndex(selectedType)
+        
+        # CREATE SENSOR READINGS TEXT BOX
+        sensorView = QLineEdit()
+        sensorView.setReadOnly(True)
+        sensorView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        
+        # CREATE SENSOR LABEL
+        typeLabel = self.data.sensorTypeList[selectedType]
+        sensorLabel = QLabel(typeLabel)
+        
+        # CREATE FORM LAYOUT
+        layout = QFormLayout()
+        layout.addRow(QLabel("Type"), sensorType)
+        
+        # ADD TO CONFIG TAB
+        label = "Sensor {}".format(nextSensor + 1)
+        self.ui.config_sensor_form.addRow(QLabel(label), layout)
+        
+        # ADD TO CONTROL PANEL TAB
+        self.ui.control_panel_sensors.addRow(sensorLabel, sensorView)
+        
+        # LINK DROP DOWN MENU TO SLOT - PASS SENSOR NUMBER AND MENU INDEX SELECTED
+        sensorType.activated.connect(lambda index, 
+                                            sensor = nextSensor, 
+                                            labelObject = sensorLabel: 
+                                            self.changeSensorType(index, sensor, labelObject))
+
+    def removeSensor(self):
+        """
+        PURPOSE
+
+        Removes a single sensor from the program.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # REMOVE SENSORS FROM CONFIG TAB
+        sensorNumber = self.ui.config_sensor_form.rowCount() - 1
+        self.ui.config_sensor_form.removeRow(sensorNumber) 
+        
+        # REMOVE SENSORS FROM CONTROL PANEL TAB
+        sensorNumber = self.ui.config_sensor_form.rowCount() - 1
+        self.ui.control_panel_sensors.removeRow(sensorNumber) 
+        
+        # REMOVE SENSOR DATA
+        del self.data.sensorSelectedType[sensorNumber]
                 
-                # REMOVE SENSORS FROM CONTROL PANEL TAB
-                totalRows = self.ui.config_sensor_form.rowCount()
-                self.ui.control_panel_sensors.removeRow(totalRows - 1) 
-                del self.data.configSensorSelectedType[oldNumber - number - 1]
-                      
     def changeSensorType(self, index, sensor, labelObject):
         """
         PURPOSE
@@ -2347,12 +2485,19 @@ class CONFIG():
 
         NONE
         """
-        labelObject.setText(self.data.configSensorTypeList[index])
-        self.data.configSensorSelectedType[sensor - 1] = index
+        labelObject.setText(self.data.sensorTypeList[index])
+        self.data.sensorSelectedType[sensor] = index
 
     #########################
     #### CAMERA SETTINGS ####
     #########################
+    def changeCamerasNumber(self):
+        """
+        PURPOSE
+
+        """
+        pass
+
     def setCamerasNumber(self):
         """
         PURPOSE
@@ -2368,9 +2513,9 @@ class CONFIG():
         NONE
         """
         newNumber = self.ui.config_cameras_number.value()
-        self.data.configCameraNumber = newNumber
+        self.data.analogCameraNumber = newNumber
         # ERASE LIST
-        del self.data.configCameraList[:]
+        del self.data.analogCameraList[:]
 
         # CLEAR MENU OPTIONS
         self.ui.control_camera_1_list.clear()
@@ -2382,31 +2527,31 @@ class CONFIG():
         self.ui.config_camera_3_list.clear()
         self.ui.config_camera_4_list.clear()
         
-        self.data.configCameraList.append('None')
+        self.data.analogCameraList.append('None')
         # ADD CAMERAS TO LIST
-        for number in range(self.data.configCameraNumber):
-            self.data.configCameraList.append('Camera {}'.format(number + 1))
+        for number in range(self.data.analogCameraNumber):
+            self.data.analogCameraList.append('Camera {}'.format(number + 1))
         # ADD LIST TO EACH DROP DOWN MENU
 
         # CONTROL PANEL
-        self.ui.control_camera_1_list.addItems(self.data.configCameraList)
-        self.ui.control_camera_1_list.setCurrentIndex(self.data.configDefaultCameraList[0])
-        self.ui.control_camera_2_list.addItems(self.data.configCameraList)
-        self.ui.control_camera_2_list.setCurrentIndex(self.data.configDefaultCameraList[1])
-        self.ui.control_camera_3_list.addItems(self.data.configCameraList)
-        self.ui.control_camera_3_list.setCurrentIndex(self.data.configDefaultCameraList[2])
-        self.ui.control_camera_4_list.addItems(self.data.configCameraList)
-        self.ui.control_camera_4_list.setCurrentIndex(self.data.configDefaultCameraList[3])
+        self.ui.control_camera_1_list.addItems(self.data.analogCameraList)
+        self.ui.control_camera_1_list.setCurrentIndex(self.data.analogDefaultCameraList[0])
+        self.ui.control_camera_2_list.addItems(self.data.analogCameraList)
+        self.ui.control_camera_2_list.setCurrentIndex(self.data.analogDefaultCameraList[1])
+        self.ui.control_camera_3_list.addItems(self.data.analogCameraList)
+        self.ui.control_camera_3_list.setCurrentIndex(self.data.analogDefaultCameraList[2])
+        self.ui.control_camera_4_list.addItems(self.data.analogCameraList)
+        self.ui.control_camera_4_list.setCurrentIndex(self.data.analogDefaultCameraList[3])
 
         # CONFIGURATION
-        self.ui.config_camera_1_list.addItems(self.data.configCameraList)
-        self.ui.config_camera_1_list.setCurrentIndex(self.data.configDefaultCameraList[0])
-        self.ui.config_camera_2_list.addItems(self.data.configCameraList)
-        self.ui.config_camera_2_list.setCurrentIndex(self.data.configDefaultCameraList[1])
-        self.ui.config_camera_3_list.addItems(self.data.configCameraList)
-        self.ui.config_camera_3_list.setCurrentIndex(self.data.configDefaultCameraList[2])
-        self.ui.config_camera_4_list.addItems(self.data.configCameraList)
-        self.ui.config_camera_4_list.setCurrentIndex(self.data.configDefaultCameraList[3])
+        self.ui.config_camera_1_list.addItems(self.data.analogCameraList)
+        self.ui.config_camera_1_list.setCurrentIndex(self.data.analogDefaultCameraList[0])
+        self.ui.config_camera_2_list.addItems(self.data.analogCameraList)
+        self.ui.config_camera_2_list.setCurrentIndex(self.data.analogDefaultCameraList[1])
+        self.ui.config_camera_3_list.addItems(self.data.analogCameraList)
+        self.ui.config_camera_3_list.setCurrentIndex(self.data.analogDefaultCameraList[2])
+        self.ui.config_camera_4_list.addItems(self.data.analogCameraList)
+        self.ui.config_camera_4_list.setCurrentIndex(self.data.analogDefaultCameraList[3])
 
     def changeDefaultCameras(self, index, camera):
         """
@@ -2425,16 +2570,16 @@ class CONFIG():
         """
         # CAMERA VARIABLE REPRESENTS WHICH CAMERA FEED IS BEING MODIFIED (0,1,2,3)
         # INDEX VARIABLE REPRESENTS THE MENU INDEX SELECTED
-        self.data.configDefaultCameraList[camera] = index  
-        self.data.controlCameraViewList[camera] = index
+        self.data.analogDefaultCameraList[camera] = index  
+        self.data.analogCameraViewList[camera] = index
         if camera == 0:
-            self.ui.control_camera_1_list.setCurrentIndex(self.data.configDefaultCameraList[0])  
+            self.ui.control_camera_1_list.setCurrentIndex(self.data.analogDefaultCameraList[0])  
         if camera == 1:
-            self.ui.control_camera_2_list.setCurrentIndex(self.data.configDefaultCameraList[1]) 
+            self.ui.control_camera_2_list.setCurrentIndex(self.data.analogDefaultCameraList[1]) 
         if camera == 2:
-            self.ui.control_camera_3_list.setCurrentIndex(self.data.configDefaultCameraList[2]) 
+            self.ui.control_camera_3_list.setCurrentIndex(self.data.analogDefaultCameraList[2]) 
         if camera == 3:
-            self.ui.control_camera_4_list.setCurrentIndex(self.data.configDefaultCameraList[3]) 
+            self.ui.control_camera_4_list.setCurrentIndex(self.data.analogDefaultCameraList[3]) 
   
     def setupDigitalCameras(self):
         """
@@ -2451,14 +2596,14 @@ class CONFIG():
         NONE
         """
         # UPDATE CAMERA NAME TEXT BOXES
-        self.ui.config_digital_name_1.setText(self.data.configDigitalCameraLabels[0])
-        self.ui.config_digital_name_2.setText(self.data.configDigitalCameraLabels[1])
-        self.ui.config_digital_name_3.setText(self.data.configDigitalCameraLabels[2])
+        self.ui.config_digital_name_1.setText(self.data.digitalCameraLabels[0])
+        self.ui.config_digital_name_2.setText(self.data.digitalCameraLabels[1])
+        self.ui.config_digital_name_3.setText(self.data.digitalCameraLabels[2])
 
         # REFRESH DROP DOWN MENUS
-        self.updateDigitalCameraMenus(self.data.configDigitalCameraLabels, 
-                                        self.data.configDigitalDefaultCameraList,
-                                        self.data.configDigitalSelectedList)
+        self.updateDigitalCameraMenus(self.data.digitalCameraLabels, 
+                                        self.data.digitalDefaultCameraList,
+                                        self.data.digitalSelectedCameraList)
 
     def changeDigitalDefault(self, index, camera):
         """
@@ -2475,7 +2620,7 @@ class CONFIG():
 
         NONE
         """
-        self.data.configDigitalDefaultCameraList[camera] = index
+        self.data.digitalDefaultCameraList[camera] = index
 
     def changeDigitalCameraName(self, text, camera):
         """
@@ -2493,11 +2638,11 @@ class CONFIG():
         NONE
         """
         # CHANGE CAMERA NAME LABEL
-        self.data.configDigitalCameraLabels[camera] = text
+        self.data.digitalCameraLabels[camera] = text
         # REFRESH DROP DOWN MENUS
-        self.updateDigitalCameraMenus(self.data.configDigitalCameraLabels, 
-                                        self.data.configDigitalDefaultCameraList,
-                                        self.data.configDigitalSelectedList)
+        self.updateDigitalCameraMenus(self.data.digitalCameraLabels, 
+                                        self.data.digitalDefaultCameraList,
+                                        self.data.digitalSelectedCameraList)
 
     def updateDigitalCameraMenus(self, items, defaultIndex, currentIndex):
         """
@@ -2539,35 +2684,61 @@ class CONFIG():
     #########################
     # KEY BINDING FUNCTIONS #
     #########################
-    def addKeyBinding(self, label, configStatus):
+    def setupKeybindings(self):
         """
         PURPOSE
 
-        Adds a keybinding configurator for a specific ROV control.
+        Adds the default keybindings.
 
         INPUT
 
-        label = the name of the ROV control.
-        configStatus = True if a config file exists.
+        NONE
 
         RETURNS
 
         NONE
         """
-        # SET DEFAULT KEY BINDING IF NO CONFIG FILE IS FOUND
-        if configStatus == False:
-            self.data.configKeyBindings.append(0)
+        self.addKeyBinding("Switch Orientation")
+        self.addKeyBinding("Change Sensitivity")
+        self.addKeyBinding("Yaw Right")
+        self.addKeyBinding("Yaw Left")
+        self.addKeyBinding("Yaw Sensitivity")
 
-        # FIND INDEX OF NEW KEY BINDING ON THE KEYBINDINGS TAB
-        index = int(self.ui.config_keybindings_form.count() / 2)
+    def addKeyBinding(self, label):
+        """
+        PURPOSE
 
-        # CREATE CONFIG TAB KEYBINDING WIDGETS
+        Adds a single keybinding configurator for a specific ROV control.
+
+        INPUT
+
+        label = the name of the ROV control.
+
+        RETURNS
+
+        NONE
+        """
+        bindingNumber = self.ui.config_keybindings_form.rowCount()
+
+        # TRY TO SET KEYBDING FROM CONFIGURATION FILE
+        try:
+            binding = self.data.keyBindings[bindingNumber]
+
+        # OTHERWISE, SET DEFAULT BINDING TO NONE
+        except:
+            binding = "None"
+            self.data.keyBindings.append(binding)
+        
+        # CREATE CONFIGURATION TAB WIDGETS
         keybindingLabel = QLabel(label)
         keybindingLabel.setStyleSheet("font-weight: bold;")
         keybindingLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         currentBinding = QComboBox()
-        currentBinding.addItems(self.data.configKeyBindingsList)
-        currentBinding.setCurrentIndex(self.data.configKeyBindings[index])
+        currentBinding.addItems(self.data.availableKeyBindings)
+        
+        # SET KEYBINDING
+        bindingIndex = self.data.availableKeyBindings.index(binding)
+        currentBinding.setCurrentIndex(bindingIndex)
 
         # --- FIND WAY TO DISABLE SCROLLING THROUGH BINDINGS --- #
         currentBinding.setFocusPolicy(Qt.StrongFocus)
@@ -2583,30 +2754,36 @@ class CONFIG():
         self.ui.config_keybindings_form.addRow(keybindingLabel, keybindingLayout)
         
         # LINK KEYBINDING WIDGETS TO SLOT - PASS LAYOUT INDEX NUMBER, THE OBJECT, AND AN INDENTIFIER
-        currentBinding.activated.connect(lambda binding, index = index: self.setKeyBindings(binding, index))
+        currentBinding.activated.connect(lambda binding, index = bindingNumber: self.setKeyBindings(binding, index))
+        
         setBinding.clicked.connect(lambda bindingFound = False, 
-                                            binding = None, index = index, 
+                                            binding = None, 
+                                            index = bindingNumber, 
                                             buttonObject = setBinding, 
                                             menuObject = currentBinding: 
                                             self.autoKeyBinding(bindingFound, binding, index, buttonObject, menuObject))
 
-    def removeKeyBinding(self, index):
+    def removeKeyBinding(self):
         """
         PURPOSE
 
-        Deletes a specific keybinding
+        Removes a single keybinding from the program.
 
         INPUT
 
-        index = position of the keybinding configurator in the keybinding group box to delete.
+        NONE
 
         RETURNS
 
         NONE
         """
-        # REMOVE ACTUATOR KEYBINDINGS FROM CONFIG TAB
-        self.ui.config_keybindings_form.removeRow(index)
-        del self.data.configKeyBindings[index]
+        bindingNumber = self.ui.config_keybindings_form.rowCount()
+        
+        # REMOVE ACTUATOR KEYBINDING FROM CONFIGURATION TAB
+        self.ui.config_keybindings_form.removeRow(bindingNumber - 1)
+
+        # REMOVE KEYBINDING DATA
+        del self.data.keyBindings[bindingNumber - 1]
 
     def setKeyBindings(self, binding, index):
         """
@@ -2624,15 +2801,17 @@ class CONFIG():
 
         NONE
         """
-        self.data.configKeyBindings[index] = binding
+        self.data.keyBindings[index] = self.data.availableKeyBindings[binding]
+
+        keyBinding = self.data.keyBindings[index]
 
         # PREVENT BINDING BEING ASSOCIATED WITH MULTIPLE CONTROLS
-        for i, item in enumerate(self.data.configKeyBindings):
+        for i, item in enumerate(self.data.keyBindings):
             # CHECK IF BINDING ALREADY EXISTS
             if i != index:
-                if item == binding and item != 0:
+                if item == keyBinding and item != 'None':
                     # SET BINDING TO NONE
-                    self.data.configKeyBindings[i] = 0
+                    self.data.keyBindings[i] = 'None'
                     # FIND BINDING MENU WIDGET
                     layout = self.ui.config_keybindings_form.itemAt((2 * i) + 1).layout()
                     widget = layout.itemAt(0).widget()
@@ -2702,7 +2881,7 @@ class CONFIG():
 
         NONE
         """
-        buttonStates = self.data.configButtonStates
+        buttonStates = self.data.buttonStates
 
         # FIND WHICH BUTTON HAS BEEN PRESSED
         for i in range(len(buttonStates)):
@@ -2759,19 +2938,7 @@ class TOOLBAR():
         NONE
         """
         # WRITE CURRENT PROGRAM CONFIGURATION TO XML FILE.
-        self.writeConfig(self.data.programTheme,
-                            self.data.configThrusterPosition,
-                            self.data.configThrusterReverse, 
-                            self.data.configActuatorLabelList,
-                            self.data.configActuatorNumber,
-                            self.data.configSensorSelectedType,
-                            self.data.configSensorNumber,
-                            self.data.configDefaultCameraList,
-                            self.data.configCameraNumber,
-                            self.data.configDigitalCameraLabels,
-                            self.data.configDigitalDefaultCameraList,
-                            self.data.configKeyBindings,
-                            self.data.configKeyBindingsList)
+        self.writeConfigFile()
 
         self.ui.printTerminal("Current program configuration saved to {}.".format(self.data.fileName))
 
@@ -2792,123 +2959,47 @@ class TOOLBAR():
         self.ui.printTerminal("Program configuration reset.")
         self.ui.resetConfig(True)
 
-    def writeConfig(self, theme,
-                        thrusterPosition, 
-                        thrusterReverse, 
-                        actuatorLabelList,
-                        actuatorNumber, 
-                        sensorSelectedType,
-                        sensorNumber, 
-                        defaultCameraList,
-                        cameraNumber,
-                        digitalCameraLabels,
-                        defaultDigitalList,
-                        keyBindings,
-                        keyBindingsList):
+    def writeConfigFile(self):
         """
         PURPOSE
 
-        Writes current program configuration to Config.xml file.
+        Write the program settings to an XML file.
 
         INPUT
 
-        - thrusterPosition = array containing the thruster positions on the ROV.
-        - thrusterReverse = array containing the direction of the thrusters.
-        - actuatorLabelList = array containing the name, off and on state labels for the actuators.
-        - actuatorNumber = the number of actuators.
-        - sensorSelectedType = array containing the sensor types.
-        - sensorNumber = the number of sensors.
-        - defaultCameraList = array containing the selection of cameras on the four feeds.
-        - cameraNuber = the number of analog cameras.
-        - keyBindings = array containing the controller keybindings for the actuators.
-        - keyBindingsList = array containing the name of each button on the controller.
+        NONE
 
         RETURNS
 
         NONE
         """
-        root = Element("root")
+        # CREATE ROOT
+        configFile = WRITE_CONFIG_FILE(self.data.fileName)
+        configFile.createFile()
 
-        SubElement(root, "theme").text = "dark" if theme else "light"
+        # SAVE THEME SETTINGS
+        configFile.saveTheme(self.data.programTheme)
+
+        # SAVE THRUSTER SETTINGS
+        configFile.saveThruster(self.data.thrusterPosition, self.data.thrusterReverseList)
+
+        # SAVE ACTUATOR SETTINGS
+        configFile.saveActuator(self.data.actuatorNumber, self.data.actuatorLabelList)
+
+        # SAVE SENSOR SETTINGS
+        configFile.saveSensor(self.data.sensorNumber, self.data.sensorSelectedType)
+
+        # SAVE ANALOG CAMERA SETTINGS
+        #configFile.saveAnalogCamera(self.data.analogCameraNumber, self.data.analogDefaultCameraList)
+
+        # SAVE DIGITAL CAMERA SETTINGS
+        #configFile.saveDigitalCameras(self.data.digitalCameraLabels, self.data.digitalDefaultCameraList)
         
-        ###################################
-        ### CONFIGURATION FOR THRUSTERS ###
-        ###################################
-        thrusters = SubElement(root, "thrusters")
-        for index in range(8):
-            thruster = SubElement(thrusters, "thruster{}".format(index))
-            SubElement(thruster, "location").text = thrusterPosition[index]
-            SubElement(thruster, "reversed").text = "True" if thrusterReverse[index] else "False"
-        
-        ###################################
-        ### CONFIGURATION FOR ACTUATORS ###
-        ###################################
-        actuators = SubElement(root, "actuators")
-        SubElement(actuators, "quantity").text = str(actuatorNumber)
-        
-        for index in range(self.data.configActuatorNumber):
-            actuator = SubElement(actuators, "actuator{}".format(index))
-            SubElement(actuator, "nameLabel").text = actuatorLabelList[index][0]
-            SubElement(actuator, "offLabel").text = actuatorLabelList[index][1]
-            SubElement(actuator, "onLabel").text = actuatorLabelList[index][2]
+        # SAVE KEYBINDING SETTINGS
+        configFile.saveKeybinding(self.data.keyBindings)
 
-        ###################################
-        #### CONFIGURATION FOR SENSORS ####
-        ###################################
-        sensors = SubElement(root, "sensors")
-        SubElement(sensors, "quantity").text = str(sensorNumber)
-        
-        for index in range(sensorNumber):
-            sensor = SubElement(sensors, "sensor{}".format(index))
-            SubElement(sensor, "type").text = str(sensorSelectedType[index])
-
-        ###################################
-        #### CONFIGURATION FOR CAMERAS ####
-        ###################################
-        cameras = SubElement(root, "cameras")
-        analog = SubElement(cameras, "analog")
-        digital = SubElement(cameras, "digital")
-
-        # ANALOG CAMERAS
-        SubElement(analog, "quantity").text = str(cameraNumber)
-        for index in range(4):
-            SubElement(analog, "defaultfeed{}".format(index)).text = str(defaultCameraList[index])
-
-        digitalLabels = SubElement(digital, "labels")
-        for index in range(3):
-            SubElement(digitalLabels, "camera{}".format(index + 1)).text = str(digitalCameraLabels[index])
-
-        defaultFeeds = SubElement(digital, "defaultfeeds")
-        for index in range(3):
-            SubElement(defaultFeeds, "feed{}".format(index + 1)).text = str(defaultDigitalList[index])
-        
-        ###################################
-        ## CONFIGURATION FOR KEYBINDINGS ##
-        ###################################
-        keybindings = SubElement(root, "keybindings")
-
-        # KEYBINDING TO SWITCH ROV CONTROL ORIENTATION
-        SubElement(keybindings, "switch_control_direction".format(index)).text = str(keyBindingsList[keyBindings[0]])
-
-        # KEYBINDING TO CHANGE CONTROLLER SENSITIVITY
-        SubElement(keybindings, "controller_sensitivity".format(index)).text = str(keyBindingsList[keyBindings[1]])
-
-        # KEYBINDING TO YAW RIGHT
-        SubElement(keybindings, "right_yaw".format(index)).text = str(keyBindingsList[keyBindings[2]])
-        
-        # KEYBINDING TO YAW LEFT
-        SubElement(keybindings, "right_left".format(index)).text = str(keyBindingsList[keyBindings[3]])
-
-        # KEYBINDING TO YAW SENSITIVITY
-        SubElement(keybindings, "yaw_sensitivity".format(index)).text = str(keyBindingsList[keyBindings[4]])
-        
-        # KEYBINDINGS TO ACTUATE EACH ACTUATOR
-        for index in range(actuatorNumber):
-            SubElement(keybindings, "actuator{}".format(index)).text = str(keyBindingsList[keyBindings[index + 5]])
-
-        # SAVE TO XML FILE                                                           
-        tree = ElementTree(root)
-        tree.write(self.data.fileName,encoding='utf-8', xml_declaration=True)
+        # WRITE SETTINGS TO XML FILE
+        configFile.writeFile()
 
     def loadSettings(self):
         """
@@ -3042,13 +3133,11 @@ class DATABASE():
     rovComPort = None                       # ACTUAL COM PORT OF THE ROV
     controllerConnectButtonStatus = False   # TRUE WHEN CONNECTION TO CONTROLLER IS SUCCESSFUL
 
-    controlActuatorStates = []              # STORES STATE OF EACH ACTUATOR
-    controlSensorValues = []                # STORES RECIEVED SENSORS VALUES
-    controlSensorLabelObjects = []          # STORES SENSOR LABEL OBJECTS
+    actuatorStates = []                     # STORES STATE OF EACH ACTUATOR
 
-    controlCameraViewList = [None] * 4      # STORES THE SELECTED EXTERNAL CAMERA FEEDS
+    analogCameraViewList = [None] * 4       # STORES THE SELECTED EXTERNAL CAMERA FEEDS
 
-    controlVisionTaskStatus = [False] * 4   # STORES THE ON/OFF STATUS OF EACH TASK
+    visionTaskStatus = [False] * 4          # STORES THE ON/OFF STATUS OF EACH TASK
     
     # STYLESHEETS USED FOR BUTTONS AND TEXT ETC.
     greenText = ""
@@ -3061,59 +3150,61 @@ class DATABASE():
     blueButtonClicked = ""
     blueButtonDefault = ""
 
-    controlControlDirection = True          # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
-    controllerSensitivity = 2/3             # 1/3, 2/3 or 3/3 controller sensitivity
-    yawSensitivity = 2/3                    # 1/3, 2/3 or 3/3 yaw sensitivity
+    rovControlDirection = True       # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
+    controllerSensitivity = 2/3      # 1/3, 2/3 or 3/3 controller sensitivity
+    yawSensitivity = 2/3             # 1/3, 2/3 or 3/3 yaw sensitivity
 
-    controlTimerEnabled = False             # TIMER START/STOP BUTTON
-    controlTimerNew = True                  # FALSE IF TIMER IS STARTED AGAIN AFTER BEING PAUSED
-    controlTimerMem = 0                     # TIME WHEN THE TIMER IS PAUSED
-
-    controlMosaicTaskStatus = False         # TRUE IF STARTED
-    controlShapeDetectionTaskStatus = False # TRUE IF STARTED
+    timerEnabled = False             # TIMER START/STOP BUTTON
+    timerNew = True                  # FALSE IF TIMER IS STARTED AGAIN AFTER BEING PAUSED
+    timerMem = 0                     # TIME WHEN THE TIMER IS PAUSED
 
     ###############################
     ######## CONFIGURATION ########
     ###############################
-    fileName = 'config/config.xml' # DEFAULT CONFIG FILE NAME
+    fileName = '.\config\config.xml' # DEFAULT CONFIG FILE NAME
 
-    # THRUSTER CONFIGURATION SETTINGS
-    configThrusterNumber = 8
-    configThrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    configThrusterPosition = ['None'] * 8
-    configThrusterReverse = [False] * 8
+    # THRUSTER SETTINGS
+    thrusterNumber = 8
+    thrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    thrusterPosition = ['None'] * 8
+    thrusterReverseList = [False] * 8
     yawButtonStates = [0,0]
     yawButtonStatesPrevious = [0,0]
 
-    # SENSOR CONFIGURATION SETTINGS
-    configSensorNumber = 0
-    configSensorTypeList = ['None','Temperature (°C)','Depth (m)', 'Yaw (°)', 'Pitch (°)', 'Roll (°)']
-    configSensorSelectedType = []
+    # SENSOR SETTINGS
+    sensorNumber = 0
+    sensorTypeList = ['None','Temperature (°C)','Depth (m)', 'Yaw (°)', 'Pitch (°)', 'Roll (°)']
+    sensorSelectedType = []
     
-    # ACTUATOR CONFIGURATION SETTINGS
-    configActuatorNumber = 0
-    configActuatorLabelList = []    # LABELS (NAME, DEFAULT STATE, ACTUATED STATE)
+    # ACTUATOR SETTINGS
+    actuatorNumber = 0
+    actuatorLabelList = []        # LABELS (NAME, DEFAULT STATE, ACTUATED STATE)
 
-    # EXTERNAL CAMERA CONFIGURATION SETTINGS
-    # ANALOG
-    configCameraNumber = 0 
-    configCameraList = []   # LIST OF AVAILABLE CAMERAS
-    configDefaultCameraList = [0] * 4   # DEFAULT CAMERAS TO SHOW ON STARTUP
-    # DIGITAL
-    configDigitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
-    configDigitalDefaultCameraList = [0, 1, 2]
-    configDigitalSelectedList = [0, 1, 2]
+    # ANALOG CAMERA SETTINGS
+    analogCameraNumber = 0 
+    analogCameraList = []                       # LIST OF AVAILABLE CAMERAS
+    analogDefaultCameraList = [0 ,1 ,2 ,3]      # DEFAULT CAMERAS TO SHOW ON STARTUP
+    analogSelectedCameraList = [0 ,1 ,2 ,3]     # SELECTED CAMERAS TO SHOW ON EACH FEED
+    
+    # DIGITAL CAMERA SETTINGS
+    digitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
+    digitalDefaultCameraList = [0, 1, 2]
+    digitalSelectedCameraList = [0, 1, 2]
 
     # KEY BINDING CONFIGURATION SETTINGS
-    # KEY BINDING LIST FOR DROP DOWN MENU
-    configKeyBindingsList = ['None','A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
-    # THE ORDER THAT BUTTONS APPEAR IN THE BUTTON STATES ARRAY
-    configControllerButtons = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
-    configControllerButtonReleased = [True] * 14    # USED FOR DEBOUNCING CONTROLLER BUTTONS
-    configKeyBindings = []  # STORES SELECTED BINDINGS
     
-    configButtonStates = [] # STORES CONTROLLER BUTTON STATES
-    configJoystickValues = [] # STORES CONTROLLER JOYSTICK STATES
+    # KEY BINDING LIST FOR DROP DOWN MENU
+    availableKeyBindings = ['None','A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
+    
+    # THE ORDER THAT BUTTONS APPEAR IN THE BUTTON STATES ARRAY
+    controllerButtons = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
+    
+    controllerButtonReleased = [True] * 14    # USED FOR DEBOUNCING CONTROLLER BUTTONS
+    
+    keyBindings = []    # STORES SELECTED BINDINGS
+    
+    buttonStates = []   # STORES CONTROLLER BUTTON STATES
+    joystickValues = [] # STORES CONTROLLER JOYSTICK STATES
 
     ###############################
     ############ OTHER ############

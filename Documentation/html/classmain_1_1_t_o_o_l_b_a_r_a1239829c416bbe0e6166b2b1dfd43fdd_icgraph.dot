@@ -1,0 +1,14 @@
+digraph "main.TOOLBAR.writeConfigFile"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="main.TOOLBAR.writeConfigFile",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="main.TOOLBAR.saveSettings",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_t_o_o_l_b_a_r.html#ad6f976c44269e6b48d9ec9998f4201c1",tooltip=" "];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.TOOLBAR.restartProgram",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_t_o_o_l_b_a_r.html#a5e6998caa0f9de17fa8210bdbe14f5d7",tooltip=" "];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="main.TOOLBAR.toggleTheme",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_t_o_o_l_b_a_r.html#ad71ca93fd2ae83f7d66aeeaec0580372",tooltip=" "];
+}

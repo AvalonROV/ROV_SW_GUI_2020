@@ -6,5 +6,5 @@ digraph "main.UI.linkConfigWidgets"
   rankdir="LR";
   Node1 [label="main.UI.linkConfigWidgets",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="main.UI.applyGlow",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#ab3aedd6d16f7ae28ad4a628a864374cd",tooltip="OTHER FUNCTIONS #####."];
+  Node2 [label="main.UI.applyGlow",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#ab3aedd6d16f7ae28ad4a628a864374cd",tooltip=" "];
 }

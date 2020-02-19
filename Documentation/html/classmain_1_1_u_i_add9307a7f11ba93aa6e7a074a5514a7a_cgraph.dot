@@ -6,9 +6,13 @@ digraph "main.UI.configSetup"
   rankdir="LR";
   Node1 [label="main.UI.configSetup",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="CONFIGURATION FILE FUNCTIONS ##."];
   Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="main.UI.printTerminal",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a2ed6351be3128a81b8a9469be6a690e1",tooltip=" "];
-  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node3 [label="main.UI.readConfigFile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a7a43094d189f573deac56fee1bf1aab0",tooltip=" "];
+  Node2 [label="main.UI.programSetup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#ac1bad584babb5e1959092c506dc90a57",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.UI.changeTheme",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a83d5e6c17ae4622eb6c98a48a89768ed",tooltip=" "];
   Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="main.UI.resetConfig",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a6ac1bdef42efb345f1b6ecfda7ebbace",tooltip=" "];
+  Node4 [label="main.UI.changeGroupBoxColor",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a3327878ac965395c380a86749b9abefc",tooltip=" "];
+  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="main.UI.readConfigFile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#abfbb3b9585e840fe7bb00a7ffd49a72a",tooltip=" "];
+  Node5 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="main.UI.printTerminal",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a2ed6351be3128a81b8a9469be6a690e1",tooltip=" "];
 }

@@ -1,0 +1,21 @@
+digraph "main.CONFIG.addActuator"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="main.CONFIG.addActuator",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="main.CONFIG.addKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a0ac17a3baa7d4f9a6f19b154a6ffcf1d",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.CONFIG.autoKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a834773b877828f908fe9bad26d3ac63a",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="main.CONFIG.findKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a3cde77a87e2af677e8623cc9e6c632d1",tooltip=" "];
+  Node4 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="main.CONFIG.setKeyBindings",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a874214db27ad7967916224ec2e7433ef",tooltip=" "];
+  Node2 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="main.CONFIG.changeActuatorType",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_f_i_g.html#a30dd8bb0a7d4ed632e615b0b81aa11ed",tooltip=" "];
+}
