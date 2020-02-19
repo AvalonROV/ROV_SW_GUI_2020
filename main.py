@@ -1428,7 +1428,7 @@ class CONTROL_PANEL():
         # SEND COMMAND TO ROV
         self.comms.setActuators(self.data.actuatorStates)
 
-    def changeThrusters(self, thrusterSpeeds):
+    def changeThrusters(self, thrusterSpeeds, testStatus = False):
         """
         PURPOSE
 
@@ -1442,15 +1442,36 @@ class CONTROL_PANEL():
 
         NONE
         """
-        tempThrusterSpeeds = thrusterSpeeds.copy()
-
         # REVERSE THE DIRECTION OF THRUSTERS WHERE NECCESSARY
+        tempThrusterSpeeds = thrusterSpeeds.copy()
+        
         for i, speed in enumerate(tempThrusterSpeeds):
             if self.data.thrusterReverseList[i] == True:
                 tempThrusterSpeeds[i] = 1000 - speed
+
+        # IF THRUSTER ARE BEING INDIVIDUALLY TESTED
+        if testStatus:
+            # SEND COMMAND TO ROV
+            self.comms.setThrusters(tempThrusterSpeeds)
+
+        else:
+            # MAPS THRUSTERS TO CORRECT ROV POSITION
+            mappedThrusterSpeeds = [500] * 8
+
+            for index, position in enumerate(self.data.thrusterPositionList):
+                if position != "None":
+                    try:
+                        # FIND WHICH THRUSTER BELONGS TO THIS ROV POSITION
+                        thrusterIndex = self.data.thrusterPosition.index(position)
+
+                        # SET SPEED TO CORRECT THRUSTER
+                        mappedThrusterSpeeds[thrusterIndex] = tempThrusterSpeeds[index - 1]
+                    except:
+                        pass
         
-        # SEND COMMAND TO ROV
-        self.comms.setThrusters(tempThrusterSpeeds)
+            # SEND COMMAND TO ROV
+            #print(mappedThrusterSpeeds)
+            self.comms.setThrusters(mappedThrusterSpeeds)
 
     def switchControlDirection(self):
         """
@@ -2122,12 +2143,12 @@ class CONFIG():
             speeds = [500] * self.data.thrusterNumber
             # SET DESIRED THRUSTER TO TEST SPEED
             speeds[thruster] = testSpeed
-            self.control.changeThrusters(speeds)
+            self.control.changeThrusters(speeds, True)
             
         else:
             # SET ALL THRUSTER SPEEDS TO ZERO
             speeds = [500] * self.data.thrusterNumber
-            self.control.changeThrusters(speeds)
+            self.control.changeThrusters(speeds, True)
             buttonObject.setStyleSheet("")
             
     #########################
