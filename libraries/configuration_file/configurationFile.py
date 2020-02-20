@@ -200,25 +200,29 @@ class READ_CONFIG_FILE():
         - defaultCameraList = array containing the default camera for each camera feed.
         """
         try:
-            child = self.root.find('cameras')
-
-            # ANALOG CAMERAS
-            cameraChild = child.find('analog')
+            child = self.root.find('analog_cameras')
 
             cameraNumber = 0
+            cameraLabelList = []
             defaultCameraList = []
 
-            for camera in cameraChild:
+            for camera in child:
                 
                 # NUMBER OF CAMERAS
                 if camera.tag == 'quantity':
                     cameraNumber = int(camera.text)
+
+                # CAMERA LABELS
+                if camera.tag == 'camera_labels':
+                    for label in camera:
+                        cameraLabelList.append(label.text)
                 
                 # DEFAULT CAMERAS
-                else:
-                    defaultCameraList.append(int(camera.text))
+                if camera.tag == 'default_feeds':
+                    for feed in camera:
+                        defaultCameraList.append(int(feed.text))
 
-            return cameraNumber, defaultCameraList
+            return cameraNumber, cameraLabelList, defaultCameraList
              
         except:
             pass
@@ -235,31 +239,41 @@ class READ_CONFIG_FILE():
 
         RETURNS
 
+        - cameraNumber = number of cameras.
         - cameraLabels = array containing the name label of each camera.
+        - cameraAddresses = array containing the source address of each camera.
         - defaultCameraList = array containing the default camera for each camera feed.
         """
         try:
-            child = self.root.find('cameras')
+            child = self.root.find('digital_cameras')
 
-            # DIGITAL CAMERAS
-            cameraChild = child.find('digital')
-
+            cameraNumber = 0
             cameraLabels = []
+            cameraAddresses = []
             defaultCameraList = []
 
-            for camera in cameraChild:
+            for camera in child:
+
+                # NUMBER OF CAMERAS
+                if camera.tag == 'quantity':
+                    cameraNumber = int(camera.text)
                 
                 # CAMERA LABELS
-                if camera.tag == 'labels':                                    
-                    for item in camera:                        
-                        cameraLabels.append(str(item.text))   
+                if camera.tag == 'camera_labels':                                    
+                    for label in camera:                        
+                        cameraLabels.append(str(label.text))  
+
+                # CAMERA ADDRESSES
+                if camera.tag == 'camera_address':
+                    for address in camera:
+                        cameraAddresses.append(str(address.text)) 
                 
                 # DEFAULT CAMERAS
                 if camera.tag == 'defaultfeeds':
                     for item in camera:                        
                         defaultCameraList.append(int(item.text))
 
-            return cameraLabels, defaultCameraList
+            return cameraNumber, cameraLabels, cameraAddresses, defaultCameraList
              
         except:
             pass
@@ -351,6 +365,7 @@ class WRITE_CONFIG_FILE():
             tree = ElementTree(self.root)
             tree.write(self.fileName, encoding='utf-8', xml_declaration=True)
             fileSaveStatus = True
+        
         except:
             fileSaveStatus = False
 
@@ -416,14 +431,18 @@ class WRITE_CONFIG_FILE():
 
         NONE
         """
-        actuators = SubElement(self.root, "actuators")
-        SubElement(actuators, "quantity").text = str(actuatorNumber)
-        
-        for index in range(actuatorNumber):
-            actuator = SubElement(actuators, "actuator{}".format(index))
-            SubElement(actuator, "nameLabel").text = actuatorLabelList[index][0]
-            SubElement(actuator, "offLabel").text = actuatorLabelList[index][1]
-            SubElement(actuator, "onLabel").text = actuatorLabelList[index][2]
+        try:
+            actuators = SubElement(self.root, "actuators")
+            SubElement(actuators, "quantity").text = str(actuatorNumber)
+            
+            for index in range(actuatorNumber):
+                actuator = SubElement(actuators, "actuator{}".format(index))
+                SubElement(actuator, "nameLabel").text = actuatorLabelList[index][0]
+                SubElement(actuator, "offLabel").text = actuatorLabelList[index][1]
+                SubElement(actuator, "onLabel").text = actuatorLabelList[index][2]
+
+        except:
+            pass
 
     def saveSensor(self, sensorNumber, sensorSelectedType):
         """
@@ -440,14 +459,18 @@ class WRITE_CONFIG_FILE():
 
         NONE
         """
-        sensors = SubElement(self.root, "sensors")
-        SubElement(sensors, "quantity").text = str(sensorNumber)
+        try:
+            sensors = SubElement(self.root, "sensors")
+            SubElement(sensors, "quantity").text = str(sensorNumber)
+            
+            for index in range(sensorNumber):
+                sensor = SubElement(sensors, "sensor{}".format(index))
+                SubElement(sensor, "type").text = str(sensorSelectedType[index])
         
-        for index in range(sensorNumber):
-            sensor = SubElement(sensors, "sensor{}".format(index))
-            SubElement(sensor, "type").text = str(sensorSelectedType[index])
+        except:
+            pass
 
-    def saveAnalogCamera(self, analogCameraNumber, analogDefaultCameraList):
+    def saveAnalogCamera(self, analogCameraNumber, analogCameraLabelList, analogDefaultCameraList):
         """
         PURPOSE
 
@@ -456,32 +479,33 @@ class WRITE_CONFIG_FILE():
         INPUT
 
         - analogCameraNumber = the number of analog cameras.
-        - analogDefaultCameraList = array containing the default camera for each camera feed.
+        - analogCameraLabelList = array contatining the label for each camera.
+        - analogDefaultCameraList = array containing the default camera feeds.
 
         RETURNS
 
         NONE
         """
-        try:
-            # CHECK IF 'CAMERAS' ELEMENT ALREADY EXISTS
-            try:
-                cameras = self.root.find("cameras")
-            except:
-                cameras = SubElement(self.root, "cameras")
-            
-            analog = SubElement(cameras, "analog")
+        try:  
+            analog = SubElement(self.root, "analog_cameras")
 
             # NUMBER OF ANALOG CAMERAS
             SubElement(analog, "quantity").text = str(analogCameraNumber)
 
+            # CAMERA LABELS
+            cameraLabels = SubElement(analog, "camera_labels")
+            for index, label in enumerate(analogCameraLabelList):
+                SubElement(cameraLabels, "label{}".format(index)).text = str(label)
+
             # DEFAULT ANALOG CAMERA FEEDS
-            for index in range(4):
-                SubElement(analog, "defaultfeed{}".format(index)).text = str(analogDefaultCameraList[index])
+            defaultCameras = SubElement(analog, "default_feeds")
+            for index, feed in enumerate(analogDefaultCameraList):
+                SubElement(defaultCameras, "defaultfeed{}".format(index)).text = str(feed)
 
         except:
             pass
 
-    def saveDigitalCamera(self, digitalCameraLabels, digitalDefaultCameraList):
+    def saveDigitalCamera(self, digitalCameraNumber, digitalCameraLabelList, digitalCameraAddressList, digitalDefaultCameraList):
         """
         PURPOSE
 
@@ -489,31 +513,35 @@ class WRITE_CONFIG_FILE():
 
         INPUT
 
+        - digitalCameraNumber = number of digital cameras.
         - digitalCameraLabels = array containing the label for each digital camera.
+        - digitalCameraAddressList = array containing the source address of each camera.
         - digitalDefaultCameraList = array containing the default digital camera for each feed.
         
         RETURNS
 
         NONE
         """
-        try:
-            # CHECK IF 'CAMERAS' ELEMENT ALREADY EXISTS
-            try:
-                cameras = self.root.find("cameras")
-            except:
-                cameras = SubElement(self.root, "cameras")
+        try: 
+            digital = SubElement(self.root, "digital_cameras")
             
-            digital = SubElement(cameras, "digital")
+            # NUMBER OF DIGITAL CAMERAS
+            SubElement(digital, "quantity").text = str(digitalCameraNumber)
 
-            # DIGITAL CAMERA LABELS
-            digitalLabels = SubElement(digital, "labels")
-            for index in range(3):
-                SubElement(digitalLabels, "camera{}".format(index + 1)).text = str(digitalCameraLabels[index])
+            # CAMERA LABELS
+            cameraLabels = SubElement(digital, "camera_labels")
+            for index, label in enumerate(digitalCameraLabelList):
+                SubElement(cameraLabels, "label{}".format(index)).text = str(label)
+
+            # CAMERA ADDRESSES
+            cameraAddress = SubElement(digital, "camera_address")
+            for index, address in enumerate(digitalCameraAddressList):
+                SubElement(cameraAddress, "address{}".format(index)).text = str(address)
 
             # DEFAULT DIGITAL CAMERA FEEDS
-            defaultFeeds = SubElement(digital, "defaultfeeds")
-            for index in range(3):
-                SubElement(defaultFeeds, "feed{}".format(index + 1)).text = str(digitalDefaultCameraList[index])
+            defaultCameras = SubElement(digital, "default_feeds")
+            for index, feed in enumerate(digitalDefaultCameraList):
+                SubElement(defaultCameras, "defaultfeed{}".format(index)).text = str(feed)
 
         except:
             pass
