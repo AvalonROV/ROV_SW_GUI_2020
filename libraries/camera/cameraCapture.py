@@ -1,4 +1,5 @@
 import sys
+import time
 from datetime import datetime
 from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW, CAP_FFMPEG, CAP_PROP_BUFFERSIZE
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
@@ -9,20 +10,50 @@ from PyQt5.QtWidgets import (QWidget, QStyleFactory, QMainWindow, QApplication, 
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QImage, QFont, QColor, QPalette
 
 class VIEW(QWidget):
-    def __init__(self):
+    def __init__(self, app):
         super(VIEW, self).__init__()
+
+        self.app = app 
+        # PROGRAM CLOSE EVENT
+        self.app.aboutToQuit.connect(self.programExit)
+
         self.setWindowTitle("Camera Capture View")
         layout = QGridLayout()
         self.view = QLabel("Camera View")
+        self.view.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        changeButton = QPushButton("CHANGE CAMERA")
+        changeButton.clicked.connect(self.changeCameraFeed)
         layout.addWidget(self.view, 0, 0)
+        layout.addWidget(changeButton, 1, 0)
         self.setLayout(layout)
+
+        self.address1 = 0
+        self.address2 = "rtsp://192.168.0.102/user=admin&password=&channel=1&stream=0.sdp?"
+
         # INITIATE CAMERA
-        camThread = CAMERA_CAPTURE(0)
-        camThread.cameraNewFrameSignal.connect(self.updateCameraFeed)
-        camThread.start()
+        self.camThread = CAMERA_CAPTURE()
+        self.camThread.cameraNewFrameSignal.connect(self.updateCameraFeed)
+        self.camThread.start()
         
+        self.currentAddress = self.address1
+        self.camThread.changeSource(self.currentAddress)
+     
         self.show()
         
+    def changeCameraFeed(self):
+        if self.currentAddress == self.address1:
+            self.currentAddress = self.address2
+            self.camThread.changeSource(self.currentAddress)
+
+        else:
+            self.currentAddress = self.address1
+            self.camThread.changeSource(self.currentAddress)
+
+    def programExit(self):
+        self.camThread.feedStop()
+        time.sleep(1)
+
+
     @pyqtSlot(QPixmap)
     def updateCameraFeed(self, frame):
         """
@@ -45,74 +76,185 @@ class CAMERA_CAPTURE(QThread):
     # CREATE SIGNAL
     cameraNewFrameSignal = pyqtSignal(QPixmap)
 
-    def __init__(self, channel):
+    def __init__(self, address = ""):
         QThread.__init__(self)
         # CAMERA FEED SOURCE
-        self.channel = channel
+        self.address = address
+        self.cameraFeed = None
         self.runFeed = True
         self.task = None
+        self.width = 1024
+        self.height = 576 
     
     def run(self):
+        """
+        PURPOSE
+
+        Main loop that captures camera frames and displays them on the GUI.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         elapsedTime = 0
         previousTime = datetime.now()
         defaultImage = QPixmap("graphics/no_signal.png")
 
-        # ATTEMPT TO CONNECT TO CAMERA EVERY SECOND
+        # ATTEMPT TO CONNECT TO CAMERA EVERY 0.5 SECONDS
         while self.runFeed:
-            # INITIATE CAMERA 
-            cameraFeed = VideoCapture(self.channel, CAP_DSHOW)
-            # CAPTURE TEST FRAME
-            status, frame = cameraFeed.read()
-            # IF IP CAMERA IS BEING USED (DOESN'T WORK WITH CAP_DSHOW)
-            if status == False:
-                cameraFeed = VideoCapture(self.channel)
+            
+            # INITIATE CAMERA
+            initiateStatus = self.initiateCamera()
 
-            #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1920)
-            #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 1080)
-            cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1024)
-            cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 576)
-            #cameraFeed.set(CAP_PROP_FRAME_WIDTH, 256)
-            #cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 144)
+            if initiateStatus:
+                self.cameraFeed.set(CAP_PROP_FRAME_WIDTH, self.width)
+                self.cameraFeed.set(CAP_PROP_FRAME_HEIGHT, self.height)
 
-            cameraFeed.set(CAP_PROP_BUFFERSIZE, 1)
-
-            while self.runFeed:
+            while self.runFeed and initiateStatus:
+                
+                # 30 FPS CAPTURE RATE
                 if elapsedTime > 1/30:
+                    
                     # CAPTURE FRAME
-                    cameraFeed.grab()
-                    status, frame = cameraFeed.read()
+                    self.cameraFeed.grab()
+                    status, frame = self.cameraFeed.read()
 
                     # IF FRAME IS CAPTURED            
                     if status:
+                        previousTime = datetime.now()
                         
                         # RUN IMAGE THROUGH VISION PROCESSING ALGORITHM
                         if self.task != None:
                             frame = self.task.runAlgorithm(frame)
 
-                        previousTime = datetime.now()
-                        # CONVERT TO RGB COLOUR
-                        cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
-                        # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
-                        height, width, _ = cameraFrame.shape
-                        # GENERATE QIMAGE
-                        cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
                         # CONVERT TO PIXMAP
-                        cameraFrame = QPixmap.fromImage(cameraFrame)
+                        cameraFrame = self.convertFrame(frame)
                         
                         # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
                         self.cameraNewFrameSignal.emit(cameraFrame)
                     
                     else:
-                        print("AHHHH")
+                        # DEFAULT IMAGE
                         self.cameraNewFrameSignal.emit(defaultImage)
-                        # EXIT WHILE LOOP AND ATTEMPT TO CONNECT TO CAMERA
                         break
 
                 elapsedTime = (datetime.now() - previousTime).total_seconds()
 
             QThread.msleep(500)
 
-        self.cameraNewFrameSignal.emit(defaultImage)
+            self.cameraNewFrameSignal.emit(defaultImage)
+
+    def initiateCamera(self):
+        """
+        PURPOSE
+
+        Attempts to initiate camera.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        initiateStatus = False
+
+        if self.address != "":
+
+            # CHECK IF ADDRESS IS INTEGER OR STRING
+            addressType = isinstance(self.address, str)
+
+            # RTSP CAMERA
+            if addressType:
+                self.cameraFeed = VideoCapture(self.address)
+
+            # USB CAMERA
+            else:
+                self.cameraFeed = VideoCapture(self.address, CAP_DSHOW)
+
+            initiateStatus = True
+        
+        return initiateStatus
+
+    def convertFrame(self, frame):
+        """
+        PURPOSE
+
+        Converts the cv2 image into a pixmap.
+
+        INPUT
+
+        - frame = the image captured by cv2.
+
+        RETURNS
+
+        - cameraFrame = the converted pixmap image.
+        """
+        # CONVERT TO RGB COLOUR
+        cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
+        # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
+        height, width, _ = cameraFrame.shape
+        # GENERATE QIMAGE
+        cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
+        # CONVERT TO PIXMAP
+        cameraFrame = QPixmap.fromImage(cameraFrame)
+
+        return cameraFrame
+
+    def changeResolution(self, width, height):
+        """
+        PURPOSE
+
+        Changes the capture resolution of the camera frames.
+
+        INPUT
+
+        - width = width of the frame in pixels.
+        - height = height of the frame in pixels.
+
+        RETURNS
+
+        NONE
+        """
+        self.width = width
+        self.height = height
+
+        # SET RESOLUTION IF CAMERA FEED IS INITIALISED
+        try:
+            self.cameraFeed.set(CAP_PROP_FRAME_WIDTH, self.width)
+            self.cameraFeed.set(CAP_PROP_FRAME_HEIGHT, self.height)
+        except:
+            pass
+
+    def changeSource(self, address):
+        """
+        PURPOSE
+
+        Changes the address of the camera source.
+
+        INPUT
+
+        - address = the source, either an integer for USB cameras, or a RTSP link for IP cameras.
+
+        RETURNS
+
+        NONE
+        """
+        self.address = address
+
+        self.feedStop()
+
+        #RE-INITIATE CAMERA
+        self.initiateCamera()
+
+        self.feedBegin()
+
+        self.start()
 
     def feedStop(self):
         """
@@ -180,5 +322,5 @@ class CAMERA_CAPTURE(QThread):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = VIEW()
+    ex = VIEW(app)
     sys.exit(app.exec_())

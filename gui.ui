@@ -387,8 +387,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>248</width>
-                 <height>594</height>
+                 <width>180</width>
+                 <height>612</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -1183,8 +1183,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>255</width>
-                  <height>225</height>
+                  <width>268</width>
+                  <height>281</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_27">
@@ -1249,8 +1249,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>255</width>
-                  <height>225</height>
+                  <width>268</width>
+                  <height>281</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_17">
@@ -1306,8 +1306,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>255</width>
-                  <height>285</height>
+                  <width>268</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_20">
@@ -1399,8 +1399,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>255</width>
-                  <height>285</height>
+                  <width>268</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_15">
@@ -1456,8 +1456,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>256</width>
-                  <height>285</height>
+                  <width>268</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_23">
@@ -1614,8 +1614,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>255</width>
-                  <height>285</height>
+                  <width>268</width>
+                  <height>282</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_39">
@@ -1733,8 +1733,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>255</width>
-                  <height>225</height>
+                  <width>268</width>
+                  <height>281</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_44">
@@ -1765,11 +1765,14 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                    </item>
                    <item row="0" column="1">
                     <widget class="QSpinBox" name="config_digital_cameras_number">
+                     <property name="minimum">
+                      <number>3</number>
+                     </property>
                      <property name="maximum">
                       <number>10</number>
                      </property>
                      <property name="value">
-                      <number>0</number>
+                      <number>3</number>
                      </property>
                     </widget>
                    </item>
@@ -1826,7 +1829,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
      <x>0</x>
      <y>0</y>
      <width>1470</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

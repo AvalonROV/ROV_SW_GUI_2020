@@ -269,7 +269,7 @@ class READ_CONFIG_FILE():
                         cameraAddresses.append(str(address.text)) 
                 
                 # DEFAULT CAMERAS
-                if camera.tag == 'defaultfeeds':
+                if camera.tag == 'default_feeds':
                     for item in camera:                        
                         defaultCameraList.append(int(item.text))
 

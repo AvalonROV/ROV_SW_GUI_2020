@@ -90,6 +90,9 @@ class UI(QMainWindow):
         # SET DEFAULT WIDGET SIZE
         self.con_panel_functions_widget.resize(self.data.screenWidth/3,self.con_panel_functions_widget.height())
 
+        # INITIATE CAMERA FEEDS
+        self.initiateCameraFeed()
+
         # LOAD SETTINGS FROM CONFIG FILE
         self.configSetup()
 
@@ -97,9 +100,6 @@ class UI(QMainWindow):
         self.linkControlPanelWidgets()
         self.linkConfigWidgets()
         self.linkToolbarWidgets()
-
-        # INITIATE CAMERA FEEDS
-        self.initiateCameraFeed()
 
         # INITIALISE WIDGETS FOR THE MACHINE VISION TASKS AND ADD THEM TO THE GUI
         self.control.initialiseVisionWidgets()
@@ -179,7 +179,7 @@ class UI(QMainWindow):
             self.data.analogCameraNumber, self.data.analogCameraLabelList, self.data.analogDefaultCameraList = configFile.readAnalogCamera()
 
             # READ DIGITAL CAMERA SETTINGS
-            self.data.digitalCameraNumber, self.data.digitalCameraLabelList, self.data.digitalCameraAddressList, self.digitalDefaultCameraList = configFile.readDigitalCamera()
+            self.data.digitalCameraNumber, self.data.digitalCameraLabelList, self.data.digitalCameraAddressList, self.data.digitalDefaultCameraList = configFile.readDigitalCamera()
 
         else:
             self.printTerminal('Configuration file not found.')
@@ -291,7 +291,7 @@ class UI(QMainWindow):
         self.config_camera_4_list.clear()
         # DIGITAL
         self.data.digitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
-        self.data.digitalDefaultCameraList = [0, 1, 2]
+        self.data.digitalDefaultCameraList = [0, 0, 0]
         self.data.digitalSelectedCameraList = [0, 1, 2]
         self.config.setupDigitalCameras()
 
@@ -447,9 +447,9 @@ class UI(QMainWindow):
         self.config_actuators_number.editingFinished.connect(self.config.changeActuatorsNumber)
 
         # DIGITAL DEFAULT CAMERA FEEDS
-        # self.config_digital_list_1.activated.connect(lambda index, camera = 0: self.config.changeDigitalDefault(index, camera))
-        # self.config_digital_list_2.activated.connect(lambda index, camera = 1: self.config.changeDigitalDefault(index, camera))
-        # self.config_digital_list_3.activated.connect(lambda index, camera = 2: self.config.changeDigitalDefault(index, camera))
+        self.config_digital_default_1.activated.connect(lambda index, camera = 0: self.config.changeDigitalDefault(index, camera))
+        self.config_digital_default_2.activated.connect(lambda index, camera = 1: self.config.changeDigitalDefault(index, camera))
+        self.config_digital_default_3.activated.connect(lambda index, camera = 2: self.config.changeDigitalDefault(index, camera))
 
         # LINK EACH DEFAULT CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING THE CAMERA ID AS 1,2,3,4 ETC.
         self.config_analog_default_1.activated.connect(lambda index, camera = 0: self.config.changeAnalogDefaultCameras(index, camera))
@@ -507,21 +507,17 @@ class UI(QMainWindow):
         # INITIATE CAMERAS IN QTHREADS
         
         # PRIMARY CAMERA        
-        address0 = "rtsp://192.168.0.103/user=admin&password=&channel=3&stream=0.sdp?"
-
-        address1 = "rtsp://192.168.0.101:554"
-        
-        self.camThread1 = CAMERA_CAPTURE("")
+        self.camThread1 = CAMERA_CAPTURE()
         self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
         self.camThread1.start()
         
         # SECONDARY CAMERA 1
-        self.camThread2 = CAMERA_CAPTURE(0)
+        self.camThread2 = CAMERA_CAPTURE()
         self.camThread2.cameraNewFrameSignal.connect(self.updateCamera2Feed)
         self.camThread2.start()
         
         # SECONDARY CAMERA 2
-        self.camThread3 = CAMERA_CAPTURE(1)
+        self.camThread3 = CAMERA_CAPTURE()
         self.camThread3.cameraNewFrameSignal.connect(self.updateCamera3Feed)
         self.camThread3.start()
 
@@ -2722,7 +2718,85 @@ class CONFIG():
 
         for i in range(cameraNumber):
             self.addDigitalCamera()
-        
+
+        self.setDigitalCameraAddress()
+
+    def setDigitalCameraAddress(self):
+        """
+        PURPOSE
+
+        Sets the source address of each digital camera.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # FEED 1
+        try:
+            default1 = self.data.digitalDefaultCameraList[0]
+            # NONE SELECTED
+            if default1 == 0:
+                address1 = ""
+            else:
+                address1 = self.data.digitalCameraAddressList[default1 - 1]
+                address1 = self.addressConverter(address1)
+            self.ui.camThread1.changeSource(address1)
+        except:
+            pass
+
+        # FEED 2
+        try:
+            default2 = self.data.digitalDefaultCameraList[1]
+            # NONE SELECTED
+            if default2 == 0:
+                address2 = ""
+            else:
+                address2 = self.data.digitalCameraAddressList[default2 - 1]
+                address2 = self.addressConverter(address2)
+            self.ui.camThread2.changeSource(address2)
+        except:
+            pass
+
+        # FEED 3
+        try:
+            default3 = self.data.digitalDefaultCameraList[2]
+            # NONE SELECTED
+            if default3 == 0:
+                address3 = ""
+            else:
+                address3 = self.data.digitalCameraAddressList[default3 - 1]
+                address3 = self.addressConverter(address3)
+            self.ui.camThread3.changeSource(address3)
+        except:
+            pass
+
+    def addressConverter(self, address):
+        """
+        PURPOSE
+
+        Converts string to int for the USB cameras.
+
+        INPUT
+
+        - address = string of the camera feed source address.
+
+        RETURNS
+
+        - cameraAddress = int source address for USB camera, string source address for RTSP camera.
+        """
+        # USB CAMERA
+        try:
+            cameraAddress = int(address)
+        # RTSP CAMERA
+        except:
+            cameraAddress = address
+
+        return cameraAddress
+
     def changeDigitalCamerasNumber(self):
         """
         PURPOSE
@@ -2800,10 +2874,11 @@ class CONFIG():
         # ADD TO CONFIGURATION TAB
         self.ui.config_digital_cameras.addRow(cameraNumber, layout)
 
+        # UPDATE MENUS
+        self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList)
+
         cameraLabel.textChanged.connect(lambda text, camera = nextCamera: self.changeDigitalCameraName(text, camera))
         cameraAddress.textChanged.connect(lambda text, camera = nextCamera: self.changeDigitalCameraAddress(text, camera))
-
-        # UPDATE MENUS HERE
 
     def removeDigitalCamera(self):
         """
@@ -2871,8 +2946,7 @@ class CONFIG():
         """
         self.data.digitalCameraAddressList[camera] = text
 
-
-    def updateDigitalCameraMenus(self, items, defaultIndex, currentIndex):
+    def updateDigitalMenus(self, labelList, defaultCameras):
         """
         PURPOSE
 
@@ -2882,32 +2956,24 @@ class CONFIG():
 
         - items = array containing the camera items to display on the drop down menus.
         - defaultIndex = array containing the menu indices for the default selected camera.
-        - currentIndex = array containing the menu indices for the current selected camera.
 
         RETURNS
 
         NONE
         """
-        # REFRESH DROP DOWN MENUS
-        self.ui.config_digital_list_1.clear()
-        self.ui.config_digital_list_1.addItems(items)
-        self.ui.config_digital_list_1.setCurrentIndex(items.index(items[defaultIndex[0]]))
-        self.ui.config_digital_list_2.clear()
-        self.ui.config_digital_list_2.addItems(items)
-        self.ui.config_digital_list_2.setCurrentIndex(items.index(items[defaultIndex[1]]))
-        self.ui.config_digital_list_3.clear()
-        self.ui.config_digital_list_3.addItems(items)
-        self.ui.config_digital_list_3.setCurrentIndex(items.index(items[defaultIndex[2]]))
-
-        self.ui.camera_feed_1_menu.clear()
-        self.ui.camera_feed_1_menu.addItems(items)
-        self.ui.camera_feed_1_menu.setCurrentIndex(items.index(items[currentIndex[0]]))
-        self.ui.camera_feed_2_menu.clear()
-        self.ui.camera_feed_2_menu.addItems(items)
-        self.ui.camera_feed_2_menu.setCurrentIndex(items.index(items[currentIndex[1]]))
-        self.ui.camera_feed_3_menu.clear()
-        self.ui.camera_feed_3_menu.addItems(items)
-        self.ui.camera_feed_3_menu.setCurrentIndex(items.index(items[currentIndex[2]]))
+        # UPDATE CONFIGURATION TAB MENUS
+        self.ui.config_digital_default_1.clear()
+        self.ui.config_digital_default_1.addItem("None")
+        self.ui.config_digital_default_1.addItems(labelList)
+        self.ui.config_digital_default_1.setCurrentIndex(defaultCameras[0])
+        self.ui.config_digital_default_2.clear()
+        self.ui.config_digital_default_2.addItem("None")
+        self.ui.config_digital_default_2.addItems(labelList)
+        self.ui.config_digital_default_2.setCurrentIndex(defaultCameras[1])
+        self.ui.config_digital_default_3.clear()
+        self.ui.config_digital_default_3.addItem("None")
+        self.ui.config_digital_default_3.addItems(labelList)
+        self.ui.config_digital_default_3.setCurrentIndex(defaultCameras[2])
 
     #########################
     # KEY BINDING FUNCTIONS #
@@ -3363,8 +3429,6 @@ class DATABASE():
 
     actuatorStates = []                     # STORES STATE OF EACH ACTUATOR
 
-    
-
     visionTaskStatus = [False] * 4          # STORES THE ON/OFF STATUS OF EACH TASK
     
     # STYLESHEETS USED FOR BUTTONS AND TEXT ETC.
@@ -3416,11 +3480,11 @@ class DATABASE():
     analogCameraViewList = [None] * 4       # STORES THE SELECTED EXTERNAL CAMERA FEEDS
     
     # DIGITAL CAMERA SETTINGS
-    digitalCameraNumber = 0 
+    digitalCameraNumber = 3 
     digitalCameraLabelList = []
     digitalCameraAddressList = []
     digitalDefaultCameraList = [0, 0, 0]
-    digitalSelectedCameraList = [0, 0, 0]
+    digitalSelectedCameraList = [0, 1, 2]
 
     # KEY BINDING CONFIGURATION SETTINGS
     
