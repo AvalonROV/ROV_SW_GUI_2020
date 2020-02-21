@@ -5,14 +5,34 @@ import math
 import sys
 import time
 
-class TRANSECT_LINE_TASK():
+from PyQt5.QtCore import pyqtSignal, QObject
+
+class TRANSECT_LINE_TASK(QObject):
+    """
+    PURPOSE
+    
+    Performs the image processing for the transect line task.
+    """
+
+    transmitData = pyqtSignal(str)
 
     def __init__(self):
-        pass
+        QObject.__init__(self)
 
     def runAlgorithm(self, frame):
         """
         PURPOSE
+
+        Processes and returns the camera frame.
+        Transmits required data to main program.
+
+        INPUT
+
+        - frame = camera frame to process.
+
+        RETURNS
+
+        NONE
         """
         edges = self.detect_edges(frame)
         
@@ -34,7 +54,43 @@ class TRANSECT_LINE_TASK():
         
         heading_image = self.display_heading_line(lane_lines_image, steering_angle)
 
+        # CALCULATE STEERING DATA
+        deviation = steering_angle - 90
+
+        data = ""
+
+        if deviation < 10 and deviation > -10:
+            data = "NEUTRAL"
+
+        elif deviation > 5:
+            data = "RIGHT"
+
+        elif deviation < -5:
+            data = "LEFT"
+
+        # SEND DATA BACK TO PROGRAM
+        self.sendData(data)
+
         return heading_image
+
+    def sendData(self, data):
+        """
+        PURPOSE
+
+        Sends required data back to main program.
+
+        INPUT
+
+        - data = the data to send.
+
+        RETURNS
+
+        NONE
+        """
+        self.transmitData.emit(data)
+
+
+    # ALL PROCESSING FUNCTIONS
 
     def detect_edges(self, frame):
         # filter for blue lane lines
@@ -186,6 +242,20 @@ class TRANSECT_LINE_TASK():
         return heading_image
 
     def get_steering_angle(self, frame, lane_lines):
+        """
+        PURPOSE
+
+        blah blah blah
+
+        INPUT
+
+        blah blah blah
+
+        RETURNS
+
+        blah blah blah
+        """
+
         height, width, _ = frame.shape
 
         if len(lane_lines) == 2:  # if two lane lines are detected

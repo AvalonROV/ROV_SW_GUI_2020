@@ -556,7 +556,7 @@ class UI(QMainWindow):
                 self.camThread3.start()
             else:
                 self.camThread3.feedStop()
-
+ 
     @pyqtSlot(QPixmap)
     def updateCamera1Feed(self, frame):
         """
@@ -1759,10 +1759,11 @@ class CONTROL_PANEL():
         self.animation = SLIDE_ANIMATION(self.ui.control_vision_stacked_widget)
         self.animation.setSpeed(300)
 
+        # MOSIAC TASK
         self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.ui.scroll_mosaic_task)
-        self.transectLinePopup = TRANSECT_LINE_POPUP_WINDOW(self.ui.group_box_transect_task)
-
-        self.transectLineTask = TRANSECT_LINE_TASK()
+        
+        # TRANSECT LINE TASK
+        self.transectLinePopup = TRANSECT_LINE_POPUP_WINDOW(self.ui.group_box_transect_task, self.ui.camThread1)
 
     def changeVisionButtons(self, index, status):
         """
@@ -1797,6 +1798,7 @@ class CONTROL_PANEL():
                 button.setStyleSheet("")
                 self.data.visionTaskStatus[i] = False
 
+    ### MOSAIC TASK ###
     def popupMosaicTask(self):
         """
         PURPOSE
@@ -1823,7 +1825,25 @@ class CONTROL_PANEL():
                 self.data.visionTaskStatus[0] = False
                 self.changeVisionButtons(0, False)
                 self.animation.jumpTo(0)
-            
+
+    @pyqtSlot()       
+    def receiveMosaicTask(self):
+        """
+        PURPOSE
+
+        Is called in the event of the mosaic algorithm sending data back to the main program.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        pass
+
+    ### SHAPE DETECTION TASK ###
     def popupShapeDetectionTask(self):
         """
         PURPOSE
@@ -1851,6 +1871,7 @@ class CONTROL_PANEL():
                 self.changeVisionButtons(1, False)
                 self.animation.jumpTo(0)
             
+    ### TRANSECT LINE TASK ###
     def popupTransectLineTask(self):
         """
         PURPOSE
@@ -1871,8 +1892,6 @@ class CONTROL_PANEL():
                 self.data.visionTaskStatus[2] = True
                 self.changeVisionButtons(2, True)
                 self.animation.jumpTo(3)
-
-                self.ui.camThread1.processImage(self.transectLineTask)
                 
             else:
                 # CLOSE WIDGET
@@ -1880,8 +1899,23 @@ class CONTROL_PANEL():
                 self.changeVisionButtons(2, False)
                 self.animation.jumpTo(0)
 
-                self.ui.camThread1.stopProcessing()
+    def receiveTransectLineTask(self):
+        """
+        PURPOSE
 
+        Is called in the event of the transect line algorithm sending data back to the main program.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        pass
+
+    ### CORAL HEALTH TASK ###
     def popupCoralHealthTask(self):
         """
         PURPOSE
@@ -2869,7 +2903,7 @@ class CONFIG():
         layout.addWidget(QLabel("Name"),0,0)
         layout.addWidget(cameraLabel,0,1)
         layout.addWidget(QLabel("Address"),1,0)
-        layout.addWidget(cameraAddress)
+        layout.addWidget(cameraAddress,1,1)
 
         # ADD TO CONFIGURATION TAB
         self.ui.config_digital_cameras.addRow(cameraNumber, layout)
@@ -2878,7 +2912,7 @@ class CONFIG():
         self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList)
 
         cameraLabel.textChanged.connect(lambda text, camera = nextCamera: self.changeDigitalCameraName(text, camera))
-        cameraAddress.textChanged.connect(lambda text, camera = nextCamera: self.changeDigitalCameraAddress(text, camera))
+        cameraAddress.editingFinished.connect(lambda lineEditObject = cameraAddress, camera = nextCamera: self.changeDigitalCameraAddress(lineEditObject, camera))
 
     def removeDigitalCamera(self):
         """
@@ -2930,7 +2964,10 @@ class CONFIG():
         """
         self.data.digitalCameraLabelList[camera] = text
 
-    def changeDigitalCameraAddress(self, text, camera):
+        # UPDATE MENUS
+        self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList)
+
+    def changeDigitalCameraAddress(self, lineEditObject, camera):
         """
         PURPOSE
 
@@ -2938,13 +2975,25 @@ class CONFIG():
 
         INPUT
 
-        NONE
+        - lineEditObject = pointer to the line edit widget.
+        - camera = the camera which address is being changed.
 
         RETURNS
 
         NONE
         """
-        self.data.digitalCameraAddressList[camera] = text
+        address = lineEditObject.text()
+
+        for index, item in enumerate(self.data.digitalCameraAddressList):
+            if item == address:
+                self.data.digitalCameraAddressList[index] = ""
+        
+        self.data.digitalCameraAddressList[camera] = address
+
+        self.updateDigitalAddress(self.ui.config_digital_cameras, self.data.digitalCameraAddressList)
+
+        # APPLY ADDRESS CHANGE
+        self.setDigitalCameraAddress()
 
     def updateDigitalMenus(self, labelList, defaultCameras):
         """
@@ -2974,6 +3023,27 @@ class CONFIG():
         self.ui.config_digital_default_3.addItem("None")
         self.ui.config_digital_default_3.addItems(labelList)
         self.ui.config_digital_default_3.setCurrentIndex(defaultCameras[2])
+
+    def updateDigitalAddress(self, layoutWidget, addressList):
+        """
+        PURPOSE
+
+        Updates the digital camera label text fields.
+
+        INPUT
+
+        NONE
+
+        OUTPUT
+
+        NONE
+        """
+        digitalNumber = layoutWidget.rowCount()
+
+        for i in range(digitalNumber):
+            layout = layoutWidget.itemAt((i * 2) + 1).layout()
+            widget = layout.itemAt(3).widget()
+            widget.setText(addressList[i])
 
     #########################
     # KEY BINDING FUNCTIONS #

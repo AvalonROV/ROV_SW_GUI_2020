@@ -28,7 +28,7 @@ class VIEW(QWidget):
         self.setLayout(layout)
 
         self.address1 = 0
-        self.address2 = "rtsp://192.168.0.102/user=admin&password=&channel=1&stream=0.sdp?"
+        self.address2 = "rtsp://192.168.0.101/user=admin&password=&channel=1&stream=0.sdp?"
 
         # INITIATE CAMERA
         self.camThread = CAMERA_CAPTURE()
@@ -171,14 +171,24 @@ class CAMERA_CAPTURE(QThread):
 
             # RTSP CAMERA
             if addressType:
-                self.cameraFeed = VideoCapture(self.address)
+                print("STARTING INITIALISATION")
+                try:
+                    self.cameraFeed = VideoCapture(self.address, CAP_FFMPEG)
+                    self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
+                    initiateStatus = True
+                except:
+                    initiateStatus = False
+                print("FINISHED INITIALISATION")
 
             # USB CAMERA
             else:
-                self.cameraFeed = VideoCapture(self.address, CAP_DSHOW)
+                try:
+                    self.cameraFeed = VideoCapture(self.address, CAP_DSHOW)
+                    self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
+                    initiateStatus = True
+                except:
+                    initiateStatus = False
 
-            initiateStatus = True
-        
         return initiateStatus
 
     def convertFrame(self, frame):
@@ -245,16 +255,17 @@ class CAMERA_CAPTURE(QThread):
 
         NONE
         """
-        self.address = address
+        if address != self.address:
+            self.address = address
 
-        self.feedStop()
+            #self.feedStop()
+            self.cameraFeed.release()
+            #RE-INITIATE CAMERA
+            self.initiateCamera()
 
-        #RE-INITIATE CAMERA
-        self.initiateCamera()
+            #self.feedBegin()
 
-        self.feedBegin()
-
-        self.start()
+            #self.start()
 
     def feedStop(self):
         """
