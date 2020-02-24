@@ -266,7 +266,10 @@ class READ_CONFIG_FILE():
                 # CAMERA ADDRESSES
                 if camera.tag == 'camera_address':
                     for address in camera:
-                        cameraAddresses.append(str(address.text)) 
+                        text = address.text 
+                        if text == None:
+                            text = ""     
+                        cameraAddresses.append(str(text))
                 
                 # DEFAULT CAMERAS
                 if camera.tag == 'default_feeds':
@@ -309,7 +312,7 @@ class WRITE_CONFIG_FILE():
     """
     PURPOSE
 
-    Writes the ROV programs settings to an XML file.
+    Writes the ROV programs configuration settings to an XML file.
     """
     def __init__(self, fileName):
         """

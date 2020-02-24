@@ -572,8 +572,8 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaled(self.cameraFeeds[0].size().width(), self.cameraFeeds[0].size().height(), Qt.KeepAspectRatio)
-        self.cameraFeeds[0].setPixmap(pixmap)
+        pixmap = frame.scaled(self.camera_feed_1.size().width(), self.camera_feed_1.size().height(), Qt.KeepAspectRatio)
+        self.camera_feed_1.setPixmap(pixmap)
 
     @pyqtSlot(QPixmap)
     def updateCamera2Feed(self, frame):
@@ -590,8 +590,8 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaled(self.cameraFeeds[1].size().width(), self.cameraFeeds[1].size().height(), Qt.KeepAspectRatio)
-        self.cameraFeeds[1].setPixmap(pixmap)
+        pixmap = frame.scaled(self.camera_feed_2.size().width(), self.camera_feed_2.size().height(), Qt.KeepAspectRatio)
+        self.camera_feed_2.setPixmap(pixmap)
 
     @pyqtSlot(QPixmap)
     def updateCamera3Feed(self, frame):
@@ -608,8 +608,8 @@ class UI(QMainWindow):
 
         NONE
         """
-        pixmap = frame.scaled(self.cameraFeeds[2].size().width(), self.cameraFeeds[2].size().height(), Qt.KeepAspectRatio)
-        self.cameraFeeds[2].setPixmap(pixmap)
+        pixmap = frame.scaled(self.camera_feed_3.size().width(), self.camera_feed_3.size().height(), Qt.KeepAspectRatio)
+        self.camera_feed_3.setPixmap(pixmap)
 
     def changeCameraFeed(self, event, cameraFeed):
         """
@@ -630,10 +630,15 @@ class UI(QMainWindow):
             pass
 
         if cameraFeed == 1:
-            self.cameraFeeds[0], self.cameraFeeds[1] = self.cameraFeeds[1], self.cameraFeeds[0]
-              
+            self.data.digitalSelectedCameraList[0], self.data.digitalSelectedCameraList[1] = self.data.digitalSelectedCameraList[1], self.data.digitalSelectedCameraList[0]
+            self.config.setDigitalCameraAddress()
+            
         if cameraFeed == 2:
-            self.cameraFeeds[0], self.cameraFeeds[2] = self.cameraFeeds[2], self.cameraFeeds[0]
+            self.data.digitalSelectedCameraList[0], self.data.digitalSelectedCameraList[2] = self.data.digitalSelectedCameraList[2], self.data.digitalSelectedCameraList[0]
+            self.config.setDigitalCameraAddress()
+
+        # UPDATE MENUS
+        self.config.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList, self.data.digitalSelectedCameraList)
 
     def changeCameraFeedMenu(self, index, cameraFeed):
         """
@@ -646,8 +651,18 @@ class UI(QMainWindow):
         - index = menu index of the camera selected.
         - cameraFeed = the camera feed that is being modified.
         """
-        # NOT YET IMPLEMENTED
-        pass
+        self.data.digitalSelectedCameraList[cameraFeed] = index
+
+        # CHECK FOR DUPLICATE CAMERA FEEDS
+        for i, camera in enumerate(self.data.digitalSelectedCameraList):
+            if camera == index and i != cameraFeed:
+                self.data.digitalSelectedCameraList[i] = 0
+
+        # UPDATE MENUS
+        self.config.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList, self.data.digitalSelectedCameraList)
+
+        # UPDATE CAMERA FEEDS
+        self.config.setDigitalCameraAddress()
 
     #############################
     ###### THEME FUNCTIONS ######
@@ -1285,7 +1300,7 @@ class CONTROL_PANEL():
             
             # APPLY THE THRUST VECTORING ALGORITHM
             filteredThrusterSpeeds = self.thrustVectorAlgorithm(joystickValues, yawDirection, controllerSensitivity, yawSensitivity)
-        
+            
             # SEND THRUSTER SPEEDS TO ROV
             self.changeThrusters(filteredThrusterSpeeds)
         
@@ -1434,35 +1449,37 @@ class CONTROL_PANEL():
 
         NONE
         """
-        # REVERSE THE DIRECTION OF THRUSTERS WHERE NECCESSARY
         tempThrusterSpeeds = thrusterSpeeds.copy()
-        
-        for i, speed in enumerate(tempThrusterSpeeds):
-            if self.data.thrusterReverseList[i] == True:
-                tempThrusterSpeeds[i] = 1000 - speed
 
         # IF THRUSTER ARE BEING INDIVIDUALLY TESTED
         if testStatus:
+
+            # REVERSE THRUSTERS WHERE NECCESSARY
+            tempThrusterSpeeds = self.changeThrusterDirection(tempThrusterSpeeds)
+
             # SEND COMMAND TO ROV
             self.comms.setThrusters(tempThrusterSpeeds)
 
         else:
             # MAPS THRUSTERS TO CORRECT ROV POSITION
             mappedThrusterSpeeds = [500] * 8
-
+            
             for index, position in enumerate(self.data.thrusterPositionList):
                 if position != "None":
                     try:
                         # FIND WHICH THRUSTER BELONGS TO THIS ROV POSITION
                         thrusterIndex = self.data.thrusterPosition.index(position)
-
+    
                         # SET SPEED TO CORRECT THRUSTER
                         mappedThrusterSpeeds[thrusterIndex] = tempThrusterSpeeds[index - 1]
+
                     except:
                         pass
-        
+
+            # REVERSE THE DIRECTION OF THRUSTERS WHERE NECCESSARY
+            mappedThrusterSpeeds = self.changeThrusterDirection(mappedThrusterSpeeds)
+            
             # SEND COMMAND TO ROV
-            #print(mappedThrusterSpeeds)
             self.comms.setThrusters(mappedThrusterSpeeds)
 
     def switchControlDirection(self):
@@ -1562,6 +1579,28 @@ class CONTROL_PANEL():
             self.ui.yaw_sensitivity_low.setStyleSheet("")
             self.ui.yaw_sensitivity_medium.setStyleSheet("")
             self.ui.yaw_sensitivity_high.setStyleSheet(self.data.greenText)
+
+    def changeThrusterDirection(self, thrusterSpeeds):
+        """
+        PURPOSE
+
+        Reverses each thruster if neccessary.
+
+        INPUT
+
+        - thrusterSpeeds = an array containing the speed of each thruster.
+
+        RETURNS
+
+        - tempThrusterSpeeds = an array containing the filtered speed of each thruster.
+        """
+        tempThrusterSpeeds = thrusterSpeeds.copy()
+
+        for i, speed in enumerate(tempThrusterSpeeds):
+            if self.data.thrusterReverseList[i] == True:
+                tempThrusterSpeeds[i] = 1000 - speed
+
+        return tempThrusterSpeeds
 
     ###########################
     ##### TIMER FUNCTIONS #####
@@ -2748,6 +2787,9 @@ class CONFIG():
         """
         cameraNumber = self.data.digitalCameraNumber
 
+        # SET CURRENT CAMERA FEEDS TO THE DEFAULT
+        self.data.digitalSelectedCameraList = self.data.digitalDefaultCameraList.copy()
+
         self.ui.config_digital_cameras_number.setValue(cameraNumber)
 
         for i in range(cameraNumber):
@@ -2771,12 +2813,12 @@ class CONFIG():
         """
         # FEED 1
         try:
-            default1 = self.data.digitalDefaultCameraList[0]
+            selected1 = self.data.digitalSelectedCameraList[0]
             # NONE SELECTED
-            if default1 == 0:
+            if selected1 == 0:
                 address1 = ""
             else:
-                address1 = self.data.digitalCameraAddressList[default1 - 1]
+                address1 = self.data.digitalCameraAddressList[selected1 - 1]
                 address1 = self.addressConverter(address1)
             self.ui.camThread1.changeSource(address1)
         except:
@@ -2784,12 +2826,12 @@ class CONFIG():
 
         # FEED 2
         try:
-            default2 = self.data.digitalDefaultCameraList[1]
+            selected2 = self.data.digitalSelectedCameraList[1]
             # NONE SELECTED
-            if default2 == 0:
+            if selected2 == 0:
                 address2 = ""
             else:
-                address2 = self.data.digitalCameraAddressList[default2 - 1]
+                address2 = self.data.digitalCameraAddressList[selected2 - 1]
                 address2 = self.addressConverter(address2)
             self.ui.camThread2.changeSource(address2)
         except:
@@ -2797,12 +2839,12 @@ class CONFIG():
 
         # FEED 3
         try:
-            default3 = self.data.digitalDefaultCameraList[2]
+            selected3 = self.data.digitalSelectedCameraList[2]
             # NONE SELECTED
-            if default3 == 0:
+            if selected3 == 0:
                 address3 = ""
             else:
-                address3 = self.data.digitalCameraAddressList[default3 - 1]
+                address3 = self.data.digitalCameraAddressList[selected3 - 1]
                 address3 = self.addressConverter(address3)
             self.ui.camThread3.changeSource(address3)
         except:
@@ -2909,7 +2951,7 @@ class CONFIG():
         self.ui.config_digital_cameras.addRow(cameraNumber, layout)
 
         # UPDATE MENUS
-        self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList)
+        self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList, self.data.digitalSelectedCameraList)
 
         cameraLabel.textChanged.connect(lambda text, camera = nextCamera: self.changeDigitalCameraName(text, camera))
         cameraAddress.editingFinished.connect(lambda lineEditObject = cameraAddress, camera = nextCamera: self.changeDigitalCameraAddress(lineEditObject, camera))
@@ -2965,7 +3007,7 @@ class CONFIG():
         self.data.digitalCameraLabelList[camera] = text
 
         # UPDATE MENUS
-        self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList)
+        self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList, self.data.digitalSelectedCameraList)
 
     def changeDigitalCameraAddress(self, lineEditObject, camera):
         """
@@ -2984,6 +3026,9 @@ class CONFIG():
         """
         address = lineEditObject.text()
 
+        if address == None:
+            address = ""
+
         for index, item in enumerate(self.data.digitalCameraAddressList):
             if item == address:
                 self.data.digitalCameraAddressList[index] = ""
@@ -2995,7 +3040,7 @@ class CONFIG():
         # APPLY ADDRESS CHANGE
         self.setDigitalCameraAddress()
 
-    def updateDigitalMenus(self, labelList, defaultCameras):
+    def updateDigitalMenus(self, labelList, defaultCameras, selectedCameras):
         """
         PURPOSE
 
@@ -3004,25 +3049,30 @@ class CONFIG():
         INPUT
 
         - items = array containing the camera items to display on the drop down menus.
-        - defaultIndex = array containing the menu indices for the default selected camera.
+        - defaultIndex = array containing the menu indices for the default cameras.
+        - selectedIndex = array containing the menu indices for the selected cameras.
 
         RETURNS
 
         NONE
         """
         # UPDATE CONFIGURATION TAB MENUS
-        self.ui.config_digital_default_1.clear()
-        self.ui.config_digital_default_1.addItem("None")
-        self.ui.config_digital_default_1.addItems(labelList)
-        self.ui.config_digital_default_1.setCurrentIndex(defaultCameras[0])
-        self.ui.config_digital_default_2.clear()
-        self.ui.config_digital_default_2.addItem("None")
-        self.ui.config_digital_default_2.addItems(labelList)
-        self.ui.config_digital_default_2.setCurrentIndex(defaultCameras[1])
-        self.ui.config_digital_default_3.clear()
-        self.ui.config_digital_default_3.addItem("None")
-        self.ui.config_digital_default_3.addItems(labelList)
-        self.ui.config_digital_default_3.setCurrentIndex(defaultCameras[2])
+        configMenus = [self.ui.config_digital_default_1, self.ui.config_digital_default_2, self.ui.config_digital_default_3]
+
+        for index, menu in enumerate(configMenus):
+            menu.clear()
+            menu.addItem("None")
+            menu.addItems(labelList)
+            menu.setCurrentIndex(defaultCameras[index])
+
+        # UPDATE CONTROL PANEL TAB MENUS
+        controlMenus = [self.ui.camera_feed_1_menu, self.ui.camera_feed_2_menu, self.ui.camera_feed_3_menu]
+
+        for index, menu in enumerate(controlMenus):
+            menu.clear()
+            menu.addItem("None")
+            menu.addItems(labelList)
+            menu.setCurrentIndex(selectedCameras[index])
 
     def updateDigitalAddress(self, layoutWidget, addressList):
         """
@@ -3554,7 +3604,7 @@ class DATABASE():
     digitalCameraLabelList = []
     digitalCameraAddressList = []
     digitalDefaultCameraList = [0, 0, 0]
-    digitalSelectedCameraList = [0, 1, 2]
+    digitalSelectedCameraList = [0, 0, 0]
 
     # KEY BINDING CONFIGURATION SETTINGS
     

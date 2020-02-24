@@ -108,13 +108,13 @@ class CAMERA_CAPTURE(QThread):
         while self.runFeed:
             
             # INITIATE CAMERA
-            initiateStatus = self.initiateCamera()
+            self.initiateCamera()
 
-            if initiateStatus:
+            if self.initiateStatus:
                 self.cameraFeed.set(CAP_PROP_FRAME_WIDTH, self.width)
                 self.cameraFeed.set(CAP_PROP_FRAME_HEIGHT, self.height)
 
-            while self.runFeed and initiateStatus:
+            while self.runFeed and self.initiateStatus:
                 
                 # 30 FPS CAPTURE RATE
                 if elapsedTime > 1/30:
@@ -162,7 +162,7 @@ class CAMERA_CAPTURE(QThread):
 
         NONE
         """
-        initiateStatus = False
+        self.initiateStatus = False
 
         if self.address != "":
 
@@ -171,25 +171,23 @@ class CAMERA_CAPTURE(QThread):
 
             # RTSP CAMERA
             if addressType:
-                print("STARTING INITIALISATION")
+                #print("STARTING INITIALISATION")
                 try:
                     self.cameraFeed = VideoCapture(self.address, CAP_FFMPEG)
                     self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
-                    initiateStatus = True
+                    self.initiateStatus = True
                 except:
-                    initiateStatus = False
-                print("FINISHED INITIALISATION")
+                    self.initiateStatus = False
+                #print("FINISHED INITIALISATION")
 
             # USB CAMERA
             else:
                 try:
                     self.cameraFeed = VideoCapture(self.address, CAP_DSHOW)
                     self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
-                    initiateStatus = True
+                    self.initiateStatus = True
                 except:
-                    initiateStatus = False
-
-        return initiateStatus
+                    self.initiateStatus = False
 
     def convertFrame(self, frame):
         """
@@ -257,11 +255,13 @@ class CAMERA_CAPTURE(QThread):
         """
         if address != self.address:
             self.address = address
+            self.initiateStatus = False
+            print("Changing address to:", self.address)
 
             #self.feedStop()
-            self.cameraFeed.release()
+            #self.cameraFeed.release()
             #RE-INITIATE CAMERA
-            self.initiateCamera()
+            #self.initiateCamera()
 
             #self.feedBegin()
 
