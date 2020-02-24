@@ -115,9 +115,9 @@ class UI(QMainWindow):
         # INITIALISE UI
         self.showMaximized()
 
-    ##################################
-    ## CONFIGURATION FILE FUNCTIONS ##
-    ##################################
+    ###############################
+    ### CONFIGURATION FUNCTIONS ###
+    ###############################
     def configSetup(self):
         """
         PURPOSE
@@ -217,10 +217,9 @@ class UI(QMainWindow):
         self.config.setupAnalogCamera() 
         
         # UPDATE GUI WITH DIGITAL CAMERA DATA
-        self.config.setupDigitalCameras()
+        self.config.setupDigitalCamera()
 
-    #### FIX THIS ASAP ####
-    def resetConfig(self, resetStatus):
+    def resetConfig(self):
         """
         PURPOSE
 
@@ -228,88 +227,180 @@ class UI(QMainWindow):
         
         INPUT
 
-        - resetStatus = true when called via the 'Reset Configuration' button (so that the number of thruster automatically resets).
+        NONE
 
         RETURNS
 
         NONE
         """
-        ###############################
-        ### RESET THRUSTER SETTINGS ###
-        ###############################
-        for i in reversed(range(self.config_thruster_form.rowCount())): 
+        # RESET THRUSTER SETTINGS
+        self.resetThrusters()
+
+        # RESET ACTUATOR SETTINGS
+        self.resetActuators()
+
+        # RESET SENSOR SETTINGS
+        self.resetSensors()
+
+        # RESET ANALOG CAMERA SETTINGS
+        self.resetAnalogCameras()
+
+        # RESET DIGITAL CAMERA SETTINGS
+        self.resetDigitalCameras()
+
+        # RESET KEYBINDING SETTINGS
+        self.resetKeybindings()
+        
+    def resetThrusters(self):
+        """
+        PURPOSE
+
+        Resets the thruster configuration to default settings.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        thrusterNumber = self.config_thruster_form.rowCount()
+
+        # REMOVE ALL THRUSTER CONFIGURATION WIDGETS
+        for i in reversed(range(thrusterNumber)): 
             self.config_thruster_form.removeRow(i)
 
+        self.data.thrusterNumber = 8
         self.data.thrusterPosition = ['None'] * 8
         self.data.thrusterReverseList = [False] * 8
 
-        # RETURN NUMBER OF THRUSTERS TO 8 IF RESET BUTTON IS PRESSED
-        if resetStatus == True:
-            self.config.setupThrusters(self.data.thrusterNumber, 
-                                            self.config_thruster_form,
-                                            self.data.thrusterPosition,
-                                            self.data.thrusterPositionList,
-                                            self.data.thrusterReverseList)
+    def resetActuators(self):
+        """
+        PURPOSE
 
-        ###############################
-        ### RESET ACTUATOR SETTINGS ###
-        ###############################
+        Resets the actuator configuration to default settings.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # DELETE CONFIGURATION TAB WIDGETS
+        actuatorNumber = self.config_actuator_form.rowCount()
+
+        for i in reversed(range(actuatorNumber)):
+            self.config_actuator_form.removeRow(i)
+
+        # DELETE CONTROL PANEL TAB WIDGETS
+        actuatorNumber = self.control_panel_actuators.rowCount()
+
+        for i in reversed(range(actuatorNumber)):
+            self.control_panel_actuators.removeRow(i)
+
         self.data.actuatorLabelList = []
-        # DELETE PREVIOUS ACTUATORS FROM GUI
-        for number in range(self.data.actuatorNumber):
-            # REMOVE ACTUATORS FROM CONFIG TAB
-            self.config_actuator_form.removeRow(1) 
-            # REMOVE ACTUATORS FROM CONTROL PANEL TAB
-            self.control_panel_actuators.removeRow(0)
-        self.config_actuators_number.setValue(0)
         self.data.actuatorNumber = 0
 
-        ###############################
-        #### RESET SENSOR SETTINGS ####
-        ###############################
-        self.data.sensorSelectedType = []
-        # DELETE PREVIOUS SENSORS FROM GUI
-        for i in reversed(range(self.control_panel_sensors.rowCount())): 
-            self.control_panel_sensors.removeRow(i)
-        for i in reversed(range(1, self.config_sensor_form.rowCount())): 
+    def resetSensors(self):
+        """
+        PURPOSE
+
+        Resets the sensor configuration to default settings.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # DELETE CONFIGURATION TAB WIDGETS
+        sensorNumber = self.config_sensor_form.rowCount()
+
+        for i in reversed(range(sensorNumber)):
             self.config_sensor_form.removeRow(i)
-            pass
-        
-        self.config_sensors_number.setValue(0)
+
+        # DELETE CONTROL PANEL TAB WIDGETS
+        sensorNumber = self.control_panel_sensors.rowCount()
+
+        for i in reversed(range(sensorNumber)):
+            self.control_panel_sensors.removeRow(i)
+
+        self.data.sensorSelectedType = []
         self.data.sensorNumber = 0
 
-        ###############################
-        #### RESET CAMERA SETTINGS ####
-        ###############################
-        # ANALOG
-        self.data.analogDefaultCameraList = [0] * 4
-        self.data.analogCameraList = []
-        self.config_analog_cameras_number.setValue(0)
-        self.config_analog_cameras_number.clear()
-        self.config_camera_2_list.clear()
-        self.config_camera_3_list.clear()
-        self.config_camera_4_list.clear()
-        # DIGITAL
-        self.data.digitalCameraLabels = ['Camera 1', 'Camera 2', 'Camera 3']
-        self.data.digitalDefaultCameraList = [0, 0, 0]
-        self.data.digitalSelectedCameraList = [0, 1, 2]
-        self.config.setupDigitalCameras()
+    def resetAnalogCameras(self):
+        """
+        PURPOSE
 
-        ###############################
-        ## RESET KEYBINDING SETTINGS ##
-        ###############################
-        numberDelete = len(self.data.keyBindings)
-        for index in range(numberDelete):
-            self.config.removeKeyBinding(numberDelete - index - 1)
+        Resets the analog camera configuration to default settings.
 
-        # RE-ADD DEFAULT KEY BINDING TO SWITCH ROV ORIENTATION IF RESET BUTTON IS PRESSED
-        if resetStatus == True:
-            self.config.addKeyBinding("Switch Orientation", False)
-            self.config.addKeyBinding("Change Sensitivity", False)
-            self.config.addKeyBinding("Yaw Right", False)
-            self.config.addKeyBinding("Yaw Left", False)
-            self.config.addKeyBinding("Yaw Sensitivity", False)
+        INPUT
+
+        NONE
+    
+        RETURNS
+
+        NONE
+        """
+        cameraNumber = self.config_analog_cameras.rowCount()
+
+        for i in reversed(range(cameraNumber)):
+            self.config_analog_cameras.removeRow(i)
+
+        self.data.analogCameraNumber = 0 
+        self.data.analogCameraLabelList = []                  
+        self.data.analogDefaultCameraList = [0 ,1 ,2 ,3]      
+        self.data.analogSelectedCameraList = [0 ,1 ,2 ,3]   
         
+    def resetDigitalCameras(self):
+        """
+        PURPOSE
+
+        Resets the digital camera configuration to default settings.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        cameraNumber = self.config_digital_cameras.rowCount()
+
+        for i in reversed(range(cameraNumber)):
+            self.config_digital_cameras.removeRow(i)
+
+        self.data.digitalCameraNumber = 3 
+        self.data.digitalCameraLabelList = []
+        self.data.digitalCameraAddressList = []
+        self.data.digitalDefaultCameraList = [0, 0, 0]
+        self.data.digitalSelectedCameraList = [0, 0, 0]     
+
+    def resetKeybindings(self):
+        """
+        PURPOSE
+
+        Resets the keybinding configuration to default settings.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+        """
+        bindingNumber = self.config_keybindings_form.rowCount()
+
+        for i in reversed(range(bindingNumber)):
+            self.config_keybindings_form.removeRow(i)
+
+        self.data.keyBindings = []
+    
     #################################
     ##### GUI LINKING FUNCTIONS #####
     #################################
@@ -2597,6 +2688,8 @@ class CONFIG():
 
         self.ui.config_analog_cameras_number.setValue(cameraNumber)
 
+        self.updateAnalogMenus(self.data.analogCameraLabelList, self.data.analogDefaultCameraList)
+
         for i in range(cameraNumber):
             self.addAnalogCamera()
 
@@ -2771,7 +2864,7 @@ class CONFIG():
     #############################
     ## DIGITAL CAMERA SETTINGS ##
     #############################
-    def setupDigitalCameras(self):
+    def setupDigitalCamera(self):
         """
         PURPOSE
 
@@ -2791,6 +2884,8 @@ class CONFIG():
         self.data.digitalSelectedCameraList = self.data.digitalDefaultCameraList.copy()
 
         self.ui.config_digital_cameras_number.setValue(cameraNumber)
+
+        self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList, self.data.digitalSelectedCameraList)
 
         for i in range(cameraNumber):
             self.addDigitalCamera()
@@ -3371,7 +3466,8 @@ class TOOLBAR():
         NONE
         """
         self.ui.printTerminal("Program configuration reset.")
-        self.ui.resetConfig(True)
+        self.ui.resetConfig()
+        self.ui.programSetup()
 
     def writeConfigFile(self):
         """
@@ -3433,6 +3529,7 @@ class TOOLBAR():
         self.data.fileName, _ = QFileDialog.getOpenFileName(self.ui, 'Open File','./','XML File (*.xml)')
         if self.data.fileName != '':
             self.ui.printTerminal("Loading {} configuration file".format(self.data.fileName))
+            self.ui.resetConfig()
             self.ui.configSetup()
         else:
             # SET BACK TO DEFAULT NAME IF USER DOES NOT SELECT A FILE
@@ -3597,7 +3694,6 @@ class DATABASE():
     analogCameraLabelList = []                  # LIST OF AVAILABLE CAMERAS
     analogDefaultCameraList = [0 ,1 ,2 ,3]      # DEFAULT CAMERAS TO SHOW ON STARTUP
     analogSelectedCameraList = [0 ,1 ,2 ,3]     # SELECTED CAMERAS TO SHOW ON EACH FEED
-    analogCameraViewList = [None] * 4       # STORES THE SELECTED EXTERNAL CAMERA FEEDS
     
     # DIGITAL CAMERA SETTINGS
     digitalCameraNumber = 3 
