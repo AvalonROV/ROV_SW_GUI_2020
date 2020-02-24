@@ -53,7 +53,6 @@ class VIEW(QWidget):
         self.camThread.feedStop()
         time.sleep(1)
 
-
     @pyqtSlot(QPixmap)
     def updateCameraFeed(self, frame):
         """
@@ -171,14 +170,14 @@ class CAMERA_CAPTURE(QThread):
 
             # RTSP CAMERA
             if addressType:
-                #print("STARTING INITIALISATION")
+                print("STARTING INITIALISATION")
                 try:
                     self.cameraFeed = VideoCapture(self.address, CAP_FFMPEG)
                     self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
                     self.initiateStatus = True
                 except:
                     self.initiateStatus = False
-                #print("FINISHED INITIALISATION")
+                print("FINISHED INITIALISATION")
 
             # USB CAMERA
             else:
@@ -256,16 +255,12 @@ class CAMERA_CAPTURE(QThread):
         if address != self.address:
             self.address = address
             self.initiateStatus = False
-            print("Changing address to:", self.address)
-
-            #self.feedStop()
-            #self.cameraFeed.release()
-            #RE-INITIATE CAMERA
-            #self.initiateCamera()
-
-            #self.feedBegin()
-
-            #self.start()
+        
+            try:
+                # DISCONNECT FROM CAMERA
+                self.cameraFeed.release()
+            except:
+                pass
 
     def feedStop(self):
         """

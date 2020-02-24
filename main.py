@@ -442,7 +442,7 @@ class UI(QMainWindow):
         self.control_rov_connect.setStyleSheet(self.data.blueButtonDefault)
         
         # CONTROLLER CONNECT BUTTON
-        self.control_controller_connect.clicked.connect(self.control.controllerConnect)
+        self.control_controller_connect.clicked.connect(lambda buttonState = self.control_controller_connect: self.control.controllerConnection(buttonState))
         self.applyGlow(self.control_controller_connect, "#0D47A1", 10)
         self.control_controller_connect.setFixedHeight(self.control_controller_connect.geometry().height() * 1.5)
         self.control_controller_connect.setStyleSheet(self.data.blueButtonDefault)
@@ -525,7 +525,7 @@ class UI(QMainWindow):
         self.config_rov_connect.setStyleSheet(self.data.blueButtonDefault)
         
         # CONTROLLER CONNECT BUTTON
-        self.config_controller_connect.clicked.connect(self.control.controllerConnect)
+        self.config_controller_connect.clicked.connect(lambda buttonState = self.config_controller_connect: self.control.controllerConnection(buttonState))
         self.applyGlow(self.config_controller_connect, "#0D47A1", 10)
         self.config_controller_connect.setFixedHeight(self.config_controller_connect.geometry().height() * 1.5)
         self.config_controller_connect.setStyleSheet(self.data.blueButtonDefault)
@@ -1228,7 +1228,29 @@ class CONTROL_PANEL():
     ############################
     ### CONTROLLER FUNCTIONS ###
     ############################
-    def controllerConnect(self):
+    def controllerConnection(self, buttonState):
+        """
+        PURPOSE
+
+        Determines whether to connect or disconnect from the controller.
+
+        INPUT
+
+        - buttonState = the state of the button (checked or unchecked).
+
+        RETURNS
+
+        NONE
+        """
+        # CONNECT
+        if buttonState:
+            self.controllerConnect()
+
+        # DISCONNECT
+        else:
+            self.controllerDisconnect()
+           
+    def controllerConnect(self):    
         """
         PURPOSE
 
@@ -1241,42 +1263,60 @@ class CONTROL_PANEL():
         RETURNS
 
         NONE
-        """
-        if self.data.controllerConnectButtonStatus == False:
-            
-            # DISABLE CONTROLLER CONNECT BUTTONS
-            self.ui.control_controller_connect.setEnabled(False)
-            self.ui.config_controller_connect.setEnabled(False)
+        """            
+        # DISABLE CONTROLLER CONNECT BUTTONS
+        self.ui.control_controller_connect.setEnabled(False)
+        self.ui.config_controller_connect.setEnabled(False)
 
-            # INITIATE COMMUNICATION WITH THE CONTROLLER
-            connectionStatus, controllerNumber, message = self.controller.findController("Controller (Xbox One For Windows)")
-            self.ui.printTerminal(message)
+        # INITIATE COMMUNICATION WITH THE CONTROLLER
+        connectionStatus, controllerNumber, message = self.controller.findController("Controller (Xbox One For Windows)")
+        self.ui.printTerminal(message)
+        
+        if connectionStatus == True:
+            # START READING CONTROLLER INPUTS IN A TIMED THREAD, RETURN VALUES TO PROCESSING FUNCTIONS
+            self.controller.startControllerEventLoop(controllerNumber, self.processButtons, self.processJoysticks)
             
-            if connectionStatus == True:
-                # START READING CONTROLLER INPUTS IN A TIMED THREAD, RETURN VALUES TO PROCESSING FUNCTIONS
-                self.controller.startControllerEventLoop(controllerNumber, self.processButtons, self.processJoysticks)
-                
-                # UPDATE BUTTON STYLE
-                self.data.controllerConnectButtonStatus = True
-                self.ui.control_controller_connect.setText('DISCONNECT')
-                self.ui.config_controller_connect.setText('DISCONNECT')
-                self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonClicked)
-                self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonClicked)
-
-            # ENABLE CONTROLLER CONNECT BUTTONS
-            self.ui.control_controller_connect.setEnabled(True)
-            self.ui.config_controller_connect.setEnabled(True)
+            # UPDATE BUTTON STYLE
+            self.data.controllerConnectButtonStatus = True
+            self.ui.control_controller_connect.setText('DISCONNECT')
+            self.ui.config_controller_connect.setText('DISCONNECT')
+            self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonClicked)
+            self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonClicked)
 
         else:
-            self.data.controllerConnectButtonStatus = False
-            self.ui.control_controller_connect.setText('CONNECT')
-            self.ui.config_controller_connect.setText('CONNECT')
-            self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonDefault)  
-            self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonDefault)
-            # STOP UPDATING CONTROLLER VALUES  
-            self.controller.stopControllerEventLoop()
-            # UNINITIALISE JOYSTICK MODULE
-            quit()
+            self.controllerDisconnect()
+
+        # ENABLE CONTROLLER CONNECT BUTTONS
+        self.ui.control_controller_connect.setEnabled(True)
+        self.ui.config_controller_connect.setEnabled(True)
+            
+    def controllerDisconnect(self):
+        """
+        PURPOSE
+
+        Disconnects from the controller.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # MODIFY BUTTON STYLE
+        self.ui.control_controller_connect.setText('CONNECT')
+        self.ui.control_controller_connect.setChecked(False)
+        self.ui.config_controller_connect.setText('CONNECT')
+        self.ui.config_controller_connect.setChecked(False)
+        self.ui.control_controller_connect.setStyleSheet(self.data.blueButtonDefault)  
+        self.ui.config_controller_connect.setStyleSheet(self.data.blueButtonDefault)
+        
+        # STOP UPDATING CONTROLLER VALUES  
+        self.controller.stopControllerEventLoop()
+        
+        # UNINITIALISE JOYSTICK MODULE
+        quit()
 
     def processButtons(self, buttonStates):
         """
