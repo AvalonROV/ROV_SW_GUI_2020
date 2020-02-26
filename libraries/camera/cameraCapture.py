@@ -28,7 +28,7 @@ class VIEW(QWidget):
         self.setLayout(layout)
 
         self.address1 = 0
-        self.address2 = "rtsp://192.168.0.101/user=admin&password=&channel=1&stream=0.sdp?"
+        self.address2 = "rtsp://192.168.0.100/user=admin&password=&channel=1&stream=0.sdp?"
 
         # INITIATE CAMERA
         self.camThread = CAMERA_CAPTURE()
@@ -117,29 +117,32 @@ class CAMERA_CAPTURE(QThread):
                 
                 # 30 FPS CAPTURE RATE
                 if elapsedTime > 1/30:
-                    
-                    # CAPTURE FRAME
-                    self.cameraFeed.grab()
-                    status, frame = self.cameraFeed.read()
+                    try:
+                        # CAPTURE FRAME
+                        self.cameraFeed.grab()
+                        status, frame = self.cameraFeed.read()
 
-                    # IF FRAME IS CAPTURED            
-                    if status:
-                        previousTime = datetime.now()
-                        
-                        # RUN IMAGE THROUGH VISION PROCESSING ALGORITHM
-                        if self.task != None:
-                            frame = self.task.runAlgorithm(frame)
+                        # IF FRAME IS CAPTURED            
+                        if status:
+                            previousTime = datetime.now()
+                            
+                            # RUN IMAGE THROUGH VISION PROCESSING ALGORITHM
+                            if self.task != None:
+                                frame = self.task.runAlgorithm(frame)
 
-                        # CONVERT TO PIXMAP
-                        cameraFrame = self.convertFrame(frame)
-                        
-                        # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
-                        self.cameraNewFrameSignal.emit(cameraFrame)
+                            # CONVERT TO PIXMAP
+                            cameraFrame = self.convertFrame(frame)
+                            
+                            # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
+                            self.cameraNewFrameSignal.emit(cameraFrame)
+
+                        else:
+                            # DEFAULT IMAGE
+                            self.cameraNewFrameSignal.emit(defaultImage)
+                            break
                     
-                    else:
-                        # DEFAULT IMAGE
-                        self.cameraNewFrameSignal.emit(defaultImage)
-                        break
+                    except:
+                        pass
 
                 elapsedTime = (datetime.now() - previousTime).total_seconds()
 
@@ -170,14 +173,14 @@ class CAMERA_CAPTURE(QThread):
 
             # RTSP CAMERA
             if addressType:
-                print("STARTING INITIALISATION")
+                #print("STARTING INITIALISATION")
                 try:
                     self.cameraFeed = VideoCapture(self.address, CAP_FFMPEG)
                     self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
                     self.initiateStatus = True
                 except:
                     self.initiateStatus = False
-                print("FINISHED INITIALISATION")
+                #print("FINISHED INITIALISATION")
 
             # USB CAMERA
             else:

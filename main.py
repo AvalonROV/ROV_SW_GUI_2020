@@ -537,6 +537,11 @@ class UI(QMainWindow):
         self.config_digital_cameras_number.editingFinished.connect(self.config.changeDigitalCamerasNumber)
         self.config_actuators_number.editingFinished.connect(self.config.changeActuatorsNumber)
 
+        # THRUSTER TESTING
+        self.config_thruster_test_speed.valueChanged.connect(self.config.changeThrusterTestSpeed)
+        self.config_thruster_test_speed.setValue(self.data.thrusterTestSpeed)
+        self.config_thruster_speed.setText("{}%".format(self.data.thrusterTestSpeed))
+
         # DIGITAL DEFAULT CAMERA FEEDS
         self.config_digital_default_1.activated.connect(lambda index, camera = 0: self.config.changeDigitalDefault(index, camera))
         self.config_digital_default_2.activated.connect(lambda index, camera = 1: self.config.changeDigitalDefault(index, camera))
@@ -595,8 +600,6 @@ class UI(QMainWindow):
         """
         self.cameraFeeds = [self.camera_feed_1, self.camera_feed_2, self.camera_feed_3]
 
-        # INITIATE CAMERAS IN QTHREADS
-        
         # PRIMARY CAMERA        
         self.camThread1 = CAMERA_CAPTURE()
         self.camThread1.cameraNewFrameSignal.connect(self.updateCamera1Feed)
@@ -1607,9 +1610,13 @@ class CONTROL_PANEL():
                     except:
                         pass
 
+            # IF ROVER IS BEING DRIVEN IN REVERSE
+            if self.data.rovControlDirection == False:
+                mappedThrusterSpeeds = self.changeThrusterOrientation(mappedThrusterSpeeds)
+
             # REVERSE THE DIRECTION OF THRUSTERS WHERE NECCESSARY
             mappedThrusterSpeeds = self.changeThrusterDirection(mappedThrusterSpeeds)
-            
+
             # SEND COMMAND TO ROV
             self.comms.setThrusters(mappedThrusterSpeeds)
 
@@ -1732,6 +1739,32 @@ class CONTROL_PANEL():
                 tempThrusterSpeeds[i] = 1000 - speed
 
         return tempThrusterSpeeds
+
+    def changeThrusterOrientation(self, thrusterSpeeds):
+        """
+        PURPOSE
+
+        Maps the thruster location to drive the ROV in reverse.
+
+        INPUT
+
+        - thrusterSpeeds = an array containing the speed of each thruster.
+
+        RETURNS
+
+        - tempThrusterSpeeds = an array containing the filtered speed of each thruster.
+        """
+        # LOCATION MAP OF EACH THRUSTER WHEN DRIVING IN REVERSE
+        arrayMap = [2,3,0,1,6,7,4,5]
+
+        mappedThrusterSpeeds = [500] * 8
+        
+        # MAPS EACH THRUSTER SPEED TO NEW POSITION
+        for i in range(8):
+            thrusterIndex = arrayMap[i]
+            mappedThrusterSpeeds[i] = thrusterSpeeds[thrusterIndex]
+
+        return mappedThrusterSpeeds
 
     ###########################
     ##### TIMER FUNCTIONS #####
@@ -2333,7 +2366,7 @@ class CONFIG():
 
         NONE
         """
-        testSpeed = 550
+        testSpeed = int(500 + (499 * self.data.thrusterTestSpeed/100))
 
         if state:
             buttonObject.setStyleSheet(self.data.blueButtonClicked)
@@ -2349,6 +2382,27 @@ class CONFIG():
             self.control.changeThrusters(speeds, True)
             buttonObject.setStyleSheet("")
             
+    def changeThrusterTestSpeed(self):
+        """
+        PURPOSE
+
+        Changes the speed the thrusters spin when the test button is pressed.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        testSpeed = self.ui.config_thruster_test_speed.value()
+
+        # UPDATE LABEL
+        self.ui.config_thruster_speed.setText("{}%".format(testSpeed))
+
+        self.data.thrusterTestSpeed = testSpeed
+
     #########################
     ### ACTUATOR SETTINGS ###
     #########################
@@ -3717,6 +3771,7 @@ class DATABASE():
     thrusterPositionList = ['None', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     thrusterPosition = ['None'] * 8
     thrusterReverseList = [False] * 8
+    thrusterTestSpeed = 10
     yawButtonStates = [0,0]
     yawButtonStatesPrevious = [0,0]
 
