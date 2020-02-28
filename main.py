@@ -5,7 +5,7 @@
 # PYQT5 MODULES
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QGroupBox, QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
+from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
                             QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
                             QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
                             QFileDialog, QGraphicsDropShadowEffect)
@@ -788,7 +788,7 @@ class UI(QMainWindow):
             darkPalette = QPalette()
             darkPalette.setColor(QPalette.Window, QColor("#161616"))        # MAIN WINDOW BACKGROUND COLOR
             darkPalette.setColor(QPalette.WindowText, QColor("#fafafa"))    # TEXT COLOR
-            darkPalette.setColor(QPalette.Base,QColor("#323232"))           # TEXT ENTRY BACKGROUND COLOR
+            darkPalette.setColor(QPalette.Base,QColor("#343434"))           # TEXT ENTRY BACKGROUND COLOR
             darkPalette.setColor(QPalette.Text,QColor("#fafafa"))           # TEXT ENTRY COLOR
             darkPalette.setColor(QPalette.Button,QColor("#353535"))         # BUTTON COLOR
             darkPalette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR       
@@ -837,6 +837,15 @@ class UI(QMainWindow):
             self.data.buttonRed = 'color: black; background-color: #c62828;'
             self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
             self.data.blueButtonDefault = 'color: white; font-weight: bold;'
+            self.data.settingsFrame = "QFrame {background-color: #282828; border-radius: 20px;}"
+            self.data.thrusterFrame = "QFrame {background-color: #01579B; border-radius: 20px;}"
+            self.data.actuatorFrame = "QFrame {background-color: #004D40; border-radius: 20px;}"
+            self.data.keybindingFrame = "QFrame {background-color: #F44336; border-radius: 20px;}"
+            self.data.digitalCameraFrame = "QFrame {background-color: #37474f; border-radius: 20px;}"
+            self.data.infoLabel = "color: rgba(255, 255, 255, 0.7)"
+        
+            # ALTERNATE FRAME COLOUR
+            #2a2b2d
 
         # LIGHT THEME
         else:
@@ -849,6 +858,12 @@ class UI(QMainWindow):
             self.data.buttonRed = 'color: black; background-color: #c62828;'
             self.data.blueButtonClicked = 'background-color: #0D47A1; color: white; font-weight: bold;'
             self.data.blueButtonDefault = 'color: #0D47A1; font-weight: bold;'
+            self.data.settingsFrame = ""
+            self.data.thrusterFrame = ""
+            self.data.actuatorFrame = ""
+            self.data.keybindingbFrame = ""
+            self.data.digitalCameraFrame = ""
+            self.data.infoLabel = ""
 
     def setLogo(self, theme):
         """
@@ -877,6 +892,37 @@ class UI(QMainWindow):
             avalonPixmap = QPixmap('graphics/logo.png')
             avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
             self.avalon_logo.setPixmap(avalonPixmap)
+
+    def setColouredFrame(self, labelObject, layoutObject, labelStyleSheet, layoutStyleSheet):
+        """
+        PURPOSE
+
+        Applies a coloured frame around a group of widgets on the configuration tab to make it easier to read.
+
+        INPUT
+
+        - labelObject = pointer to the label object.
+        - layoutObject = pointer to the layout containing the configuration widgets.
+        - styleSheet = the style sheet to apply to the frame.
+
+        RETURNS
+
+        - labelFrame = the label with a frame applied.
+        - layoutFrame = the group of widgets with a frame applied.
+        """
+        # APPLY COLOURED FRAME TO LABEL OBJECT
+        labelFrame = QFrame()
+        labelLayout = QGridLayout()
+        labelLayout.addWidget(labelObject)
+        labelFrame.setStyleSheet(labelStyleSheet)
+        labelFrame.setLayout(labelLayout)
+
+        # APPLY COLOURED FRAME TO GROUP OF WIDGETS
+        layoutFrame = QFrame()
+        layoutFrame.setStyleSheet(layoutStyleSheet)
+        layoutFrame.setLayout(layoutObject)
+
+        return labelFrame, layoutFrame
 
     ###########################
     ##### OTHER FUNCTIONS #####
@@ -2285,16 +2331,21 @@ class CONFIG():
         layout = QGridLayout()
         label1 = QLabel('ROV Location')
         label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        label1.setStyleSheet(self.data.infoLabel)
         layout.addWidget(label1,0,0)
         layout.addWidget(thrusterLocation,0,1)
         label2 = QLabel('Reversed')
         label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        label2.setStyleSheet(self.data.infoLabel)
         layout.addWidget(label2,1,0)
         layout.addWidget(thrusterReverseCheck,1,1)
         layout.addWidget(thrusterTest,2,1)
 
+        # APPLY COLOURED FRAME
+        labelFrame, layoutFrame = self.ui.setColouredFrame(thrusterLabel, layout, self.data.thrusterFrame, self.data.settingsFrame)
+
         # ADD TO CONFIG TAB FORM LAYOUT
-        thrusterLayout.addRow(thrusterLabel, layout)
+        thrusterLayout.addRow(labelFrame, layoutFrame)
 
         # LINK EACH THRUSTER CONFIGURATION TO SAME SLOT, PASSING THE MENU INDEX, THRUSTER SELECTED, AND WHICH SETTING HAS BEEN CHANGED (POSITION, REVERSE, TEST, CONFIG)
         thrusterLocation.activated.connect(lambda index, thruster = thrusterNumber: self.thrusterPosition(index, thruster)) 
@@ -2327,7 +2378,8 @@ class CONFIG():
                 # SET BINDING TO NONE
                 self.data.thrusterPosition[i] = self.data.thrusterPositionList[0]
                 # FIND BINDING MENU WIDGET
-                layout = self.ui.config_thruster_form.itemAt((2 * i) + 1).layout()
+                layout = self.ui.config_thruster_form.itemAt((2 * i) + 1).widget()
+                layout = layout.layout()
                 widget = layout.itemAt(1).widget()
                 # SET TO NONE
                 widget.setCurrentIndex(0)
@@ -2509,19 +2561,27 @@ class CONFIG():
         actuatorLayout = QGridLayout()
         label1 = QLabel('Actuator Name')
         label1.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        label1.setStyleSheet(self.data.infoLabel)
         actuatorLayout.addWidget(label1,0,0)
         actuatorLayout.addWidget(actuatorLabel,0,1)
+        
         label2 = QLabel('Default State')
         label2.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        label2.setStyleSheet(self.data.infoLabel)
         actuatorLayout.addWidget(label2,1,0)
         actuatorLayout.addWidget(state1,1,1)
+        
         label3 = QLabel('Actuated State')
         label3.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        label3.setStyleSheet(self.data.infoLabel)
         actuatorLayout.addWidget(label3,2,0)
         actuatorLayout.addWidget(state2,2,1)
 
+        # APPLY COLOURED FRAME
+        labelFrame, layoutFrame = self.ui.setColouredFrame(actuatorNumber, actuatorLayout, self.data.actuatorFrame, self.data.settingsFrame)
+
         # ADD TO CONFIGURATION TAB
-        self.ui.config_actuator_form.addRow(actuatorNumber, actuatorLayout)
+        self.ui.config_actuator_form.addRow(labelFrame, layoutFrame)
         
         # ADD TO CONTROL PANEL TAB
         self.ui.control_panel_actuators.addRow(actuatorName, actuatorToggle)
@@ -3136,8 +3196,11 @@ class CONFIG():
         layout.addWidget(QLabel("Address"),1,0)
         layout.addWidget(cameraAddress,1,1)
 
+        # APPLY COLOURED FRAME
+        labelFrame, layoutFrame = self.ui.setColouredFrame(cameraNumber, layout, self.data.digitalCameraFrame, self.data.settingsFrame)
+
         # ADD TO CONFIGURATION TAB
-        self.ui.config_digital_cameras.addRow(cameraNumber, layout)
+        self.ui.config_digital_cameras.addRow(labelFrame, layoutFrame)
 
         # UPDATE MENUS
         self.updateDigitalMenus(self.data.digitalCameraLabelList, self.data.digitalDefaultCameraList, self.data.digitalSelectedCameraList)
@@ -3280,7 +3343,8 @@ class CONFIG():
         digitalNumber = layoutWidget.rowCount()
 
         for i in range(digitalNumber):
-            layout = layoutWidget.itemAt((i * 2) + 1).layout()
+            layout = layoutWidget.itemAt((i * 2) + 1).widget()
+            layout = layout.layout()
             widget = layout.itemAt(3).widget()
             widget.setText(addressList[i])
 
@@ -3353,8 +3417,11 @@ class CONFIG():
         keybindingLayout.addWidget(currentBinding,0,0)
         keybindingLayout.addWidget(setBinding,1,0)
 
+        # APPLY COLOURED FRAME
+        labelFrame, layoutFrame = self.ui.setColouredFrame(keybindingLabel, keybindingLayout, self.data.keybindingFrame, self.data.settingsFrame)
+
         # ADD TO CONFIG TAB KEYBINDINGS FORM
-        self.ui.config_keybindings_form.addRow(keybindingLabel, keybindingLayout)
+        self.ui.config_keybindings_form.addRow(labelFrame, layoutFrame)
         
         # LINK KEYBINDING WIDGETS TO SLOT - PASS LAYOUT INDEX NUMBER, THE OBJECT, AND AN INDENTIFIER
         currentBinding.activated.connect(lambda binding, index = bindingNumber: self.setKeyBindings(binding, index))
@@ -3416,7 +3483,8 @@ class CONFIG():
                     # SET BINDING TO NONE
                     self.data.keyBindings[i] = 'None'
                     # FIND BINDING MENU WIDGET
-                    layout = self.ui.config_keybindings_form.itemAt((2 * i) + 1).layout()
+                    layout = self.ui.config_keybindings_form.itemAt((2 * i) + 1).widget()
+                    layout = layout.layout()
                     widget = layout.itemAt(0).widget()
                     # SET SELECTED MENU ITEM TO NONE
                     widget.setCurrentIndex(0)
@@ -3446,7 +3514,8 @@ class CONFIG():
 
             # DISABLE ALL AUTOBINDING BUTTONS UNTIL BINDING HAS BEEN FOUND
             for item in range(self.ui.config_keybindings_form.rowCount()):
-                layout = self.ui.config_keybindings_form.itemAt((2 * item) + 1).layout()
+                layout = self.ui.config_keybindings_form.itemAt((2 * item) + 1).widget()
+                layout = layout.layout()
                 widget = layout.itemAt(1).widget()
                 widget.setEnabled(False)
             
@@ -3463,7 +3532,8 @@ class CONFIG():
 
             # ENABLE ALL AUTOBINDING BUTTONS
             for item in range(self.ui.config_keybindings_form.rowCount()):
-                layout = self.ui.config_keybindings_form.itemAt((2 * item) + 1).layout()
+                layout = self.ui.config_keybindings_form.itemAt((2 * item) + 1).widget()
+                layout = layout.layout()
                 widget = layout.itemAt(1).widget()
                 widget.setEnabled(True)
 
@@ -3752,6 +3822,12 @@ class DATABASE():
     buttonRed = ""
     blueButtonClicked = ""
     blueButtonDefault = ""
+    settingsFrame = ""
+    thrusterFrame = ""
+    actuatorFrame = ""
+    keybindingFrame = ""
+    digitalCameraFrame = ""
+    infoLabel = ""
 
     rovControlDirection = True       # ROV CONTROL ORIENTATION (TRUE = FORWARD, FALSE = REVERSE)
     controllerSensitivity = 2/3      # 1/3, 2/3 or 3/3 controller sensitivity

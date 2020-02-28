@@ -149,6 +149,11 @@ class CAMERA_CAPTURE(QThread):
             QThread.msleep(500)
 
             self.cameraNewFrameSignal.emit(defaultImage)
+            
+        try:
+            self.cameraFeed.release()
+        except:
+            pass
 
     def initiateCamera(self):
         """
