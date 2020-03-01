@@ -23,6 +23,7 @@ from pygame import init
 from pygame.joystick import quit, Joystick, get_count
 from pygame.event import Event, get
 import serial
+from math import ceil
 import time
 import numpy as np
 import subprocess
@@ -912,6 +913,7 @@ class UI(QMainWindow):
         """
         # APPLY COLOURED FRAME TO LABEL OBJECT
         labelFrame = QFrame()
+        #labelFrame.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
         labelLayout = QGridLayout()
         labelLayout.addWidget(labelObject)
         labelFrame.setStyleSheet(labelStyleSheet)
@@ -1054,6 +1056,9 @@ class UI(QMainWindow):
         NONE
         """
         self.changePixmapSize()
+
+        self.reorderConfigGrid()
+
         QMainWindow.resizeEvent(self, event)
 
     def splitterEvent(self):
@@ -1097,6 +1102,121 @@ class UI(QMainWindow):
                 camera.setPixmap(cameraPixmap)  
             except:
                 pass
+
+    def reorderConfigGrid(self):
+        """
+        PURPOSE
+
+        Adjusts the number of rows/columns in the configuration tab depending on the window size so all the settings are clearly visible.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # GET WINDOW DIMENSIONS
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+
+        widthProportion = width/self.data.screenWidth
+
+        if widthProportion < 0.5:
+            objects = self.unparentGridWidgets()
+            self.setNewGridOrder(objects, 3)
+
+        elif widthProportion < 0.75:
+            objects = self.unparentGridWidgets()
+            self.setNewGridOrder(objects, 4)
+
+        else:
+            objects = self.unparentGridWidgets()
+            self.setNewGridOrder(objects, 5)
+
+    def unparentGridWidgets(self):
+        """
+        PURPOSE
+
+        Removes the group box from each grid location and stores them in an array.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        - objects = an array containing the children of the grid layout.
+        """
+        # FIND ALL GROUP BOXES IN THE GRID LAYOUT (IN ORDER FROM TOP LEFT TO BOTTOM RIGHT)
+        objects = []
+
+        rowCount = self.config_grid_layout.rowCount()
+        columnCount = self.config_grid_layout.columnCount()
+
+        for row in range(rowCount):
+            for column in range(columnCount):
+                item = self.config_grid_layout.itemAtPosition(row, column)
+
+                # IF GRID LOCATION CONTAINS OBJECT
+                if item != None:
+                    widget = item.widget()
+                    objects.append(widget)
+
+        # UNPARENT ALL GROUP BOXES FROM GRID LAYOUT
+        for groupBox in objects:
+            self.config_grid_layout.removeWidget(groupBox)
+
+        return objects
+
+    def setNewGridOrder(self, objects, columnNumber):
+        """
+        PURPOSE
+
+        Sets the number of columns in the configuration tab grid layout.
+
+        INPUT
+
+        - objects = array containing the pointers to the group bxoe.
+
+        RETURNS
+
+        NONE
+        """
+        # NUMBER OF GROUP BOXES TO DISPLAY IN THE GRID LAYOUT
+        widgetCount = len(objects)
+
+        newColumnCount = columnNumber
+        newRowCount = ceil(widgetCount/newColumnCount)
+        
+        index = 0
+
+        # ADD GROUP BOXES TO NEW GRID LOCATIONS
+        for row in range(newRowCount):
+            for column in range(newColumnCount):
+                try:
+                    self.config_grid_layout.addWidget(objects[index], row, column)
+                    index += 1   
+                except:
+                    pass
+
+        rowCount = self.config_grid_layout.rowCount()            
+        columnCount = self.config_grid_layout.columnCount()
+
+        # HIDE UNUSED GRID LOCATIONS
+        for row in range(rowCount):
+             for column in range(columnCount):
+                item = self.config_grid_layout.itemAtPosition(row, column)
+
+                # IF GRID LOCATION CONTAINS OBJECT
+                if item == None:
+                    self.config_grid_layout.setRowStretch(row, 0)
+                    self.config_grid_layout.setColumnStretch(column, 0)
+
+                else:
+                    self.config_grid_layout.setRowStretch(row, 1)
+                    self.config_grid_layout.setColumnStretch(column, 1)
 
     def programExit(self):
         """
@@ -1195,15 +1315,17 @@ class CONTROL_PANEL():
         # DISABLE BUTTONS TO AVOID DOUBLE CLICKS
         self.ui.control_rov_connect.setEnabled(False)
         self.ui.config_rov_connect.setEnabled(False)
-        
-        # FIND ALL AVAILABLE COM PORTS
-        self.ui.printTerminal('Searching for available COM ports...')
-        
-        availableComPorts, rovComPort, identity = self.comms.findComPorts(self.ui.config_com_port_list, 115200, self.data.rovID)
-        self.data.rovComPort = rovComPort
-        
-        self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts)))
-        self.ui.printTerminal('Device Identity: {}'.format(identity))
+
+        # AUTO CONNECT ENABLED    
+        if self.ui.config_auto_connect.isChecked():
+            # FIND ALL AVAILABLE COM PORTS
+            self.ui.printTerminal('Searching for available COM ports...')
+            availableComPorts, rovComPort, identity = self.comms.findComPorts(self.ui.config_com_port_list, 115200, self.data.rovID)
+            self.data.rovComPort = rovComPort
+            self.ui.printTerminal("{} available COM ports found.".format(len(availableComPorts)))
+            self.ui.printTerminal('Device Identity: {}'.format(identity))
+        else:
+            rovComPort = self.data.rovComPort
         
         # ATTEMPT CONNECTION TO ROV COM PORT
         status, message = self.comms.serialConnect(rovComPort, 115200)
@@ -2243,8 +2365,9 @@ class CONFIG():
 
         NONE
         """
-        ### FEATURE NOT YET IMPLEMENTED ###
-        pass
+        comPorts = [self.ui.config_com_port_list.itemText(i) for i in range(self.ui.config_com_port_list.count())] 
+
+        self.data.rovComPort = comPorts[index]
 
     def refreshComPorts(self):
         """
@@ -3399,7 +3522,6 @@ class CONFIG():
         # CREATE CONFIGURATION TAB WIDGETS
         keybindingLabel = QLabel(label)
         keybindingLabel.setStyleSheet("font-weight: bold;")
-        keybindingLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         currentBinding = QComboBox()
         currentBinding.addItems(self.data.availableKeyBindings)
         
