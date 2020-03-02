@@ -5,11 +5,10 @@
 # PYQT5 MODULES
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, QApplication, QComboBox, 
-                            QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
-                            QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
-                            QFileDialog, QGraphicsDropShadowEffect)
-from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QIcon, QFont, QColor, QPalette, QPainter
+from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
+                            QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
+                            QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect, QShortcut)
+from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QKeyEvent, QKeySequence, QIcon, QFont, QColor, QPalette, QPainter
 
 # ADDITIONAL MODULES
 import sys, os
@@ -108,13 +107,16 @@ class UI(QMainWindow):
         # RESIZE GUI PIXMAPS WHEN WINDOW IS RESIZED
         self.resizeEvent(QResizeEvent(self.size(), QSize()))
 
+        # KEY PRESS EVENTS
+        #self.keyPressEvent(QKeyEvent)
+
         # INITIAL STARTUP MESSAGE
         self.printTerminal("Welcome to the Avalon ROV control interface.")
         self.printTerminal("Click 'Help' on the taskbar to access the user manual.")
         self.printTerminal("Connect to the ROV and CONTROLLER to get started.")
     
         # INITIALISE UI
-        self.showMaximized()
+        self.showFullScreen()
 
     ###############################
     ### CONFIGURATION FUNCTIONS ###
@@ -582,6 +584,10 @@ class UI(QMainWindow):
         self.toolbar_open_github.triggered.connect(self.toolbar.openGitHub)
         self.toolbar_toggle_theme.triggered.connect(self.toolbar.toggleTheme)
 
+        # CTRL+S SAVE SETTINGS KEYBOARD SHORTCUT
+        saveShortcut = QShortcut(QKeySequence('Ctrl+S'), self)
+        saveShortcut.activated.connect(self.toolbar.saveSettings) 
+ 
     #############################
     ### CAMERA FEED FUNCTIONS ###
     #############################
@@ -841,7 +847,7 @@ class UI(QMainWindow):
             self.data.settingsFrame = "QFrame {background-color: #282828; border-radius: 20px;}"
             self.data.thrusterFrame = "QFrame {background-color: #01579B; border-radius: 20px;}"
             self.data.actuatorFrame = "QFrame {background-color: #004D40; border-radius: 20px;}"
-            self.data.keybindingFrame = "QFrame {background-color: #F44336; border-radius: 20px;}"
+            self.data.keybindingFrame = "QFrame {background-color: #d32f2f; border-radius: 20px;}"
             self.data.digitalCameraFrame = "QFrame {background-color: #37474f; border-radius: 20px;}"
             self.data.infoLabel = "color: rgba(255, 255, 255, 0.7)"
         
@@ -925,6 +931,209 @@ class UI(QMainWindow):
         layoutFrame.setLayout(layoutObject)
 
         return labelFrame, layoutFrame
+
+    ###########################
+    #### SCALING FUNCTIONS ####
+    ###########################
+
+    def resizeEvent(self, event):
+        """
+        PURPOSE
+
+        Function is called whenever the programs window size is changed.
+
+        INPUT
+
+        - event = QResizeEvent event.
+
+        RETURNS
+
+        NONE
+        """
+        self.changePixmapSize()
+        self.reorderConfigGrid()
+
+        QMainWindow.resizeEvent(self, event)
+
+    def splitterEvent(self):
+        """
+        PURPOSE
+
+        Function is called whenever the control panel splitter is activated.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        self.changePixmapSize()
+        
+    def changePixmapSize(self): 
+        """
+        PURPOSE
+
+        Dynamically scales all the pixmap objects in the program.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # UPDATE PIXMAP SIZE ON MOSAIC TASK POPUP WINDOW
+        self.control.mosaicPopup.imageResizeEvent()
+
+        # UPDATE SIZE OF EACH CAMERA FEED
+        for camera in self.cameraFeeds:
+            try:
+                camSize = [camera.size().width(), camera.size().height()]
+                cameraPixmap = camera.pixmap().scaled(camSize[0], camSize[1], Qt.KeepAspectRatio)
+                camera.setPixmap(cameraPixmap)  
+            except:
+                pass
+
+    def reorderConfigGrid(self):
+        """
+        PURPOSE
+
+        Adjusts the number of rows/columns in the configuration tab depending on the window size so all the settings are clearly visible.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        # GET WINDOW DIMENSIONS
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+
+        widthProportion = width/self.data.screenWidth
+
+        if widthProportion < 0.6:
+            objects = self.unparentGridWidgets()
+            self.setNewGridOrder(objects, 3)
+            self.setGridStretch()
+
+        elif widthProportion < 0.8:
+            objects = self.unparentGridWidgets()
+            self.setNewGridOrder(objects, 4)
+            self.setGridStretch()
+
+        else:
+            objects = self.unparentGridWidgets()
+            self.setNewGridOrder(objects, 5)
+            self.setGridStretch()
+
+    def unparentGridWidgets(self):
+        """
+        PURPOSE
+
+        Removes the group box from each grid location and stores them in an array.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        - objects = an array containing the children of the grid layout.
+        """
+        # FIND ALL GROUP BOXES IN THE GRID LAYOUT (IN ORDER FROM TOP LEFT TO BOTTOM RIGHT)
+        objects = []
+
+        rowCount = self.config_grid_layout.rowCount()
+        columnCount = self.config_grid_layout.columnCount()
+
+        for row in range(rowCount):
+            for column in range(columnCount):
+                item = self.config_grid_layout.itemAtPosition(row, column)
+
+                # IF GRID LOCATION CONTAINS OBJECT
+                if item != None:
+                    widget = item.widget()
+                    objects.append(widget)
+
+        # UNPARENT ALL GROUP BOXES FROM GRID LAYOUT
+        for groupBox in objects:
+            self.config_grid_layout.removeWidget(groupBox)
+
+        return objects
+
+    def setNewGridOrder(self, objects, columnNumber):
+        """
+        PURPOSE
+
+        Sets the number of columns in the configuration tab grid layout.
+
+        INPUT
+
+        - objects = array containing the pointers to the group bxoe.
+
+        RETURNS
+
+        NONE
+        """
+        # NUMBER OF GROUP BOXES TO DISPLAY IN THE GRID LAYOUT
+        widgetCount = len(objects)
+
+        newColumnCount = columnNumber
+        newRowCount = ceil(widgetCount/newColumnCount)
+        
+        index = 0
+
+        # ADD GROUP BOXES TO NEW GRID LOCATIONS
+        for row in range(newRowCount):
+            for column in range(newColumnCount):
+                try:
+                    self.config_grid_layout.addWidget(objects[index], row, column)
+                    index += 1   
+                except:
+                    pass
+
+    def setGridStretch(self):
+        """
+        PURPOSE
+
+        Sets the stretch of each row and column in the grid layout to make the size of each group box equal.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        rowCount = self.config_grid_layout.rowCount()            
+        columnCount = self.config_grid_layout.columnCount()
+
+        # HIDE UNUSED ROWS
+        for row in range(rowCount):
+            self.config_grid_layout.setRowStretch(row, 0)
+            for column in range(columnCount):
+                item = self.config_grid_layout.itemAtPosition(row, column)
+
+                # IF OBJECT EXISTS ON CURRENT GRID ROW
+                if item != None:
+                    self.config_grid_layout.setRowStretch(row, 1)
+                
+        # HIDE UNUSED COLUMNS
+        for column in range(columnCount):
+            self.config_grid_layout.setColumnStretch(column, 0)
+            for row in range(rowCount):
+                item = self.config_grid_layout.itemAtPosition(row, column)
+
+                # IF OBJECT EXISTS ON CURRENT GRID ROW
+                if item != None:
+                    self.config_grid_layout.setColumnStretch(column, 1)
 
     ###########################
     ##### OTHER FUNCTIONS #####
@@ -1041,182 +1250,29 @@ class UI(QMainWindow):
         string = time + " -> " + str(text)
         self.config_terminal.appendPlainText(str(string))
 
-    def resizeEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         """
         PURPOSE
 
-        Function is called whenever the programs window size is changed.
+        Handles key press events.
 
         INPUT
 
-        - event = QResizeEvent event.
+        - event = the key press event.
 
         RETURNS
 
         NONE
         """
-        self.changePixmapSize()
+        keyPress = event.key()
 
-        self.reorderConfigGrid()
+        # EXIT FULL SCREEN
+        if keyPress == Qt.Key_Escape:
+            self.showMaximized()
 
-        QMainWindow.resizeEvent(self, event)
-
-    def splitterEvent(self):
-        """
-        PURPOSE
-
-        Function is called whenever the control panel splitter is activated.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        self.changePixmapSize()
-        
-    def changePixmapSize(self): 
-        """
-        PURPOSE
-
-        Dynamically scales all the pixmap objects in the program.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        # UPDATE PIXMAP SIZE ON MOSAIC TASK POPUP WINDOW
-        self.control.mosaicPopup.imageResizeEvent()
-
-        # UPDATE SIZE OF EACH CAMERA FEED
-        for camera in self.cameraFeeds:
-            try:
-                camSize = [camera.size().width(), camera.size().height()]
-                cameraPixmap = camera.pixmap().scaled(camSize[0], camSize[1], Qt.KeepAspectRatio)
-                camera.setPixmap(cameraPixmap)  
-            except:
-                pass
-
-    def reorderConfigGrid(self):
-        """
-        PURPOSE
-
-        Adjusts the number of rows/columns in the configuration tab depending on the window size so all the settings are clearly visible.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        # GET WINDOW DIMENSIONS
-        width = self.frameGeometry().width()
-        height = self.frameGeometry().height()
-
-        widthProportion = width/self.data.screenWidth
-
-        if widthProportion < 0.5:
-            objects = self.unparentGridWidgets()
-            self.setNewGridOrder(objects, 3)
-
-        elif widthProportion < 0.75:
-            objects = self.unparentGridWidgets()
-            self.setNewGridOrder(objects, 4)
-
-        else:
-            objects = self.unparentGridWidgets()
-            self.setNewGridOrder(objects, 5)
-
-    def unparentGridWidgets(self):
-        """
-        PURPOSE
-
-        Removes the group box from each grid location and stores them in an array.
-
-        INPUT
-
-        NONE
-
-        RETURNS
-
-        - objects = an array containing the children of the grid layout.
-        """
-        # FIND ALL GROUP BOXES IN THE GRID LAYOUT (IN ORDER FROM TOP LEFT TO BOTTOM RIGHT)
-        objects = []
-
-        rowCount = self.config_grid_layout.rowCount()
-        columnCount = self.config_grid_layout.columnCount()
-
-        for row in range(rowCount):
-            for column in range(columnCount):
-                item = self.config_grid_layout.itemAtPosition(row, column)
-
-                # IF GRID LOCATION CONTAINS OBJECT
-                if item != None:
-                    widget = item.widget()
-                    objects.append(widget)
-
-        # UNPARENT ALL GROUP BOXES FROM GRID LAYOUT
-        for groupBox in objects:
-            self.config_grid_layout.removeWidget(groupBox)
-
-        return objects
-
-    def setNewGridOrder(self, objects, columnNumber):
-        """
-        PURPOSE
-
-        Sets the number of columns in the configuration tab grid layout.
-
-        INPUT
-
-        - objects = array containing the pointers to the group bxoe.
-
-        RETURNS
-
-        NONE
-        """
-        # NUMBER OF GROUP BOXES TO DISPLAY IN THE GRID LAYOUT
-        widgetCount = len(objects)
-
-        newColumnCount = columnNumber
-        newRowCount = ceil(widgetCount/newColumnCount)
-        
-        index = 0
-
-        # ADD GROUP BOXES TO NEW GRID LOCATIONS
-        for row in range(newRowCount):
-            for column in range(newColumnCount):
-                try:
-                    self.config_grid_layout.addWidget(objects[index], row, column)
-                    index += 1   
-                except:
-                    pass
-
-        rowCount = self.config_grid_layout.rowCount()            
-        columnCount = self.config_grid_layout.columnCount()
-
-        # HIDE UNUSED GRID LOCATIONS
-        for row in range(rowCount):
-             for column in range(columnCount):
-                item = self.config_grid_layout.itemAtPosition(row, column)
-
-                # IF GRID LOCATION CONTAINS OBJECT
-                if item == None:
-                    self.config_grid_layout.setRowStretch(row, 0)
-                    self.config_grid_layout.setColumnStretch(column, 0)
-
-                else:
-                    self.config_grid_layout.setRowStretch(row, 1)
-                    self.config_grid_layout.setColumnStretch(column, 1)
+        # ENTER FULL SCREEN
+        if keyPress == Qt.Key_F11:
+            self.showFullScreen()
 
     def programExit(self):
         """
@@ -1239,7 +1295,7 @@ class UI(QMainWindow):
         self.toggleCameraFeed(False, 2)
         # REQUIRED TO LET THREADS CLOSE BEFORE MAIN EVENT LOOP EXITS
         time.sleep(1)
-        
+
 class CONTROL_PANEL():
     """
     PURPOSE
@@ -2365,6 +2421,7 @@ class CONFIG():
 
         NONE
         """
+        # GET LIST OF AVAILABLE COM PORTS
         comPorts = [self.ui.config_com_port_list.itemText(i) for i in range(self.ui.config_com_port_list.count())] 
 
         self.data.rovComPort = comPorts[index]
