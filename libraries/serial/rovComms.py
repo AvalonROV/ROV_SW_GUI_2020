@@ -12,10 +12,27 @@ class ROV_SERIAL(QObject):
     # SIGNAL EMITTED TO UI FUNCTION WHEN THERE IS A COMMS FAIL EVENT
     uiSerialFunction = pyqtSignal(str)
 
+    # DATABASE
+    rovID = "AVALONROV"
+    rovComPort = None
+    comms = None
+    commsStatus = False
+
     def __init__(self):
+        """
+        PURPOSE
+
+        Class constructor.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         QObject.__init__(self)
-        self.comms = None
-        self.commsStatus = False
 
     def findComPorts(self, menuObject, baudRate, rovIdentity):
         """
@@ -44,6 +61,7 @@ class ROV_SERIAL(QObject):
 
         # CLEAR CURRENT MENU LIST
         menuObject.clear()
+        menuObject.addItem("None")
 
         identity = ""
         rovComPort = None
@@ -67,6 +85,8 @@ class ROV_SERIAL(QObject):
                 # FIND WHICH COM PORT IS THE ROV
                 if identity == rovIdentity:
                     rovComPort = port
+                    menuIndex = availableComPorts.index(rovComPort) + 1
+                    #menuObject.setCurrentIndex(menuIndex)
                     break
                     
             # SKIP COM PORT IF UNAVAILABLE

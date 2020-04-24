@@ -4,7 +4,7 @@ from PyQt5.QtCore import QSize, Qt, pyqtSlot, pyqtSignal, pyqtBoundSignal
 from PyQt5.QtWidgets import (QWidget, QApplication, QGridLayout, QPushButton, QLineEdit, QSizePolicy)
 from PyQt5.QtGui import QPixmap, QImage, QFont
 
-from libraries.computer_vision.transectLineTask.transectLineAlgorithm import TRANSECT_LINE_TASK
+from libraries.computer_vision.transectLineTask.transectLineAlgorithm_v1 import TRANSECT_LINE_TASK
 
 class TRANSECT_LINE_POPUP_WINDOW(QWidget):
     """
@@ -12,6 +12,7 @@ class TRANSECT_LINE_POPUP_WINDOW(QWidget):
 
     Popup windows to complete the computer vision transect line task. 
     """
+    # SIGNAL TO SEND DATA BACK TO MAIN PROGRAM
     transmitData = pyqtSignal()
 
     def __init__(self, viewWidget, cameraFeed):

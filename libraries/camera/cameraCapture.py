@@ -72,13 +72,30 @@ class VIEW(QWidget):
         self.view.setPixmap(pixmap)
     
 class CAMERA_CAPTURE(QThread):
-    # CREATE SIGNAL
-    cameraNewFrameSignal = pyqtSignal(QPixmap)
+    """
+    PURPOSE
 
-    def __init__(self, address = ""):
+    Contains all the functions to setup and read from RTSP and USB cameras.
+    """
+    # CREATE SIGNAL
+    cameraNewFrameSignal = pyqtSignal(QPixmap, int)
+
+    def __init__(self, address = "", identifier = 0):
+        """
+        PURPOSE
+
+        Class constructor.
+        Defines the default camera settings.
+
+        INPUT
+
+        address = address of the camera feed.
+        identifier = the number of the camera (0, 1, 2)
+        """
         QThread.__init__(self)
         # CAMERA FEED SOURCE
         self.address = address
+        self.identifier = identifier
         self.cameraFeed = None
         self.runFeed = True
         self.task = None
@@ -134,11 +151,11 @@ class CAMERA_CAPTURE(QThread):
                             cameraFrame = self.convertFrame(frame)
                             
                             # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
-                            self.cameraNewFrameSignal.emit(cameraFrame)
+                            self.cameraNewFrameSignal.emit(cameraFrame, self.identifier)
 
                         else:
                             # DEFAULT IMAGE
-                            self.cameraNewFrameSignal.emit(defaultImage)
+                            self.cameraNewFrameSignal.emit(defaultImage, self.identifier)
                             break
                     
                     except:
@@ -148,7 +165,7 @@ class CAMERA_CAPTURE(QThread):
 
             QThread.msleep(500)
 
-            self.cameraNewFrameSignal.emit(defaultImage)
+            self.cameraNewFrameSignal.emit(defaultImage, self.identifier)
             
         try:
             self.cameraFeed.release()
@@ -178,14 +195,12 @@ class CAMERA_CAPTURE(QThread):
 
             # RTSP CAMERA
             if addressType:
-                #print("STARTING INITIALISATION")
                 try:
                     self.cameraFeed = VideoCapture(self.address, CAP_FFMPEG)
                     self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
                     self.initiateStatus = True
                 except:
                     self.initiateStatus = False
-                #print("FINISHED INITIALISATION")
 
             # USB CAMERA
             else:

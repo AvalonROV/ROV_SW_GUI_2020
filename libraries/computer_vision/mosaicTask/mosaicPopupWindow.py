@@ -69,7 +69,22 @@ class MOSAIC_POPUP_WINDOW(QWidget):
         self.layout.addWidget(computeButton, 10, 0)
         computeButton.clicked.connect(self.computeMosaic)
 
-    def captureImage(self, index, buttonObject, imageObject):        
+    def captureImage(self, index, buttonObject, imageObject):  
+        """
+        PURPOSE
+
+        Grabs a frame from the primary camera feed and displays it in the popup window.
+
+        INPUT
+
+        - index = the index of the mosaic item being photographed.
+        - buttonObject = pointer to the button pressed.
+        - imageObject = pointer to the label object to paint the pixmap onto.
+
+        RETURNS
+
+        NONE
+        """      
         channel = 0
 
         # INITIATE PRIMARY CAMERA
@@ -98,9 +113,35 @@ class MOSAIC_POPUP_WINDOW(QWidget):
             imageObject.setPixmap(cameraFrame)
 
     def computeMosaic(self):
+        """
+        PURPOSE
+
+        Displays the processed image in a new window.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         self.mosaicResult = MOSAIC_RESULT(self.images[0])
 
     def imageResizeEvent(self):
+        """
+        PURPOSE
+
+        Dynamically resizes each pixmap during a resize event.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         for image in range(5):
             widget = self.layout.itemAt(image*2).widget()
             cameraPixmap = self.images[image]
@@ -109,7 +150,26 @@ class MOSAIC_POPUP_WINDOW(QWidget):
             widget.setPixmap(adjustedImage)
 
 class MOSAIC_RESULT(QWidget):
+    """
+    PURPOSE
+
+    External window that displays the processed iamge.
+    """
     def __init__(self, image):
+        """
+        PURPOSE
+
+        Class constructor.
+        Creates layout and displays image.
+
+        INPUT
+
+        - image = the pixmap to display.
+
+        RETURNS
+
+        NONE
+        """
         QWidget.__init__(self)
         imageShow = QLabel("Mosaic Result")
         imageShow.setPixmap(image.scaledToHeight(1000, Qt.SmoothTransformation))

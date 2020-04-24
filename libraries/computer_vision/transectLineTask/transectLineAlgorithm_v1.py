@@ -89,7 +89,6 @@ class TRANSECT_LINE_TASK(QObject):
         """
         self.transmitData.emit(data)
 
-
     # ALL PROCESSING FUNCTIONS
 
     def detect_edges(self, frame):

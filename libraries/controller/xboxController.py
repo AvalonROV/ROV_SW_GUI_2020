@@ -43,7 +43,7 @@ class VIEW(QWidget):
 
             # IF CONTROLLER IS FOUND
             if connectionStatus == True:
-                self.controller.startControllerEventLoop(controllerNumber, None, None)
+                self.controller.startControllerEventLoop(controllerNumber)
             else:
                 self.controllerConnect()
 
@@ -55,8 +55,34 @@ class VIEW(QWidget):
             quit()
 
 class CONTROLLER(QObject):
+    """
+    PURPOSE
+
+    Contains the functions to connect and read from the XBOX controller.
+    """
+    # SIGNALS TO SEND BUTTON AND JOYSTICK DATA FOR FURTHER PROCESSING
+    processInputSignal = pyqtSignal(list, list)
+
+    # DATABASE
+    buttonStates = []
+    joystickValues = []
+    buttonLabels = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
+    buttonReleased = [True] * 14
 
     def __init__(self):
+        """
+        PURPOSE
+
+        Class constructor
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         QObject.__init__(self)
 
     def findController(self, controllerID):
@@ -121,7 +147,6 @@ class CONTROLLER(QObject):
 
         - controllerLabelObjects = array containing pointers to the label objects to update the controller values.
         """
-        print("SETTING UP CONTROLLER VALUES")
         # NAMES OF JOYSTICK AXES
         joystickLabels = ['Left X', 'Left Y','Triggers', 'Right Y', 'Right X']
         buttonLabels = ['A','B','X','Y','LB','RB','SELECT','START','LS','RS','LEFT','RIGHT','DOWN','UP']
@@ -164,18 +189,41 @@ class CONTROLLER(QObject):
 
         return controllerLabelObjects
 
-    def startControllerEventLoop(self, controllerNumber, processButtonsFunction, processJoystickFunction):
+    def startControllerEventLoop(self, controllerNumber):
+        """
+        PURPOSE
+
+        Initiates a thread with a timer that repeatidly reads the values of the controllers joysticks and buttons.
+        Connects signal to send values back to main program for processing.
+
+        INPUT
+
+        - controllerNumber = address of the controller to read from.
+
+        RETURNS
+
+        NONE
+        """
         self.eventLoop = CONTROLLER_UPDATE(controllerNumber)
+        
         # UPDATE GUI CONTROLLER INDICATORS
         self.eventLoop.controllerValues.connect(self.updateControllerValues)
         self.eventLoop.start()
 
-        # DEFINE FUNCTIONS TO SEND BUTTONS AND JOYSTICK VALUES TO
-        # FOR TOGGLEING ACTUATORS AND CONTROLLING THRUSTERS
-        self.processButtons = processButtonsFunction
-        self.processJoysticks = processJoystickFunction
-
     def stopControllerEventLoop(self):
+        """
+        PURPOSE
+
+        Stops reading from the controller.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         try:
             self.eventLoop.exit()
         except:
@@ -186,7 +234,7 @@ class CONTROLLER(QObject):
         """
         PURPOSE
 
-        Updates the text fields on the configuration tab with the latest controller button states and joystick values.
+        Emits a signal to updates the text fields on the configuration tab with the latest controller button states and joystick values.
 
         INPUT
 
@@ -197,33 +245,48 @@ class CONTROLLER(QObject):
         
         NONE
         """
-        # UPDATE JOYSTICK VALUES
-        for index in range(5):
-            self.formLayout.itemAt((2*index)+1).widget().setText(str(joystickValues[index]))
-            
-        # UPDATE BUTTON STATES
-        for index in range(5,19):
-            self.formLayout.itemAt((2*index)+1).widget().setText(str(buttonStates[index - 5]))
+        # SEND BUTTON AND JOYSTICK VALUES TO MAIN PROGRAM
+        if buttonStates != self.buttonStates or joystickValues != self.joystickValues:
+            try:
+                self.processInputSignal.emit(buttonStates, joystickValues)
+            except:
+                pass
 
-        # SEND BUTTON AND JOYSTICK VALUES TO PROCESSING FUNCTIONS IF THEY EXIST
-        try:
-            self.processButtons(buttonStates)
-            self.processJoysticks(joystickValues)
-        except:
-            pass
+        # SAVE DATA LOCALLY FOR FUTURE COMPARISON
+        self.buttonStates = buttonStates
+        self.joystickValues = joystickValues
               
 class CONTROLLER_UPDATE(QThread):
+    """
+    PURPOSE
 
+    Thread that contains the functions required to read from the controller.
+    """
+    # SIGNAL TO SEND DATA TO CONTROLLER OBJECT
     controllerValues = pyqtSignal(list, list)
 
     def __init__(self, controllerNumber):
+        """
+        PURPOSE
+
+        Class constructor.
+        Initialises a timer to repeatidly read from the XBOX controller.
+
+        INPUT
+
+        - controllerNumber = the address of the controller to read from.
+
+        RETURNS
+
+        NONE
+        """
         QThread.__init__(self)
         self.controllerNumber = controllerNumber
         # UPDATE CONTROLLER VALUES AT A RATE OF 60FPS
         self.timer = QTimer()
         self.timer.setTimerType(Qt.PreciseTimer)
         self.timer.timeout.connect(self.run)
-        self.timer.start(1000/60)
+        self.timer.start(int(1000/60))
 
     def getControllerInputs(self, controllerNumber):
         """
@@ -332,7 +395,7 @@ class CONTROLLER_UPDATE(QThread):
         """
         filteredJoystickValues = joystickValues.copy()
         
-        # ADD DEADZONE OF 0.1
+        # ADD DEADZONE OF +/-0.1
         filteredJoystickValues = [0 if (number < 0.1 and number > -0.1) 
                                     else number 
                                     for number in filteredJoystickValues]
@@ -342,16 +405,45 @@ class CONTROLLER_UPDATE(QThread):
         return(filteredJoystickValues)
 
     def run(self):
+        """
+        PURPOSE
+
+        Main thread loop that reads, filters, and emits the button states and joystick values.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         # TAKE SINGLE READING OF CONTROLLER VALUES
         buttonStates, arrowStates, joystickValues = self.getControllerInputs(self.controllerNumber)
+        
         # PROCESS BUTTON STATES
         filteredButtonStates = self.filterButtons(buttonStates, arrowStates)
+        
         # PROCESS JOYSTICK VALUES
         filteredJoystickValues = self.filterJoysticks(joystickValues)
-        # SHOW NEW CONTROLLER VALUES ON GUI
+        
+        # EMIT SIGNAL FOR FURTHER PROCESSING
         self.controllerValues.emit(filteredButtonStates, filteredJoystickValues)
 
     def exit(self):
+        """
+        PURPOSE
+
+        Stops the timer.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
         self.timer.stop()
 
 if __name__ == '__main__':
