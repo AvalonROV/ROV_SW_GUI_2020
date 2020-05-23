@@ -71,6 +71,13 @@
                     </spacer>
                    </item>
                    <item>
+                    <widget class="QLabel" name="label_9">
+                     <property name="text">
+                      <string>Primary Feed:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QComboBox" name="camera_feed_1_menu">
                      <property name="sizeAdjustPolicy">
                       <enum>QComboBox::AdjustToContents</enum>
@@ -107,7 +114,7 @@
                     <string>Camera Feed 1</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignHCenter|Qt::AlignTop</set>
                    </property>
                   </widget>
                  </item>
@@ -116,21 +123,11 @@
               </item>
               <item row="0" column="0">
                <widget class="QWidget" name="widget_5" native="true">
-                <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
+                <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
                  <item>
-                  <widget class="QGroupBox" name="analog_camera_control">
-                   <property name="title">
-                    <string>External Camera Feeds</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <layout class="QGridLayout" name="gridLayout" rowstretch="0,1">
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="camera_feed_2">
+                  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0">
+                   <item row="1" column="2">
+                    <widget class="QLabel" name="camera_feed_4">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
                        <horstretch>0</horstretch>
@@ -141,10 +138,10 @@
                       <enum>QFrame::NoFrame</enum>
                      </property>
                      <property name="text">
-                      <string>Camera Feed 2</string>
+                      <string>Camera Feed 4</string>
                      </property>
                      <property name="alignment">
-                      <set>Qt::AlignCenter</set>
+                      <set>Qt::AlignHCenter|Qt::AlignTop</set>
                      </property>
                     </widget>
                    </item>
@@ -162,6 +159,13 @@
                         </size>
                        </property>
                       </spacer>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label">
+                       <property name="text">
+                        <string>Secondary Feed 1:</string>
+                       </property>
+                      </widget>
                      </item>
                      <item>
                       <widget class="QComboBox" name="camera_feed_2_menu">
@@ -185,6 +189,25 @@
                      </item>
                     </layout>
                    </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="camera_feed_2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="frameShape">
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                     <property name="text">
+                      <string>Camera Feed 2</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignHCenter|Qt::AlignTop</set>
+                     </property>
+                    </widget>
+                   </item>
                    <item row="0" column="1">
                     <layout class="QHBoxLayout" name="horizontalLayout_10">
                      <item>
@@ -199,6 +222,13 @@
                         </size>
                        </property>
                       </spacer>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_5">
+                       <property name="text">
+                        <string>Secondary Feed 2:</string>
+                       </property>
+                      </widget>
                      </item>
                      <item>
                       <widget class="QComboBox" name="camera_feed_3_menu">
@@ -237,9 +267,53 @@
                       <string>Camera Feed 3</string>
                      </property>
                      <property name="alignment">
-                      <set>Qt::AlignCenter</set>
+                      <set>Qt::AlignHCenter|Qt::AlignTop</set>
                      </property>
                     </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <layout class="QHBoxLayout" name="horizontalLayout_12">
+                     <item>
+                      <spacer name="horizontalSpacer_10">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_8">
+                       <property name="text">
+                        <string>Secondary Feed 3:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="camera_feed_4_menu">
+                       <property name="sizeAdjustPolicy">
+                        <enum>QComboBox::AdjustToContents</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_11">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
                    </item>
                   </layout>
                  </item>
@@ -586,87 +660,6 @@
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QGroupBox" name="controller_control">
-                  <property name="title">
-                   <string>Controller Sensitivity</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QGroupBox" name="groupBox">
-                  <property name="title">
-                   <string>Enable/Disable Camera</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <layout class="QGridLayout" name="gridLayout_40">
-                   <item row="0" column="0">
-                    <layout class="QFormLayout" name="formLayout">
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="label_20">
-                       <property name="text">
-                        <string>Camera 1</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QCheckBox" name="camera_1_enable">
-                       <property name="text">
-                        <string>Enable</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_21">
-                       <property name="text">
-                        <string>Camera 2</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_22">
-                       <property name="text">
-                        <string>Camera 3</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QCheckBox" name="camera_2_enable">
-                       <property name="text">
-                        <string>Enable</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QCheckBox" name="camera_3_enable">
-                       <property name="text">
-                        <string>Enable</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
                 <item row="0" column="1">
                  <widget class="QGroupBox" name="group_box_minirov">
                   <property name="title">
@@ -719,6 +712,111 @@
                     </layout>
                    </item>
                   </layout>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QGroupBox" name="controller_control">
+                  <property name="title">
+                   <string>Controller Sensitivity</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QGroupBox" name="groupBox">
+                  <property name="title">
+                   <string>Cameras</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_40">
+                   <item row="0" column="0">
+                    <layout class="QFormLayout" name="formLayout">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_20">
+                       <property name="text">
+                        <string>Primary</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QCheckBox" name="camera_1_enable">
+                       <property name="text">
+                        <string>Enable</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_21">
+                       <property name="text">
+                        <string>Secondary 1</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_22">
+                       <property name="text">
+                        <string>Secondary 2</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QCheckBox" name="camera_2_enable">
+                       <property name="text">
+                        <string>Enable</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QCheckBox" name="camera_3_enable">
+                       <property name="text">
+                        <string>Enable</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="label_23">
+                       <property name="text">
+                        <string>Secondary 3</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QCheckBox" name="camera_4_enable">
+                       <property name="text">
+                        <string>Enable</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <spacer name="verticalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QGroupBox" name="analog_camera_control">
+                  <property name="title">
+                   <string>External Camera Feeds</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -874,8 +972,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1738</width>
-             <height>1086</height>
+             <width>941</width>
+             <height>563</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_45">
@@ -1030,8 +1128,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>307</width>
-                      <height>484</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1076,8 +1174,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>307</width>
-                      <height>483</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1122,8 +1220,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>307</width>
-                      <height>483</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1174,8 +1272,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>306</width>
-                      <height>484</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1221,8 +1319,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>307</width>
-                      <height>484</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1273,8 +1371,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>307</width>
-                      <height>483</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1313,8 +1411,8 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>307</width>
-                      <height>484</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>

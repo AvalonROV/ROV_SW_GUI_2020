@@ -325,10 +325,12 @@ class THRUSTERS(QObject):
         self.forwardLabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.reverseLabel = QLabel("REVERSE")
         self.reverseLabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        changeButton = QPushButton()          
+        changeButton = QPushButton()  
+        changeButton.setFixedSize(50, 50)        
 
         # APPLY STYLING
         try:
+            changeButton.setStyleSheet(self.style.orientationButton)
             self.forwardLabel.setStyleSheet(self.style.greenText)
             self.style.applyGlow(changeButton, "#679e37", 10)
             # APPLY ICON TO BUTTON
@@ -528,7 +530,7 @@ class THRUSTERS(QObject):
         try:
             label1.setStyleSheet(self.style.infoLabel)
             label2.setStyleSheet(self.style.infoLabel)
-            thrusterTest.setStyleSheet(self.style.blueButton)
+            thrusterTest.setStyleSheet(self.style.blueButtonSmall)
             frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.thrusterFrame, self.style.settingsFrame)
         except:
             pass

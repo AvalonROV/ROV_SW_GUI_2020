@@ -93,14 +93,13 @@ class CAMERA_CAPTURE(QThread):
         identifier = the number of the camera (0, 1, 2)
         """
         QThread.__init__(self)
-        # CAMERA FEED SOURCE
         self.address = address
         self.identifier = identifier
         self.cameraFeed = None
         self.runFeed = True
         self.task = None
-        self.width = 1024
-        self.height = 576 
+        self.width = 1280   
+        self.height = 720
     
     def run(self):
         """
@@ -122,7 +121,6 @@ class CAMERA_CAPTURE(QThread):
 
         # ATTEMPT TO CONNECT TO CAMERA EVERY 0.5 SECONDS
         while self.runFeed:
-            
             # INITIATE CAMERA
             self.initiateCamera()
 
@@ -132,7 +130,7 @@ class CAMERA_CAPTURE(QThread):
 
             while self.runFeed and self.initiateStatus:
                 
-                # 30 FPS CAPTURE RATE
+                # ~30 FPS CAPTURE RATE
                 if elapsedTime > 1/30:
                     try:
                         # CAPTURE FRAME
@@ -150,7 +148,7 @@ class CAMERA_CAPTURE(QThread):
                             # CONVERT TO PIXMAP
                             cameraFrame = self.convertFrame(frame)
                             
-                            # EMIT SIGNAL CONTAINING NEW FRAME TO SLOT
+                            # SEND FRAME BACK TO MAIN PROGRAM
                             self.cameraNewFrameSignal.emit(cameraFrame, self.identifier)
 
                         else:
@@ -206,6 +204,7 @@ class CAMERA_CAPTURE(QThread):
             else:
                 try:
                     self.cameraFeed = VideoCapture(self.address, CAP_DSHOW)
+                    
                     self.cameraFeed.set(CAP_PROP_BUFFERSIZE, 3)
                     self.initiateStatus = True
                 except:

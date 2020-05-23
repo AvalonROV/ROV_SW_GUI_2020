@@ -28,9 +28,9 @@ import numpy as np
 import subprocess
 
 # CUSTOM LIBRARIES
-from libraries.configuration_file. configurationFile import READ_CONFIG_FILE, WRITE_CONFIG_FILE
-from libraries.controller.xboxController import CONTROLLER
+from libraries.configuration_file.configurationFile import READ_CONFIG_FILE, WRITE_CONFIG_FILE
 from libraries.serial.rovComms import ROV_SERIAL
+from libraries.controller.xboxController import CONTROLLER
 from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
 from libraries.computer_vision.transectLineTask.transectLinePopupWindow import TRANSECT_LINE_POPUP_WINDOW
 from libraries.computer_vision.transectLineTask.transectLineAlgorithm_v1 import TRANSECT_LINE_TASK
@@ -244,7 +244,7 @@ class UI(QMainWindow):
         """
         PURPOSE
 
-        Reads the XML configuration file and stores the data neccessary modules.
+        Reads the XML configuration file and stores the data in their respective modules.
 
         INPUT
 
@@ -422,13 +422,13 @@ class UI(QMainWindow):
         """
         # GO TO CONTROL PANEL TAB BUTTON
         self.change_gui_control.clicked.connect(lambda state, view = 0: self.changeView(view))
-        self.change_gui_control.setStyleSheet(self.style.blueButton)
+        self.change_gui_control.setStyleSheet(self.style.blueButtonSmall)
         self.change_gui_control.setChecked(True)
         self.style.applyGlow(self.change_gui_control, "#0D47A1", 10)
         
         # GO TO CONFIGURATION TAB BUTTON
         self.change_gui_config.clicked.connect(lambda state, view = 1: self.changeView(view))
-        self.change_gui_config.setStyleSheet(self.style.blueButton)
+        self.change_gui_config.setStyleSheet(self.style.blueButtonSmall)
         self.style.applyGlow(self.change_gui_config, "#0D47A1", 10)
         
         # VERTICAL SPITTER
@@ -436,43 +436,47 @@ class UI(QMainWindow):
 
         # ROV CONNECT BUTTON
         self.control_rov_connect.clicked.connect(self.control.rovSerialConnection)
-        self.control_rov_connect.setStyleSheet(self.style.blueButton)
+        self.control_rov_connect.setStyleSheet(self.style.blueButtonLarge)
         self.style.applyGlow(self.control_rov_connect, "#0D47A1", 10)
-        self.control_rov_connect.setFixedHeight(int(self.control_rov_connect.geometry().height() * 1.5))
+        self.control_rov_connect.setFixedHeight(50)
         
         # CONTROLLER CONNECT BUTTON
         self.control_controller_connect.clicked.connect(self.control.controllerConnection)
-        self.control_controller_connect.setStyleSheet(self.style.blueButton)
+        self.control_controller_connect.setStyleSheet(self.style.blueButtonLarge)
         self.style.applyGlow(self.control_controller_connect, "#0D47A1", 10)
-        self.control_controller_connect.setFixedHeight(int(self.control_controller_connect.geometry().height() * 1.5))
+        self.control_controller_connect.setFixedHeight(50)
         
         # MACHINE VISION TASK BUTTONS
         self.control_vision_mosaic.clicked.connect(lambda status, task = 0: self.control.popupVisionTask(task))
-        self.control_vision_mosaic.setStyleSheet(self.style.blueButton)
+        self.control_vision_mosaic.setStyleSheet(self.style.blueButtonSmall)
         self.control_vision_shape_detection.clicked.connect(lambda status, task = 1: self.control.popupVisionTask(task))
-        self.control_vision_shape_detection.setStyleSheet(self.style.blueButton)
+        self.control_vision_shape_detection.setStyleSheet(self.style.blueButtonSmall)
         self.control_vision_transect_line.clicked.connect(lambda status, task = 2: self.control.popupVisionTask(task))
-        self.control_vision_transect_line.setStyleSheet(self.style.blueButton)
+        self.control_vision_transect_line.setStyleSheet(self.style.blueButtonSmall)
         self.control_vision_coral_health.clicked.connect(lambda status, task = 3: self.control.popupVisionTask(task))
-        self.control_vision_coral_health.setStyleSheet(self.style.blueButton)
+        self.control_vision_coral_health.setStyleSheet(self.style.blueButtonSmall)
 
         # CAMERA ENABLE CHECKBOX
         self.camera_1_enable.setChecked(True)
         self.camera_2_enable.setChecked(True)
         self.camera_3_enable.setChecked(True)
+        self.camera_4_enable.setChecked(True)
         self.camera_1_enable.toggled.connect(lambda state, camera = 0: self.toggleCameraFeed(state, camera))
         self.camera_2_enable.toggled.connect(lambda state, camera = 1: self.toggleCameraFeed(state, camera))
         self.camera_3_enable.toggled.connect(lambda state, camera = 2: self.toggleCameraFeed(state, camera))
+        self.camera_4_enable.toggled.connect(lambda state, camera = 3: self.toggleCameraFeed(state, camera))
 
         # LINK EACH DIGITAL CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING CAMERA ID AS 1,2,3,4 ETC.
         self.camera_feed_1_menu.activated.connect(lambda index, camera = 0: self.changeCameraFeedMenu(index, camera))
         self.camera_feed_2_menu.activated.connect(lambda index, camera = 1: self.changeCameraFeedMenu(index, camera))
         self.camera_feed_3_menu.activated.connect(lambda index, camera = 2: self.changeCameraFeedMenu(index, camera))
+        self.camera_feed_4_menu.activated.connect(lambda index, camera = 3: self.changeCameraFeedMenu(index, camera))
 
         # CAMERA FEED CLICK EVENT
         self.camera_feed_1.mousePressEvent = lambda event, cameraFeed = 0: self.changeCameraFeed(event, cameraFeed)
         self.camera_feed_2.mousePressEvent = lambda event, cameraFeed = 1: self.changeCameraFeed(event, cameraFeed)
         self.camera_feed_3.mousePressEvent = lambda event, cameraFeed = 2: self.changeCameraFeed(event, cameraFeed)
+        self.camera_feed_4.mousePressEvent = lambda event, cameraFeed = 3: self.changeCameraFeed(event, cameraFeed)
 
     def linkConfigWidgets(self):
         """
@@ -490,15 +494,15 @@ class UI(QMainWindow):
         """
         # ROV CONNECT BUTTON
         self.config_rov_connect.clicked.connect(self.control.rovSerialConnection)
-        self.config_rov_connect.setStyleSheet(self.style.blueButton)
+        self.config_rov_connect.setStyleSheet(self.style.blueButtonLarge)
         self.style.applyGlow(self.config_rov_connect, "#0D47A1", 10)
-        self.config_rov_connect.setFixedHeight(int(self.config_rov_connect.geometry().height() * 1.5))
+        self.config_rov_connect.setFixedHeight(50)
         
         # CONTROLLER CONNECT BUTTON
         self.config_controller_connect.clicked.connect(self.control.controllerConnection)
-        self.config_controller_connect.setStyleSheet(self.style.blueButton)
+        self.config_controller_connect.setStyleSheet(self.style.blueButtonLarge)
         self.style.applyGlow(self.config_controller_connect, "#0D47A1", 10)
-        self.config_controller_connect.setFixedHeight(int(self.config_controller_connect.geometry().height() * 1.5))
+        self.config_controller_connect.setFixedHeight(50)
             
         # SERIAL COMMUNICATION BUTTONS
         self.config_com_port_list.activated.connect(self.config.changeComPort)
@@ -542,7 +546,7 @@ class UI(QMainWindow):
 
         NONE
         """
-        self.cameraFeeds = [self.camera_feed_1, self.camera_feed_2, self.camera_feed_3]
+        self.cameraFeeds = [self.camera_feed_1, self.camera_feed_2, self.camera_feed_3, self.camera_feed_4]
 
         # INITIATE CAMERA THREADS
         feedQuantity = len(self.cameraFeeds)
@@ -573,7 +577,7 @@ class UI(QMainWindow):
 
         RETURNS
         """
-        menuList = [self.camera_feed_1_menu, self.camera_feed_2_menu, self.camera_feed_3_menu]
+        menuList = [self.camera_feed_1_menu, self.camera_feed_2_menu, self.camera_feed_3_menu, self.camera_feed_4_menu]
 
         for i, menu in enumerate(menuList):
             menu.clear()
@@ -590,7 +594,7 @@ class UI(QMainWindow):
         INPUT
 
         - status = True to turn ON, False to turn OFF.
-        - feed = the camera to be toggled (1,2,3).
+        - feed = the camera to be toggled (1,2,3,4).
 
         RETURNS
 
@@ -623,7 +627,15 @@ class UI(QMainWindow):
         """
         # FORMAT ADDRESS
         formattedAddress = self.digitalCameras.addressConverter(address)
-        
+
+        # CHECK IF THIS ADDRESS IS ALREADY IN USE
+        for i, cameraThread in enumerate(self.cameraThreadList):
+            address = cameraThread.address
+            if address == formattedAddress and i != camera:
+                # DISCONNECT FROM THAT FEED BEFORE ATTEMPTING TO CONNECT AGAIN
+                # PREVENTS THREADS FIGHTING OVER CAMERA ACCESS
+                cameraThread.changeSource("")
+
         # REINITIALISE CAMERA WITH NEW ADDRESS
         self.cameraThreadList[camera].changeSource(formattedAddress)
  
@@ -644,7 +656,7 @@ class UI(QMainWindow):
         NONE
         """
         # RESIZE PIXMAP
-        pixmap = frame.scaled(self.cameraFeeds[identifier].size().width(), self.cameraFeeds[identifier].size().height(), Qt.KeepAspectRatio)
+        pixmap = frame.scaled(self.cameraFeeds[identifier].size().width(), self.cameraFeeds[identifier].size().height(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         
         # PAINT PIXMAP ONTO LABEL
         self.cameraFeeds[identifier].setPixmap(pixmap)
@@ -658,22 +670,18 @@ class UI(QMainWindow):
         INPUT
 
         - event = Mouse click event.
-        - cameraFeed = Camera feed that has been clicked on (1,2,3).
+        - cameraFeed = Camera feed that has been clicked on (1,2,3,4).
 
         RETURNS
 
         NONE
         """
-        if cameraFeed == 0:
+        # SWAP MAIN FEED WITH SELECTED SECONDARY FEED
+        try:
+            self.digitalCameras.selectedCameras[0], self.digitalCameras.selectedCameras[cameraFeed] = self.digitalCameras.selectedCameras[cameraFeed], self.digitalCameras.selectedCameras[0]
+            self.digitalCameras.setCameraAddresses()
+        except:
             pass
-
-        if cameraFeed == 1:
-            self.digitalCameras.selectedCameras[0], self.digitalCameras.selectedCameras[1] = self.digitalCameras.selectedCameras[1], self.digitalCameras.selectedCameras[0]
-            self.digitalCameras.setCameraAddresses()
-            
-        if cameraFeed == 2:
-            self.digitalCameras.selectedCameras[0], self.digitalCameras.selectedCameras[2] = self.digitalCameras.selectedCameras[2], self.digitalCameras.selectedCameras[0]
-            self.digitalCameras.setCameraAddresses()
         
         # UPDATE MENUS
         self.updateCameraMenus()
@@ -727,8 +735,8 @@ class UI(QMainWindow):
         # APPLY NEW APPLICATION PALETTE
         self.style.setPalette(theme, self.app)
 
-        # CHANGE GROUP BOX COLOUR
-        self.gui_view_widget.setStyleSheet(self.style.groupBox)
+        # SET GLOBAL DEFAULT STYLESHEETS
+        self.centralwidget.setStyleSheet(self.style.groupBox + self.style.comboBox + self.style.blueButtonSmall)
 
         # LOAD AVALON LOGO
         self.setLogo(self.style.theme)
@@ -781,7 +789,8 @@ class UI(QMainWindow):
         screenWidth, screenHeight = self.getScreenSize()
 
         # SET DEFAULT SIDE BAR WIDTH
-        self.con_panel_functions_widget.resize(int(screenWidth/3),self.con_panel_functions_widget.height())
+        #self.con_panel_functions_widget.resize(int(screenWidth/3),self.con_panel_functions_widget.height())
+        self.con_panel_functions_widget.resize(1000,self.con_panel_functions_widget.height())
 
     def getScreenSize(self):
         """
@@ -1208,7 +1217,9 @@ class CONTROL_PANEL():
         # IF CONNECTION IS SUCCESSFUL
         if status == True:
             # MODIFY BUTTON STYLE
+            self.ui.control_rov_connect.setChecked(True)
             self.ui.control_rov_connect.setText('DISCONNECT')
+            self.ui.config_rov_connect.setChecked(True)
             self.ui.config_rov_connect.setText('DISCONNECT')
 
             # CALL INITIAL ROV FUNCTIONS
@@ -1318,7 +1329,9 @@ class CONTROL_PANEL():
             self.controller.startControllerEventLoop(controllerNumber)
             
             # UPDATE BUTTON STYLE
+            self.ui.control_controller_connect.setChecked(True)
             self.ui.control_controller_connect.setText('DISCONNECT')
+            self.ui.config_controller_connect.setChecked(True)
             self.ui.config_controller_connect.setText('DISCONNECT')
 
         else:
@@ -2042,7 +2055,7 @@ def guiInitiate():
     splash.show()
 
     # SET PROGRAM STYLE
-    app.setFont(QFont("Bahnschrift Light", 10))
+    app.setFont(QFont("Bahnschrift Regular", 10))
     app.setStyle("Fusion")
     app.setWindowIcon(QIcon('graphics/icon.ico'))
     

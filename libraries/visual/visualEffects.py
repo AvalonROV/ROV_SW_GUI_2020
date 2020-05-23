@@ -11,8 +11,12 @@ class STYLE():
     theme = False
 
     # STYLESHEETS
-    blueButton = ""
+    blueButtonLarge = ""
+    blueButtonSmall = ""
     actuatorButton = ""
+    orientationButton = ""
+    comboBox = ""
+    timerLCD = ""
     timerStartButton = ""
     groupBox = ""
     greenText = ""
@@ -92,24 +96,40 @@ class STYLE():
         # DARK THEME
         if theme:
 
-            self.blueButton = ("QPushButton {color: white;}" 
-                                "QPushButton:pressed {background-color: #0D47A1; color: white;}"
-                                "QPushButton:checked {background-color: #0D47A1; color: white;}")
+            self.blueButtonLarge = ("QPushButton {background-color: #424242; color: white; border-radius: 25px;}" 
+                                "QPushButton:hover {background-color: #393939;}"
+                                "QPushButton:pressed {background-color: #1976d2;}"
+                                "QPushButton:checked {background-color: #1976d2;}")
+
+            self.blueButtonSmall = ("QPushButton {background-color: #424242; color: white; border-radius: 15px; padding: 5px 20px}" 
+                                "QPushButton:hover {background-color: #393939;}"
+                                "QPushButton:pressed {background-color: #1976d2;}"
+                                "QPushButton:checked {background-color: #1976d2;}")
             
-            self.actuatorButton = ("QPushButton {background-color: #679e37; color: white; border-radius: 25px}" 
-                                    "QPushButton:checked {background-color: #c62828; color: white; border-radius: 25px}")
+            self.actuatorButton = ("QPushButton {background-color: #43a047; font-size: 20px; font-weight: bold; color: white; border-radius: 25px}" 
+                                    "QPushButton:hover {background-color: #388e3c}"
+                                    "QPushButton:checked {background-color: #c62828;}"
+                                    "QPushButton:checked:hover {background-color: #b71c1c}")
+
+            self.orientationButton = ("QPushButton {background-color: #424242; border-radius: 25px;}")
+                                
+            self.comboBox = ("QComboBox {background-color: #363636; border-radius: 15px; padding: 5px 20px 5px 10px;}"
+                                "QComboBox:hover {background-color: #333333;}"
+                                "QComboBox:down-arrow {image: url(./graphics/arrow_down_white.png); height: 30px; width: 30px; padding-right: 20px;}"
+                                "QComboBox:drop-down {border: 0px;}")
+
+            self.timerLCD = ("QLCDNumber {border: 0px;}")
             
-            self.timerStartButton = ("QPushButton {background-color: #679e37; color: black;}" 
-                                    "QPushButton:checked {background-color: #c62828; color: white;}")
+            self.timerStartButton = ("QPushButton {background-color: #43a047; color: white;}"
+                                    "QPushButton:hover {background-color: #388e3c;}" 
+                                    "QPushButton:checked {background-color: #c62828; color: white;}"
+                                    "QPushButton:checked:hover {background-color: #b71c1c;}")
 
             self.groupBox = ("""QGroupBox {background-color: #212121;
                                             border-radius: 20px;
                                             font-size: 12pt;
                                             margin-top: 1.2em;
-                                            padding-top: 10px;
-                                            padding-bottom: 10px;
-                                            padding-left: 10px;
-                                            padding-right: 10px;}""")
+                                            padding: 10px}""")
 
             self.greenText = "color: #679e37"
             self.redText = 'color: #c62828'
@@ -128,8 +148,15 @@ class STYLE():
                                 "QPushButton:pressed {background-color: #0D47A1; color: white;}"
                                 "QPushButton:checked {background-color: #0D47A1; color: white;}")
 
-            self.actuatorButton = ("QPushButton {background-color: #679e37; color: white; border-radius: 20px}" 
-                                    "QPushButton:checked {background-color: #c62828; color: white; border-radius: 20px}")
+            self.actuatorButton = ("QPushButton {background-color: #679E37; color: white; border-radius: 20px}" 
+                                    "QPushButton:hover {background-color: #c62828;}"
+                                    "QPushButton:checked {background-color: #c62828;}")
+
+            self.orientationButton = ("QPushButton {background-color: #424242; border-radius: 20px;}")
+
+            self.comboBox = ("")
+
+            self.timerLCD = ("")
 
             self.timerStartButton = ("QPushButton {background-color: #679e37; color: black;}" 
                                     "QPushButton:checked {background-color: #c62828; color: white;}")

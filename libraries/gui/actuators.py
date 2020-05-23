@@ -285,11 +285,10 @@ class ACTUATORS(QObject):
         parentLayout = QVBoxLayout()
         
         # WIDGETS TO CHANGE ACTUATOR QUANTITY
-        quantityLayout = QHBoxLayout()
+        quantityLayout = QFormLayout()
         self.actuatorNumber = QSpinBox()
         self.actuatorNumber.setMaximum(10)
-        quantityLayout.addWidget(QLabel("Quantity")) 
-        quantityLayout.addWidget(self.actuatorNumber)
+        quantityLayout.addRow(QLabel("Quantity"), self.actuatorNumber)
 
         # LAYOUT TO SHOW THRUSTER SETTINGS
         self.configForm = QFormLayout()

@@ -52,6 +52,7 @@ class TIMER(QVBoxLayout):
         """
         # CREATE WIDGETS
         self.time = QLCDNumber()
+        self.time.setSegmentStyle(QLCDNumber.Flat)
         self.time.setNumDigits(11)
         self.time.display('00:00:00:00')
         self.time.setMinimumHeight(48)
@@ -65,6 +66,7 @@ class TIMER(QVBoxLayout):
         
         try:
             self.startButton.setStyleSheet(self.style.timerStartButton)
+            self.time.setStyleSheet(self.style.timerLCD)
         except:
             pass
 

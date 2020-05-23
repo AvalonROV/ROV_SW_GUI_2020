@@ -205,7 +205,7 @@ class KEYBINDINGS(QObject):
         # APPLY STYLING
         try:
             frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.keybindingFrame, self.style.settingsFrame)
-            setBinding.setStyleSheet(self.style.blueButton)
+            setBinding.setStyleSheet(self.style.blueButtonSmall)
         except:
             pass
 

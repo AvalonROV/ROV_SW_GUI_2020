@@ -147,6 +147,7 @@ class ANALOG_CAMERAS(QObject):
         # CAMERA FEED MENUS
         for i in range(4):
             label = QLabel("Feed {}".format(i + 1))
+            label.setAlignment(Qt.AlignCenter)
             menu = QComboBox()
             self.selectedMenus.append(menu)
             menu.activated.connect(lambda index, camera = i: self.changeSelectedCameras(index, camera))
@@ -156,7 +157,7 @@ class ANALOG_CAMERAS(QObject):
             layout.addWidget(label)
             layout.addWidget(menu)
 
-            # ADD CAMERA TO 3x3 GRID ARRANGEMENT
+            # ADD CAMERA TO 2x4 GRID ARRANGEMENT
             parentLayout.addLayout(layout, (0 if i < 2 else 1), (i if i < 2 else i - 2))
 
         # ADD TO GUI

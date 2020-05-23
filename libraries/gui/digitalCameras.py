@@ -12,12 +12,12 @@ class DIGITAL_CAMERAS(QObject):
     cameraChangeAddress = pyqtSignal(int, str)
 
     # DATABASE
-    quantity = 3 
+    quantity = 4 
     labelList = []
     addressList = []
-    defaultCameras = [0, 0, 0]
+    defaultCameras = [0, 0, 0, 0]
     defaultMenus = []
-    selectedCameras = [0, 0, 0]
+    selectedCameras = [0, 0, 0, 0]
     selectedMenus = []
 
     def __init__(self, *, controlLayout = None, configLayout = None, style = None):
@@ -131,41 +131,18 @@ class DIGITAL_CAMERAS(QObject):
 
         NONE
         """
-        # FEED 1
-        try:
-            selected1 = self.selectedCameras[0]
-            # NONE SELECTED
-            if selected1 == 0:
-                address1 = ""
-            else:
-                address1 = self.addressList[selected1 - 1]
-            self.cameraChangeAddress.emit(0, address1)
-        except:
-            pass
-
-        # FEED 2
-        try:
-            selected2 = self.selectedCameras[1]
-            # NONE SELECTED
-            if selected2 == 0:
-                address2 = ""
-            else:
-                address2 = self.addressList[selected2 - 1]
-            self.cameraChangeAddress.emit(1, address2)
-        except:
-            pass
-
-        # FEED 3
-        try:
-            selected3 = self.selectedCameras[2]
-            # NONE SELECTED
-            if selected3 == 0:
-                address3 = ""
-            else:
-                address3 = self.addressList[selected3 - 1]
-            self.cameraChangeAddress.emit(2, address3)
-        except:
-            pass
+        for i, camera in enumerate(self.selectedCameras):
+            try:
+                # NONE SELECTED
+                if camera == 0:
+                    address = ""
+                else:
+                    address = self.addressList[camera - 1]
+                
+                # EMIT SIGNAL TO MAIN PROGRAM TO CHANGE CAMERA ADDRESS
+                self.cameraChangeAddress.emit(i, address)
+            except:
+                pass
 
     def addressConverter(self, address):
         """
@@ -207,11 +184,11 @@ class DIGITAL_CAMERAS(QObject):
         for i in range(self.quantity):
             self.removeCamera()
         
-        self.quantity = 3
+        self.quantity = 4
         self.labelList = []
         self.addressList = []
-        self.defaultCameras = [0, 0, 0]
-        self.selectedCameras = [0, 0, 0]
+        self.defaultCameras = [0, 0, 0, 0]
+        self.selectedCameras = [0, 0, 0, 0]
     
     #########################
     ### CONTROL PANEL TAB ###
@@ -296,14 +273,14 @@ class DIGITAL_CAMERAS(QObject):
         settingsLayout.addRow(QLabel("Quantity"), self.cameraNumber)
         
         # DEFAULT CAMERA FEED MENUS
-        for i in range(3):
+        for i in range(self.quantity):
             label = QLabel("Default Feed {}".format(i))
             defaultMenu = QComboBox()
             self.defaultMenus.append(defaultMenu)
             defaultMenu.activated.connect(lambda index, camera = i: self.changeDefaultCameras(index, camera))
             settingsLayout.addRow(label, defaultMenu)
 
-        # LAYOUT TO SHOW EACH CAMERAS SETTINGS
+        # LAYOUT TO SHOW CAMERA SETTINGS
         self.configForm = QFormLayout()
 
         # SPACER TO PUSH ALL WIDGETS UP
