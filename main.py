@@ -452,7 +452,6 @@ class UI(QMainWindow):
         self.control_vision_transect_line.clicked.connect(lambda status, task = 2: self.control.popupVisionTask(task))
         self.control_vision_coral_health.clicked.connect(lambda status, task = 3: self.control.popupVisionTask(task))
    
-
         # LINK EACH DIGITAL CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING CAMERA ID AS 1,2,3,4 ETC.
         self.camera_feed_1_menu.activated.connect(lambda index, camera = 0: self.changeCameraFeedMenu(index, camera))
         self.camera_feed_2_menu.activated.connect(lambda index, camera = 1: self.changeCameraFeedMenu(index, camera))
@@ -464,6 +463,9 @@ class UI(QMainWindow):
         self.camera_feed_2.mousePressEvent = lambda event, cameraFeed = 1: self.changeCameraFeed(event, cameraFeed)
         self.camera_feed_3.mousePressEvent = lambda event, cameraFeed = 2: self.changeCameraFeed(event, cameraFeed)
         self.camera_feed_4.mousePressEvent = lambda event, cameraFeed = 3: self.changeCameraFeed(event, cameraFeed)
+
+        self.program_exit.clicked.connect(lambda: self.app.quit())
+        self.program_exit.setStyleSheet(self.style.programExit)
 
     def linkConfigWidgets(self):
         """
@@ -768,15 +770,15 @@ class UI(QMainWindow):
         # DARK THEME
         if theme:
             self.avalon_logo.clear()
-            avalonPixmap = QPixmap('graphics/logo_white.png')
-            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
+            avalonPixmap = QPixmap('graphics/thumbnail.png')
+            avalonPixmap = avalonPixmap.scaledToWidth(200, Qt.SmoothTransformation)
             self.avalon_logo.setPixmap(avalonPixmap)
 
         # LIGHT THEME
         else:
             self.avalon_logo.clear()
             avalonPixmap = QPixmap('graphics/logo.png')
-            avalonPixmap = avalonPixmap.scaledToWidth(250, Qt.SmoothTransformation)
+            avalonPixmap = avalonPixmap.scaledToWidth(200, Qt.SmoothTransformation)
             self.avalon_logo.setPixmap(avalonPixmap)
 
     ###########################
@@ -1050,6 +1052,7 @@ class UI(QMainWindow):
             # TRANSITION TO CONTROL PANEL TAB
             if view == 0:
                 self.animation.screenPrevious()
+                self.change_gui_control.setChecked(True)
                 self.change_gui_config.setChecked(False)
 
                 # RESTART CAMERA FEEDS
@@ -1062,6 +1065,7 @@ class UI(QMainWindow):
                 
                 self.animation.screenNext()
                 self.change_gui_control.setChecked(False)
+                self.change_gui_config.setChecked(True)
 
         else:
             # IGNORE BUTTONS WHILE ANIMATION IS IN PROGRESS

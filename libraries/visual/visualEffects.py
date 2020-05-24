@@ -18,6 +18,7 @@ class STYLE():
     comboBox = ""
     timerLCD = ""
     timerStartButton = ""
+    programExit = ""
     groupBox = ""
     greenText = ""
     redText = ""
@@ -127,6 +128,9 @@ class STYLE():
                                     "QPushButton:checked {background-color: #c62828; color: white;}"
                                     "QPushButton:checked:hover {background-color: #b71c1c;}")
 
+            self.programExit = ("QPushButton {background-color: #c62828; color: white; border-radius: 15px; padding: 5px 20px}" 
+                                "QPushButton:hover {background-color: #b71c1c}")
+                                
             self.groupBox = ("""QGroupBox {background-color: #212121;
                                             border-radius: 20px;
                                             font-size: 12pt;
@@ -162,6 +166,8 @@ class STYLE():
 
             self.timerStartButton = ("QPushButton {background-color: #679e37; color: black;}" 
                                     "QPushButton:checked {background-color: #c62828; color: white;}")
+
+            self.programExit = ("")
 
             self.groupBox = ("")
 
