@@ -2,30 +2,34 @@
 ######## IMPORTS ########
 #########################
 
-# PYQT5 MODULES
-from PyQt5 import uic
-from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
-                            QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
-                            QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect, QShortcut)
-from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QKeyEvent, QKeySequence, QIcon, QFont, QColor, QPalette, QPainter
+try:
+    # PYQT5 MODULES
+    from PyQt5 import uic
+    from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
+    from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
+                                QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
+                                QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect, QShortcut)
+    from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QKeyEvent, QKeySequence, QIcon, QFont, QColor, QPalette, QPainter
 
-# ADDITIONAL MODULES
-import sys, os
-from threading import Thread, Timer
-from datetime import datetime
-from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW, CAP_FFMPEG
-from xml.etree.ElementTree import parse, Element, SubElement, ElementTree
-from subprocess import call
-from webbrowser import open
-from pygame import init
-from pygame.joystick import quit, Joystick, get_count
-from pygame.event import Event, get
-import serial
-from math import ceil
-import time
-import numpy as np
-import subprocess
+    # ADDITIONAL MODULES
+    import sys, os
+    from threading import Thread, Timer
+    from datetime import datetime
+    from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW, CAP_FFMPEG
+    from xml.etree.ElementTree import parse, Element, SubElement, ElementTree
+    from subprocess import call
+    from webbrowser import open
+    from pygame import init
+    from pygame.joystick import quit, Joystick, get_count
+    from pygame.event import Event, get
+    import serial
+    from math import ceil
+    import time
+    import subprocess
+except:
+    sys.exit("\n###################################################################################################"
+                "\nSome libraries are missing! Run the 'install_libraries.bat' file to install the required libraries."
+                "\n###################################################################################################")
 
 # CUSTOM LIBRARIES
 from libraries.configuration_file.configurationFile import READ_CONFIG_FILE, WRITE_CONFIG_FILE
