@@ -251,6 +251,7 @@ class READ_CONFIG_FILE():
             cameraLabels = []
             cameraAddresses = []
             defaultCameraList = []
+            cameraResolutions = []
 
             for camera in child:
 
@@ -276,7 +277,12 @@ class READ_CONFIG_FILE():
                     for item in camera:                        
                         defaultCameraList.append(int(item.text))
 
-            return cameraNumber, cameraLabels, cameraAddresses, defaultCameraList
+                # RESOLUTIONS
+                if camera.tag == 'resolution':
+                    for item in camera:
+                        cameraResolutions.append(int(item.text))
+
+            return cameraNumber, cameraLabels, cameraAddresses, defaultCameraList, cameraResolutions
              
         except:
             pass
@@ -508,7 +514,7 @@ class WRITE_CONFIG_FILE():
         except:
             pass
 
-    def saveDigitalCamera(self, digitalCameraNumber, digitalCameraLabelList, digitalCameraAddressList, digitalDefaultCameraList):
+    def saveDigitalCamera(self, digitalCameraNumber, digitalCameraLabelList, digitalCameraAddressList, digitalDefaultCameraList, digitalResolutionsList):
         """
         PURPOSE
 
@@ -545,6 +551,11 @@ class WRITE_CONFIG_FILE():
             defaultCameras = SubElement(digital, "default_feeds")
             for index, feed in enumerate(digitalDefaultCameraList):
                 SubElement(defaultCameras, "defaultfeed{}".format(index)).text = str(feed)
+
+            # CAMERA FEED RESOLUTIONS
+            cameraResolutions = SubElement(digital, "resolution")
+            for index, resolution in enumerate(digitalResolutionsList):
+                SubElement(cameraResolutions, "feed{}".format(index)).text = str(resolution)
 
         except:
             pass

@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QFrame, QLineEdit, QSpinBox, QFormLayout, QLabel, QSizePolicy, QComboBox, QCheckBox, QSpacerItem
-from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot, QSize
+from PyQt5.QtGui import QIcon
 
 class DIGITAL_CAMERAS(QObject):
     """
@@ -8,6 +9,8 @@ class DIGITAL_CAMERAS(QObject):
     Contains the functions to control the digital camera feeds.
     """
     # SIGNALS TO CALL FUNCTIONS IN MAIN PROGRAM
+    cameraEnableSignal = pyqtSignal(bool, int)
+    cameraResolutionSignal = pyqtSignal(int, int, int)
     cameraEditSignal = pyqtSignal()
     cameraChangeAddress = pyqtSignal(int, str)
 
@@ -19,6 +22,10 @@ class DIGITAL_CAMERAS(QObject):
     defaultMenus = []
     selectedCameras = [0, 0, 0, 0]
     selectedMenus = []
+    resolutions = [[1920, 1080], [1600, 900], [1280, 720], [1024, 576], [640, 360], [256, 144]]
+    resolutionMenus = []
+    selectedResolutions = []
+    feedStatus = []
 
     def __init__(self, *, controlLayout = None, configLayout = None, style = None):
         """
@@ -78,6 +85,12 @@ class DIGITAL_CAMERAS(QObject):
 
         # SET THE DEFAULT CAMERA ADDRESSES
         self.setCameraAddresses()
+
+        # SET CAMERA FEED RESOLUTIONS
+        for i, res in enumerate(self.selectedResolutions):
+            self.changeResolution(res, i)
+
+        self.updateResolutionMenus()
 
     def addCamera(self):
         """
@@ -184,17 +197,21 @@ class DIGITAL_CAMERAS(QObject):
         for i in range(self.quantity):
             self.removeCamera()
         
-        self.quantity = 4
+        self.quantity = 4 
         self.labelList = []
         self.addressList = []
         self.defaultCameras = [0, 0, 0, 0]
+        self.defaultMenus = []
         self.selectedCameras = [0, 0, 0, 0]
+        self.selectedMenus = []
+        self.resolutions = [[1920, 1080], [1600, 900], [1280, 720], [1024, 576], [640, 360], [256, 144]]
+        self.selectedResolutions = []
+        self.feedStatus = []
     
     #########################
     ### CONTROL PANEL TAB ###
     #########################
 
-    ### NOT IMPLEMENTED ###
     def setupControlLayout(self):
         """
         PURPOSE
@@ -209,8 +226,133 @@ class DIGITAL_CAMERAS(QObject):
 
         NONE
         """
-        pass
+        parentLayout = QFormLayout()
+        parentLayout.setLabelAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        label1 = QLabel("Enable/Disable")
+        label2 = QLabel("Resolution")
+        label2.setAlignment(Qt.AlignCenter)
+        parentLayout.addRow(label1, label2)
 
+        # PRIMARY AND SECONDARY CAMERA ICONS FOR EACH BUTTON
+        icons = ["graphics/cam_1.png", "graphics/cam_2.png", "graphics/cam_3.png", "graphics/cam_4.png"]
+
+        for feed, icon in enumerate(icons):
+            # ENABLE/DISABLE BUTTON
+            button = QPushButton()
+            button.setCheckable(True)
+            button.setChecked(True)
+            button.setIcon(QIcon(icon))
+            button.setIconSize(QSize(100, 22))
+
+            self.feedStatus.append(True)
+
+            # CHANGE RESOLUTION MENU
+            menu = QComboBox()
+            formattedRes = [str(item[0]) + "x" + str(item[1]) for item in self.resolutions]
+            menu.addItems(formattedRes)
+            self.resolutionMenus.append(menu)
+
+            # GET FRAME RESOLUTION FROM CONFIG FILE
+            try:
+                index = self.selectedResolutions[feed]
+
+            # OTHERWISE, SET DEFAULT RESOLUTION
+            except:
+                index = 4
+                self.selectedResolutions.append(index)
+
+            menu.setCurrentIndex(index)
+
+            # LINK WIDGETS
+            button.clicked.connect(lambda state, feed = feed: self.toggleCameraFeed(state, feed))
+            menu.activated.connect(lambda index, feed = feed: self.changeResolution(index, feed))
+
+            # ADD BUTTON AND MENU TO FORM LAYOUT
+            parentLayout.addRow(button, menu)
+
+        # ADD TO GUI
+        self.controlLayout.setLayout(parentLayout)
+
+    def toggleCameraFeed(self, status, feed):
+        """
+        PURPOSE
+
+        Emits signal to main program to enable/disable a camera feed.
+
+        INPUT
+
+        - status = state of the button.
+        - feed = the camera feed to toggle (1,2,3,4).
+
+        RETURNS
+
+        NONE
+        """
+        self.feedStatus[feed] = status 
+        self.cameraEnableSignal.emit(status, feed)
+
+    def toggleAllFeeds(self, feedStatus):
+        """
+        PURPOSE
+
+        Enables/disables all camera feeds when the user switches between control panel and configutaion tab.
+
+        INPUT
+
+        - state = True to turn on, False to turn off.
+
+        RETURNS
+
+        NONE
+        """
+        # DISABLE ALL FEEDS
+        if feedStatus == False:
+            for i, state in enumerate(self.feedStatus):
+                self.cameraEnableSignal.emit(False, i)
+
+        # ENABLE FEEDS THAT WERE PREVIOUSLY ENABLED
+        if feedStatus == True:
+            for i, state in enumerate(self.feedStatus):
+                self.cameraEnableSignal.emit(state, i)
+        
+    def changeResolution(self, menuIndex, feed):
+        """
+        PURPOSE
+
+        User selects camera feed display resolution from drop down menu.
+
+        INPUT
+
+        - menuIndex = the index of the menu item selected.
+        - feed = the camera feed being modified.
+
+        RETURNS
+
+        NONE
+        """
+        self.selectedResolutions[feed] = menuIndex
+        width = self.resolutions[menuIndex][0]
+        height = self.resolutions[menuIndex][1]
+
+        self.cameraResolutionSignal.emit(feed, width, height)
+
+    def updateResolutionMenus(self):
+        """
+        PURPOSE
+
+        Updates the resolutions menus with the correct indices.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        for i, menu in enumerate(self.resolutionMenus):
+            menu.setCurrentIndex(self.selectedResolutions[i])
+        
     def changeSelectedCameras(self, index, camera):
         """
         PURPOSE

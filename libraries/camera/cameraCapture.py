@@ -98,8 +98,8 @@ class CAMERA_CAPTURE(QThread):
         self.cameraFeed = None
         self.runFeed = True
         self.task = None
-        self.width = 1280   
-        self.height = 720
+        self.width = 1920      
+        self.height = 1080
     
     def run(self):
         """

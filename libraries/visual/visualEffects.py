@@ -99,12 +99,14 @@ class STYLE():
             self.blueButtonLarge = ("QPushButton {background-color: #424242; color: white; border-radius: 25px;}" 
                                 "QPushButton:hover {background-color: #393939;}"
                                 "QPushButton:pressed {background-color: #1976d2;}"
-                                "QPushButton:checked {background-color: #1976d2;}")
+                                "QPushButton:checked {background-color: #1976d2;}"
+                                "QPushButton:checked:hover {background-color: #115293}")
 
             self.blueButtonSmall = ("QPushButton {background-color: #424242; color: white; border-radius: 15px; padding: 5px 20px}" 
                                 "QPushButton:hover {background-color: #393939;}"
                                 "QPushButton:pressed {background-color: #1976d2;}"
-                                "QPushButton:checked {background-color: #1976d2;}")
+                                "QPushButton:checked {background-color: #1976d2;}"
+                                "QPushButton:checked:hover {background-color: #115293}")
             
             self.actuatorButton = ("QPushButton {background-color: #43a047; font-size: 20px; font-weight: bold; color: white; border-radius: 25px}" 
                                     "QPushButton:hover {background-color: #388e3c}"

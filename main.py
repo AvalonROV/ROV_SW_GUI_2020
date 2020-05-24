@@ -163,7 +163,7 @@ class UI(QMainWindow):
         self.analogCameras = ANALOG_CAMERAS(controlLayout = self.analog_camera_control, configLayout = self.analog_camera_config, style = self.style)
 
         # INITIATE DIGITAL CAMERAS
-        self.digitalCameras = DIGITAL_CAMERAS(configLayout = self.digital_camera_config, style = self.style)
+        self.digitalCameras = DIGITAL_CAMERAS(controlLayout = self.digital_camera_control, configLayout = self.digital_camera_config, style = self.style)
 
         # INITIATE KEYBINDINGS
         self.keybindings = KEYBINDINGS(configLayout = self.keybinding_config, style = self.style)
@@ -198,6 +198,8 @@ class UI(QMainWindow):
         self.keybindings.getButtonStates.connect(self.config.returnButtonStates)
 
         # DIGITAL CAMERA CHANGE ADDRESS/LABEL SIGNALS
+        self.digitalCameras.cameraEnableSignal.connect(self.toggleCameraFeed)
+        self.digitalCameras.cameraResolutionSignal.connect(self.changeCameraResolution)
         self.digitalCameras.cameraEditSignal.connect(self.updateCameraMenus)
         self.digitalCameras.cameraChangeAddress.connect(self.changeCameraAddress)
 
@@ -274,7 +276,7 @@ class UI(QMainWindow):
             self.analogCameras.quantity, self.analogCameras.labelList, self.analogCameras.defaultCameras = configFile.readAnalogCamera()
 
             # READ DIGITAL CAMERA SETTINGS
-            self.digitalCameras.quantity, self.digitalCameras.labelList, self.digitalCameras.addressList, self.digitalCameras.defaultCameras = configFile.readDigitalCamera()
+            self.digitalCameras.quantity, self.digitalCameras.labelList, self.digitalCameras.addressList, self.digitalCameras.defaultCameras, self.digitalCameras.selectedResolutions = configFile.readDigitalCamera()
 
             # READ KEYBINDING SETTINGS
             self.keybindings.bindings = configFile.readKeyBinding()
@@ -316,7 +318,7 @@ class UI(QMainWindow):
         configFile.saveAnalogCamera(self.analogCameras.quantity, self.analogCameras.labelList, self.analogCameras.defaultCameras)
 
         # SAVE DIGITAL CAMERA SETTINGS
-        configFile.saveDigitalCamera(self.digitalCameras.quantity, self.digitalCameras.labelList, self.digitalCameras.addressList, self.digitalCameras.defaultCameras)
+        configFile.saveDigitalCamera(self.digitalCameras.quantity, self.digitalCameras.labelList, self.digitalCameras.addressList, self.digitalCameras.defaultCameras, self.digitalCameras.selectedResolutions)
         
         # SAVE KEYBINDING SETTINGS
         configFile.saveKeybinding(self.keybindings.bindings)
@@ -422,13 +424,11 @@ class UI(QMainWindow):
         """
         # GO TO CONTROL PANEL TAB BUTTON
         self.change_gui_control.clicked.connect(lambda state, view = 0: self.changeView(view))
-        self.change_gui_control.setStyleSheet(self.style.blueButtonSmall)
         self.change_gui_control.setChecked(True)
         self.style.applyGlow(self.change_gui_control, "#0D47A1", 10)
         
         # GO TO CONFIGURATION TAB BUTTON
         self.change_gui_config.clicked.connect(lambda state, view = 1: self.changeView(view))
-        self.change_gui_config.setStyleSheet(self.style.blueButtonSmall)
         self.style.applyGlow(self.change_gui_config, "#0D47A1", 10)
         
         # VERTICAL SPITTER
@@ -447,24 +447,11 @@ class UI(QMainWindow):
         self.control_controller_connect.setFixedHeight(50)
         
         # MACHINE VISION TASK BUTTONS
-        self.control_vision_mosaic.clicked.connect(lambda status, task = 0: self.control.popupVisionTask(task))
-        self.control_vision_mosaic.setStyleSheet(self.style.blueButtonSmall)
+        self.control_vision_mosaic.clicked.connect(lambda status, task = 0: self.control.popupVisionTask(task)) 
         self.control_vision_shape_detection.clicked.connect(lambda status, task = 1: self.control.popupVisionTask(task))
-        self.control_vision_shape_detection.setStyleSheet(self.style.blueButtonSmall)
         self.control_vision_transect_line.clicked.connect(lambda status, task = 2: self.control.popupVisionTask(task))
-        self.control_vision_transect_line.setStyleSheet(self.style.blueButtonSmall)
         self.control_vision_coral_health.clicked.connect(lambda status, task = 3: self.control.popupVisionTask(task))
-        self.control_vision_coral_health.setStyleSheet(self.style.blueButtonSmall)
-
-        # CAMERA ENABLE CHECKBOX
-        self.camera_1_enable.setChecked(True)
-        self.camera_2_enable.setChecked(True)
-        self.camera_3_enable.setChecked(True)
-        self.camera_4_enable.setChecked(True)
-        self.camera_1_enable.toggled.connect(lambda state, camera = 0: self.toggleCameraFeed(state, camera))
-        self.camera_2_enable.toggled.connect(lambda state, camera = 1: self.toggleCameraFeed(state, camera))
-        self.camera_3_enable.toggled.connect(lambda state, camera = 2: self.toggleCameraFeed(state, camera))
-        self.camera_4_enable.toggled.connect(lambda state, camera = 3: self.toggleCameraFeed(state, camera))
+   
 
         # LINK EACH DIGITAL CAMERA DROP DOWN MENU TO THE SAME SLOT, PASSING CAMERA ID AS 1,2,3,4 ETC.
         self.camera_feed_1_menu.activated.connect(lambda index, camera = 0: self.changeCameraFeedMenu(index, camera))
@@ -585,6 +572,7 @@ class UI(QMainWindow):
             menu.addItems(self.digitalCameras.labelList)
             menu.setCurrentIndex(self.digitalCameras.selectedCameras[i])
 
+    @pyqtSlot(bool, int)
     def toggleCameraFeed(self, status, feed):
         """
         PURPOSE
@@ -639,6 +627,28 @@ class UI(QMainWindow):
         # REINITIALISE CAMERA WITH NEW ADDRESS
         self.cameraThreadList[camera].changeSource(formattedAddress)
  
+    @pyqtSlot(int, int, int)
+    def changeCameraResolution(self, camera, width, height):
+        """
+        PURPOSE
+
+        Calls function in camera capture library to change camera resolution.
+
+        INPUT
+
+        - camera = the camera feed being modified (0,1,2,3).
+        - width = width of the frame in px.
+        - height = height of the frame in px.
+
+        RETURNS
+
+        NONE
+        """
+        try:
+            self.cameraThreadList[camera].changeResolution(width, height)
+        except:
+            pass
+
     @pyqtSlot(QPixmap, int)
     def updateCameraFeed(self, frame, identifier):
         """
@@ -710,7 +720,7 @@ class UI(QMainWindow):
 
     #############################
     ###### THEME FUNCTIONS ######
-    #############################
+    ############################# 
     def changeTheme(self, theme = None):
         """
         PURPOSE
@@ -1036,8 +1046,6 @@ class UI(QMainWindow):
 
         NONE
         """
-        checkboxes = [self.camera_1_enable, self.camera_2_enable, self.camera_3_enable]
-
         if self.animation.animationComplete:
             # TRANSITION TO CONTROL PANEL TAB
             if view == 0:
@@ -1045,19 +1053,22 @@ class UI(QMainWindow):
                 self.change_gui_config.setChecked(False)
 
                 # RESTART CAMERA FEEDS
-                for i, checkbox in enumerate(checkboxes):
-                    if checkbox.isChecked():
-                        self.toggleCameraFeed(True, i)
+                self.digitalCameras.toggleAllFeeds(True)
 
             # TRANSITION TO CONFIGURATION TAB
             if view == 1:
                 # TURN OFF CAMERA FEEDS
-                for i, checkbox in enumerate(checkboxes):
-                    if checkbox.isChecked():
-                        self.toggleCameraFeed(False, i)
+                self.digitalCameras.toggleAllFeeds(False)
                 
                 self.animation.screenNext()
                 self.change_gui_control.setChecked(False)
+
+        else:
+            # IGNORE BUTTONS WHILE ANIMATION IS IN PROGRESS
+            if view == 0:
+                self.change_gui_control.setChecked(not self.change_gui_control.isChecked())
+            if view == 1:
+                self.change_gui_config.setChecked(not self.change_gui_config.isChecked())
 
     def printTerminal(self, text):
         """
