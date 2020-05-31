@@ -17,7 +17,7 @@ class ANALOG_CAMERAS(QObject):
     selectedCameras = [1 ,2 ,3 ,4]
     selectedMenus = []
 
-    def __init__(self, *, controlLayout = None, configLayout = None, style = None):
+    def __init__(self, *, controlLayout = None, configLayout = None):
         """
         PURPOSE
 
@@ -39,7 +39,6 @@ class ANALOG_CAMERAS(QObject):
         # CREATE THRUSTER WIDGETS ON THE CONTROL PANEL AND CONFIGURATION TABS
         self.controlLayout = controlLayout
         self.configLayout = configLayout
-        self.style = style
 
         # INITIAL LAYOUT SETUP
         self.setupConfigLayout()
@@ -324,16 +323,11 @@ class ANALOG_CAMERAS(QObject):
 
         # ADD LAYOUTS TO FRAMES (TO ALLOW STYLING)
         frame1 = QFrame()
+        frame1.setObjectName("analog-camera-frame")
         frame1.setLayout(layout1)
         frame2 = QFrame()
+        frame2.setObjectName("settings-frame")
         frame2.setLayout(layout2)
-        
-        # APPLY STYLING
-        try:
-            pass
-            #frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.analogCameraFrame, self.style.settingsFrame)
-        except:
-            pass
 
         # ADD TO CONFIGURATION TAB
         self.configForm.addRow(frame1, frame2)

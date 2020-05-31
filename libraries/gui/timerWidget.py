@@ -1,9 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QFrame, QSizePolicy, QLCDNumber
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QObject
 
 from datetime import datetime
 from threading import Timer
-class TIMER(QVBoxLayout):
+class TIMER(QObject):
     """
     PURPOSE
 
@@ -17,7 +17,7 @@ class TIMER(QVBoxLayout):
     timerNew = True                  
     timerMemory = 0
 
-    def __init__(self, *, style = None):
+    def __init__(self, *, controlLayout = None):
         """
         PURPOSE
 
@@ -26,15 +26,14 @@ class TIMER(QVBoxLayout):
 
         INPUT
 
-        - style = pointer to the style library to access stylesheets.
+        NONE
 
         RETURNS
 
         NONE
         """
-        self.style = style
-
-        QWidget.__init__(self)
+        QObject.__init__(self)
+        self.controlLayout = controlLayout
 
     def setup(self):
         """
@@ -50,33 +49,35 @@ class TIMER(QVBoxLayout):
 
         NONE
         """
-        # CREATE WIDGETS
-        self.time = QLCDNumber()
-        self.time.setSegmentStyle(QLCDNumber.Flat)
-        self.time.setNumDigits(11)
-        self.time.display('00:00:00:00')
-        self.time.setMinimumHeight(48)
-        
-        buttonLayout = QHBoxLayout()
-        self.startButton = QPushButton('Start')
-        self.startButton.setCheckable(True)
-        self.resetButton = QPushButton('Reset')
-        buttonLayout.addWidget(self.startButton)
-        buttonLayout.addWidget(self.resetButton)
-        
-        try:
-            self.startButton.setStyleSheet(self.style.timerStartButton)
-            self.time.setStyleSheet(self.style.timerLCD)
-        except:
-            pass
+        # CHECK IF TIMER WIDGET HAS ALREADY BEEN SETUP
+        if self.controlLayout.layout() == None:
+            self.parentLayout = QVBoxLayout()
 
-        # LINK WIDGETS
-        self.startButton.clicked.connect(self.timerToggle)
-        self.resetButton.clicked.connect(self.timerReset)
+            # CREATE WIDGETS
+            self.time = QLCDNumber()
+            self.time.setObjectName("timer-lcd")
+            self.time.setSegmentStyle(QLCDNumber.Flat)
+            self.time.setNumDigits(11)
+            self.time.display('00:00:00:00')
+            self.time.setMinimumHeight(48)
+            
+            buttonLayout = QHBoxLayout()
+            self.startButton = QPushButton('Start')
+            self.startButton.setObjectName("timer-start-button")
+            self.startButton.setCheckable(True)
+            self.resetButton = QPushButton('Reset')
+            buttonLayout.addWidget(self.startButton)
+            buttonLayout.addWidget(self.resetButton)
 
-        # ADD TO PARENT LAYOUT
-        self.addWidget(self.time)
-        self.addLayout(buttonLayout)
+            # LINK WIDGETS
+            self.startButton.clicked.connect(self.timerToggle)
+            self.resetButton.clicked.connect(self.timerReset)
+
+            # ADD TO PARENT LAYOUT
+            self.parentLayout.addWidget(self.time)
+            self.parentLayout.addLayout(buttonLayout)
+
+            self.controlLayout.setLayout(self.parentLayout)
 
     def timerStart(self):
         """
@@ -187,3 +188,6 @@ class TIMER(QVBoxLayout):
         
         # DISPLAY TIME SINCE MEASUREMENT START
         self.time.display('%02d:%02d:%02d:%02d' % (days, hours, minutes, seconds))
+
+    def reset(self):
+        pass

@@ -16,7 +16,7 @@ class KEYBINDINGS(QObject):
     bindings = []
     buttonStates = []
 
-    def __init__(self, *, controlLayout = None, configLayout = None, style = None):
+    def __init__(self, *, controlLayout = None, configLayout = None):
         """
         PURPOSE
 
@@ -27,7 +27,6 @@ class KEYBINDINGS(QObject):
 
         - controlLayout = layout widget located on the control panel tab to add widgets to.
         - controlLayout = layout widget located on the configuration tab to add widgets to.
-        - style = pointer to the style library to access stylesheets.
 
         RETURNS
 
@@ -38,7 +37,6 @@ class KEYBINDINGS(QObject):
         # CREATE THRUSTER WIDGETS ON THE CONTROL PANEL AND CONFIGURATION TABS
         self.controlLayout = controlLayout 
         self.configLayout = configLayout
-        self.style = style
 
         # INITIAL LAYOUT SETUP
         self.setupConfigLayout()
@@ -196,18 +194,11 @@ class KEYBINDINGS(QObject):
         
         # ADD LAYOUTS TO FRAMES (TO ALLOW STYLING)
         frame1 = QFrame()
+        frame1.setObjectName("key-binding-frame")
         frame1.setLayout(layout1)
         frame2 = QFrame()
+        frame2.setObjectName("settings-frame")
         frame2.setLayout(layout2)
-
-        frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.keybindingFrame, self.style.settingsFrame)
-        
-        # APPLY STYLING
-        try:
-            frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.keybindingFrame, self.style.settingsFrame)
-            setBinding.setStyleSheet(self.style.blueButtonSmall)
-        except:
-            pass
 
         # ADD TO FORM LAYOUT
         self.configForm.addRow(frame1, frame2)

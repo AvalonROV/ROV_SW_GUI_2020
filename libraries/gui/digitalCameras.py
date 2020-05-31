@@ -15,7 +15,8 @@ class DIGITAL_CAMERAS(QObject):
     cameraChangeAddress = pyqtSignal(int, str)
 
     # DATABASE
-    quantity = 4 
+    feedQuantity = 4
+    quantity = 0 
     labelList = []
     addressList = []
     defaultCameras = [0, 0, 0, 0]
@@ -24,10 +25,10 @@ class DIGITAL_CAMERAS(QObject):
     selectedMenus = []
     resolutions = [[1920, 1080], [1600, 900], [1280, 720], [1024, 576], [640, 360], [256, 144]]
     resolutionMenus = []
-    selectedResolutions = []
+    selectedResolutions = [4, 4, 4, 4]
     feedStatus = []
 
-    def __init__(self, *, controlLayout = None, configLayout = None, style = None):
+    def __init__(self, *, controlLayout = None, configLayout = None):
         """
         PURPOSE
 
@@ -38,7 +39,6 @@ class DIGITAL_CAMERAS(QObject):
 
         - controlLayout = layout widget located on the control panel tab to add widgets to.
         - controlLayout = layout widget located on the configuration tab to add widgets to.
-        - style = pointer to the style library to access stylesheets.
 
         RETURNS
 
@@ -49,7 +49,6 @@ class DIGITAL_CAMERAS(QObject):
         # CREATE THRUSTER WIDGETS ON THE CONTROL PANEL AND CONFIGURATION TABS
         self.controlLayout = controlLayout
         self.configLayout = configLayout
-        self.style = style
 
         # INITIAL LAYOUT SETUP
         self.setupConfigLayout()
@@ -87,11 +86,10 @@ class DIGITAL_CAMERAS(QObject):
         self.setCameraAddresses()
 
         # SET CAMERA FEED RESOLUTIONS
+        self.updateResolutionMenus()
         for i, res in enumerate(self.selectedResolutions):
             self.changeResolution(res, i)
-
-        self.updateResolutionMenus()
-
+        
     def addCamera(self):
         """
         PURPOSE
@@ -108,9 +106,6 @@ class DIGITAL_CAMERAS(QObject):
         """
         self.addConfigCamera()
 
-        # UPDATE MAIN PROGRAM 
-        self.cameraEditSignal.emit()
-
     def removeCamera(self):
         """
         PURPOSE
@@ -126,9 +121,6 @@ class DIGITAL_CAMERAS(QObject):
         NONE
         """
         self.removeConfigCamera()
-
-        # UPDATE MAIN PROGRAM 
-        self.cameraEditSignal.emit()
 
     def setCameraAddresses(self):
         """
@@ -197,21 +189,23 @@ class DIGITAL_CAMERAS(QObject):
         for i in range(self.quantity):
             self.removeCamera()
         
-        self.quantity = 4 
+        self.feedQuantity = 4
+        self.quantity = 0 
         self.labelList = []
         self.addressList = []
         self.defaultCameras = [0, 0, 0, 0]
-        self.defaultMenus = []
         self.selectedCameras = [0, 0, 0, 0]
-        self.selectedMenus = []
         self.resolutions = [[1920, 1080], [1600, 900], [1280, 720], [1024, 576], [640, 360], [256, 144]]
-        self.selectedResolutions = []
-        self.feedStatus = []
-    
+        self.selectedResolutions = [4, 4, 4, 4]
+
+        # UPDATE WIDGETS
+        self.cameraNumber.setValue(self.quantity)
+        self.updateDefaultMenus()
+        self.updateSelectedMenus()
+
     #########################
     ### CONTROL PANEL TAB ###
     #########################
-
     def setupControlLayout(self):
         """
         PURPOSE
@@ -253,13 +247,7 @@ class DIGITAL_CAMERAS(QObject):
             self.resolutionMenus.append(menu)
 
             # GET FRAME RESOLUTION FROM CONFIG FILE
-            try:
-                index = self.selectedResolutions[feed]
-
-            # OTHERWISE, SET DEFAULT RESOLUTION
-            except:
-                index = 4
-                self.selectedResolutions.append(index)
+            index = self.selectedResolutions[feed]
 
             menu.setCurrentIndex(index)
 
@@ -384,11 +372,9 @@ class DIGITAL_CAMERAS(QObject):
 
         NONE
         """
-        for i, menu in enumerate(self.selectedMenus):
-            menu.clear()
-            menu.addItems(self.labelList)
-            menu.setCurrentIndex(self.selectedCameras[i])
-
+        # UPDATE MAIN PROGRAM 
+        self.cameraEditSignal.emit()
+        
     #########################
     ### CONFIGURATION TAB ###
     #########################
@@ -415,7 +401,7 @@ class DIGITAL_CAMERAS(QObject):
         settingsLayout.addRow(QLabel("Quantity"), self.cameraNumber)
         
         # DEFAULT CAMERA FEED MENUS
-        for i in range(self.quantity):
+        for i in range(self.feedQuantity):
             label = QLabel("Default Feed {}".format(i))
             defaultMenu = QComboBox()
             self.defaultMenus.append(defaultMenu)
@@ -516,17 +502,11 @@ class DIGITAL_CAMERAS(QObject):
 
         # ADD LAYOUTS TO FRAMES (TO ALLOW STYLING)
         frame1 = QFrame()
+        frame1.setObjectName("digital-camera-frame")
         frame1.setLayout(layout1)
         frame2 = QFrame()
+        frame2.setObjectName("settings-frame")
         frame2.setLayout(layout2)
-        
-        # APPLY STYLING
-        try:
-            label1.setStyleSheet(self.style.infoLabel)
-            label2.setStyleSheet(self.style.infoLabel)
-            frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.digitalCameraFrame, self.style.settingsFrame)
-        except:
-            pass
 
         # ADD TO CONFIGURATION TAB
         self.configForm.addRow(frame1, frame2)
@@ -609,9 +589,6 @@ class DIGITAL_CAMERAS(QObject):
         self.updateDefaultMenus() 
         self.updateSelectedMenus()
 
-        # UPDATE MAIN PROGRAM 
-        self.cameraEditSignal.emit()
-
     def changeCameraAddress(self, lineEditObject, camera):
         """
         PURPOSE
@@ -642,9 +619,6 @@ class DIGITAL_CAMERAS(QObject):
 
         # APPLY ADDRESS CHANGE
         self.setCameraAddresses()
-
-        # UPDATE MAIN PROGRAM 
-        self.cameraEditSignal.emit()
 
     def updateAddressLabels(self):
         """

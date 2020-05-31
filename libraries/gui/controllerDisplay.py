@@ -14,7 +14,7 @@ class CONTROLLER_DISPLAY(QObject):
     joystickSensitivity = 2/3
     yawSensitivity = 2/3
 
-    def __init__(self, *, controlLayout = None, configLayout = None, style = None):
+    def __init__(self, *, controlLayout = None, configLayout = None):
         """
         PURPOSE
 
@@ -24,7 +24,6 @@ class CONTROLLER_DISPLAY(QObject):
 
         - controlLayout = layout widget located on the control panel tab to add widgets to.
         - controlLayout = layout widget located on the configuration tab to add widgets to.
-        - style = pointer to the style library to access stylesheets.
 
         RETURNS
 
@@ -35,7 +34,6 @@ class CONTROLLER_DISPLAY(QObject):
         # CREATE THRUSTER WIDGETS ON THE CONTROL PANEL AND CONFIGURATION TABS
         self.controlLayout = controlLayout
         self.configLayout = configLayout
-        self.style = style
 
     def setup(self):
         """
@@ -91,8 +89,32 @@ class CONTROLLER_DISPLAY(QObject):
 
         NONE
         """
-        parentLayout = QVBoxLayout()
+        # CHECK IF TIMER WIDGET HAS ALREADY BEEN SETUP
+        if self.controlLayout.layout() == None:
 
+            parentLayout = QVBoxLayout()
+
+            # CREATE WIDGETS FOR CONTROLLER AND YAW SENSITIVITY CONTROL
+            joystickLayout = self.setupControllerSensitivity()
+            yawLayout = self.setupYawSensitivity()
+
+            # ADD TO PARENT LAYOUT
+            parentLayout.addLayout(joystickLayout)
+            parentLayout.addLayout(yawLayout)
+
+            # ADD TO GUI
+            self.controlLayout.setLayout(parentLayout)
+
+    def setupControllerSensitivity(self):
+        """
+        PURPOSE
+
+        INPUT
+
+        RETURNS
+
+        NON£
+        """
         # JOYSTICK SENSITIVITY WIDGETS
         label1 = QLabel("Joystick")
         label1.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
@@ -103,27 +125,18 @@ class CONTROLLER_DISPLAY(QObject):
         self.joystickSlider.setPageStep(1)
         self.joystickLow = QLabel("LOW")
         self.joystickLow.setAlignment(Qt.AlignLeft)
+        self.joystickLow.setEnabled(False)
+        self.joystickLow.setObjectName("label-on-off")
         self.joystickNormal = QLabel("NORMAL")
         self.joystickNormal.setAlignment(Qt.AlignCenter)
+        self.joystickNormal.setEnabled(True)
+        self.joystickNormal.setObjectName("label-on-off")
         self.joystickHigh = QLabel("HIGH")
         self.joystickHigh.setAlignment(Qt.AlignRight)
+        self.joystickHigh.setEnabled(False)
+        self.joystickHigh.setObjectName("label-on-off")
 
-        # YAW SENSITIVITY WIDGETS
-        label2 = QLabel("Yaw")
-        label2.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.yawSlider =  QSlider(Qt.Horizontal)
-        self.yawSlider.setValue(2)
-        self.yawSlider.setMinimum(1)
-        self.yawSlider.setMaximum(3)
-        self.yawSlider.setPageStep(1)
-        self.yawLow = QLabel("LOW")
-        self.yawLow.setAlignment(Qt.AlignLeft)
-        self.yawNormal = QLabel("NORMAL")
-        self.yawNormal.setAlignment(Qt.AlignCenter)
-        self.yawHigh = QLabel("HIGH")
-        self.yawHigh.setAlignment(Qt.AlignRight)
-
-        # ADD WIDGETS TO CHILD LAYOUT
+        # BUILD LAYOUT
         joystickLayout = QHBoxLayout()
         joystickInnerLayout = QVBoxLayout()
         joystickLabelLayout = QHBoxLayout()
@@ -135,6 +148,41 @@ class CONTROLLER_DISPLAY(QObject):
         joystickLayout.addWidget(label1, 2)
         joystickLayout.addLayout(joystickInnerLayout, 5)
 
+        # LINK WIDGETS
+        self.joystickSlider.valueChanged.connect(self.changeJoystickSensitivity)
+
+        return joystickLayout
+        
+    def setupYawSensitivity(self):
+        """
+        PURPOSE
+
+        INPUT
+
+        RETURNS
+        """
+        # YAW SENSITIVITY WIDGETS
+        label2 = QLabel("Yaw")
+        label2.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        self.yawSlider =  QSlider(Qt.Horizontal)
+        self.yawSlider.setValue(2)
+        self.yawSlider.setMinimum(1)
+        self.yawSlider.setMaximum(3)
+        self.yawSlider.setPageStep(1)
+        self.yawLow = QLabel("LOW")
+        self.yawLow.setAlignment(Qt.AlignLeft)
+        self.yawLow.setEnabled(False)
+        self.yawLow.setObjectName("label-on-off")
+        self.yawNormal = QLabel("NORMAL")
+        self.yawNormal.setAlignment(Qt.AlignCenter)
+        self.yawNormal.setEnabled(True)
+        self.yawNormal.setObjectName("label-on-off")
+        self.yawHigh = QLabel("HIGH")
+        self.yawHigh.setAlignment(Qt.AlignRight)
+        self.yawHigh.setEnabled(False)
+        self.yawHigh.setObjectName("label-on-off")
+
+        # BUILD LAYOUT
         yawLayout = QHBoxLayout()
         yawInnerLayout = QVBoxLayout()
         yawLabelLayout = QHBoxLayout()
@@ -145,24 +193,11 @@ class CONTROLLER_DISPLAY(QObject):
         yawInnerLayout.addLayout(yawLabelLayout)
         yawLayout.addWidget(label2, 2)
         yawLayout.addLayout(yawInnerLayout, 5)
-        
-        # ADD TO PARENT LAYOUT
-        parentLayout.addLayout(joystickLayout)
-        parentLayout.addLayout(yawLayout)
-
-        # APPLY STYLING
-        try:
-            self.joystickNormal.setStyleSheet(self.style.greenText)
-            self.yawNormal.setStyleSheet(self.style.greenText)
-        except:
-            pass
 
         # LINK WIDGETS
-        self.joystickSlider.valueChanged.connect(self.changeJoystickSensitivity)
         self.yawSlider.valueChanged.connect(self.changeYawSensitivity)
 
-        # ADD TO GUI
-        self.controlLayout.setLayout(parentLayout)
+        return yawLayout
 
     def changeJoystickSensitivity(self, sensitivity):
         """
@@ -190,9 +225,9 @@ class CONTROLLER_DISPLAY(QObject):
         try:
             for i, label in enumerate(labels):
                 if i + 1 == sensitivity:
-                    label.setStyleSheet(self.style.greenText)
+                    label.setEnabled(True)
                 else:
-                    label.setStyleSheet("")
+                    label.setEnabled(False)
         except:
             pass
 
@@ -222,9 +257,9 @@ class CONTROLLER_DISPLAY(QObject):
         try:
             for i, label in enumerate(labels):
                 if i + 1 == sensitivity:
-                    label.setStyleSheet(self.style.greenText)
+                    label.setEnabled(True)
                 else:
-                    label.setStyleSheet("")
+                    label.setEnabled(False)
         except:
             pass
 
@@ -245,46 +280,48 @@ class CONTROLLER_DISPLAY(QObject):
 
         NONE
         """
-        parentLayout = QFormLayout()
+        # CHECK IF TIMER WIDGET HAS ALREADY BEEN SETUP
+        if self.configLayout.layout() == None:
+            parentLayout = QFormLayout()
 
-        # CREATE DISPLAY FOR JOYSTICKS
-        for index in range(5):
-            # CREATE JOYSTICK LABEL
-            label = QLabel(self.joystickLabels[index])
-            label.setStyleSheet("font-weight: bold;")
-            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            
-            # CREATE TEXT BOX TO DISPLAY VALUE
-            value = QLineEdit()
-            value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            value.setReadOnly(True)
+            # CREATE DISPLAY FOR JOYSTICKS
+            for index in range(5):
+                # CREATE JOYSTICK LABEL
+                label = QLabel(self.joystickLabels[index])
+                label.setStyleSheet("font-weight: bold;")
+                label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                
+                # CREATE TEXT BOX TO DISPLAY VALUE
+                value = QLineEdit()
+                value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+                value.setReadOnly(True)
 
-            # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
-            self.textBoxObjects.append(value)
+                # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
+                self.textBoxObjects.append(value)
 
-            # ADD TO FORM LAYOUT
-            parentLayout.addRow(label, value)
+                # ADD TO FORM LAYOUT
+                parentLayout.addRow(label, value)
 
-        # CREATE DISPLAY FOR BUTTONS
-        for index in range(14):
-            # CREATE BUTTON LABEL
-            label = QLabel(self.buttonLabels[index])
-            label.setStyleSheet("font-weight: bold;")
-            label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            
-            # CREATE TEXT BOX TO DISPLAY VALUE
-            value = QLineEdit()
-            value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            value.setReadOnly(True)
+            # CREATE DISPLAY FOR BUTTONS
+            for index in range(14):
+                # CREATE BUTTON LABEL
+                label = QLabel(self.buttonLabels[index])
+                label.setStyleSheet("font-weight: bold;")
+                label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                
+                # CREATE TEXT BOX TO DISPLAY VALUE
+                value = QLineEdit()
+                value.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+                value.setReadOnly(True)
 
-            # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
-            self.textBoxObjects.append(value)
+                # ADD POINTER FOR THE QLINEEDIT INTO AN ARRAY FOR LATER ACCESS
+                self.textBoxObjects.append(value)
 
-            # ADD TO FORM LAYOUT
-            parentLayout.addRow(label, value)
+                # ADD TO FORM LAYOUT
+                parentLayout.addRow(label, value)
 
-        # ADD TO GUI
-        self.configLayout.setLayout(parentLayout)
+            # ADD TO GUI
+            self.configLayout.setLayout(parentLayout)
 
     def updateDisplay(self, buttonStates, joystickValues):
         """

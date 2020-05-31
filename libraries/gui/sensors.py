@@ -14,7 +14,7 @@ class SENSORS(QObject):
     typeOptions = ['None','Temperature (°C)','Depth (m)', 'Yaw (°)', 'Pitch (°)', 'Roll (°)']
     selectedTypes = []
 
-    def __init__(self, *, controlLayout = None, configLayout = None, style = None):
+    def __init__(self, *, controlLayout = None, configLayout = None):
         """
         PURPOSE
 
@@ -24,8 +24,7 @@ class SENSORS(QObject):
         INPUT
         
         - controlLayout = layout widget located on the control panel tab to add widgets to.
-        - controlLayout = layout widget located on the configuration tab to add widgets to.
-        - style = pointer to the style library to access stylesheets.       
+        - controlLayout = layout widget located on the configuration tab to add widgets to.    
         
         RETURNS
 
@@ -36,7 +35,6 @@ class SENSORS(QObject):
         # CREATE THRUSTER WIDGETS ON THE CONTROL PANEL AND CONFIGURATION TABS
         self.controlLayout = controlLayout 
         self.configLayout = configLayout
-        self.style = style
 
         # INITIAL LAYOUT SETUP
         self.setupConfigLayout()
@@ -116,7 +114,10 @@ class SENSORS(QObject):
 
         self.quantity = 0
         self.selectedTypes = []
-        
+
+        # UPDATE WIDGETS
+        self.sensorNumber.setValue(self.quantity)
+
     #########################
     ### CONTROL PANEL TAB ###
     #########################
@@ -345,16 +346,11 @@ class SENSORS(QObject):
 
         # ADD LAYOUTS TO FRAMES (TO ALLOW STYLING)
         frame1 = QFrame()
+        #frame1.setObjectName("sensor-frame")
         frame1.setLayout(layout1)
         frame2 = QFrame()
+        #frame2.setObjectName("settings-frame")
         frame2.setLayout(layout2)
-        
-        # APPLY STYLING
-        try:
-            typeLabel.setStyleSheet(self.style.infoLabel)
-            #frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.sensorFrame, self.style.settingsFrame)
-        except:
-            pass
         
         # ADD TO FORM LAYOUT
         self.configForm.addRow(frame1, frame2)

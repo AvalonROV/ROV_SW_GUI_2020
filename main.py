@@ -41,6 +41,7 @@ from libraries.computer_vision.transectLineTask.transectLineAlgorithm_v1 import 
 from libraries.camera.cameraCapture import CAMERA_CAPTURE
 from libraries.animation.slideAnimation import SLIDE_ANIMATION
 from libraries.visual.visualEffects import STYLE
+from libraries.gui.profileSelector import PROFILE_SELECTOR
 from libraries.gui.timerWidget import TIMER
 from libraries.gui.thrusters import THRUSTERS
 from libraries.gui.actuators import ACTUATORS
@@ -57,7 +58,7 @@ class UI(QMainWindow):
     Contains functions to initiate the GUI, link the widgets and connect all the signals/slots from external libraries together.
     """
     # DATABASE
-    fileName = '.\config\config.xml'
+    fileName = ""
     cameraFeeds = []
     cameraThreadList = []
     visionTaskStatus = [False] * 4
@@ -93,16 +94,16 @@ class UI(QMainWindow):
         # CONNECT LIBRARY SIGNALS TO SLOTS
         self.connectSignals()
 
-        # LOAD SETTINGS FROM CONFIG FILE
-        self.configSetup()
-
-        # SET DEFAULT SCALING
-        self.setupDefaultScaling()
-
         # LINK SIGNALS TO SLOTS
         self.linkControlPanelWidgets()
         self.linkConfigWidgets()
         self.linkToolbarWidgets()
+
+        # LOAD DEFAULT PROGRAM CONFIGURATION
+        self.configSetup()
+
+        # SET DEFAULT SCALING
+        self.setupDefaultScaling()
 
         # LINK KEYBOARD SHORTCUTS
         self.setKeyShortcuts()
@@ -114,6 +115,9 @@ class UI(QMainWindow):
     
         # LAUNCH GUI
         self.showFullScreen()
+
+        # LAUNCH PILOT PROFILE SELECTOR
+        self.profileSelector.showPopup()     
 
     def initiateObjects(self):
         """
@@ -129,6 +133,9 @@ class UI(QMainWindow):
 
         NONE
         """
+        # OPEN PILOT PROFILE SELECTOR WINDOW
+        self.profileSelector = PROFILE_SELECTOR()
+
         # INITIATE SERIAL COMMUNICATION LIBRARY
         self.comms = ROV_SERIAL()
 
@@ -154,26 +161,25 @@ class UI(QMainWindow):
         self.control.initialiseVisionWidgets()
 
         # INITIATE TIMER
-        self.timer = TIMER(style = self.style)
-        self.timer_control.setLayout(self.timer)
+        self.timer = TIMER(controlLayout = self.timer_control)
 
         # INITIATE THRUSTERS
-        self.thrusters = THRUSTERS(controlLayout = self.orientation_control, configLayout = self.thruster_config, style = self.style)
+        self.thrusters = THRUSTERS(controlLayout = self.orientation_control, configLayout = self.thruster_config)
 
         # INITIATE ACTUATORS
-        self.actuators = ACTUATORS(controlLayout = self.actuator_control, configLayout = self.actuator_config, style = self.style)
+        self.actuators = ACTUATORS(controlLayout = self.actuator_control, configLayout = self.actuator_config)
 
         # INITIATE ANALOG CAMERAS
-        self.analogCameras = ANALOG_CAMERAS(controlLayout = self.analog_camera_control, configLayout = self.analog_camera_config, style = self.style)
+        self.analogCameras = ANALOG_CAMERAS(controlLayout = self.analog_camera_control, configLayout = self.analog_camera_config)
 
         # INITIATE DIGITAL CAMERAS
-        self.digitalCameras = DIGITAL_CAMERAS(controlLayout = self.digital_camera_control, configLayout = self.digital_camera_config, style = self.style)
+        self.digitalCameras = DIGITAL_CAMERAS(controlLayout = self.digital_camera_control, configLayout = self.digital_camera_config)
 
         # INITIATE KEYBINDINGS
-        self.keybindings = KEYBINDINGS(configLayout = self.keybinding_config, style = self.style)
+        self.keybindings = KEYBINDINGS(configLayout = self.keybinding_config)
 
         # INITIATE CONTROLLER INPUT DISPLAY
-        self.controllerDisplay = CONTROLLER_DISPLAY(configLayout = self.controller_display_config, controlLayout = self.controller_control, style = self.style)
+        self.controllerDisplay = CONTROLLER_DISPLAY(configLayout = self.controller_display_config, controlLayout = self.controller_control)
 
         # INITIATE SENSORS
         self.sensors = SENSORS(controlLayout = self.sensor_control, configLayout = self.sensor_config)
@@ -192,6 +198,9 @@ class UI(QMainWindow):
 
         NONE
         """
+        # PILOT PROFILE SELECTED SIGNAL
+        self.profileSelector.loadProfileSignal.connect(self.pilotProfileSelected)
+
         # PROGRAM CLOSE SIGNAL
         self.app.aboutToQuit.connect(self.programExit)
 
@@ -225,6 +234,29 @@ class UI(QMainWindow):
     ###############################
     ### CONFIGURATION FUNCTIONS ###
     ###############################
+    @pyqtSlot(str)
+    def pilotProfileSelected(self, directory):
+        """
+        PURPOSE
+
+        Called when a pilot profile is selected from the popup window.
+        Sets the directory of the configuration file to load.
+        Loads to configuration file.
+
+        INPUT
+
+        - directory = directory of the XML configuration file.
+
+        RETURNS
+
+        NONE
+        """
+        self.fileName = "./config/" + directory
+
+        # LOAD SETTINGS FROM CONFIG FILE
+        self.resetConfig()
+        self.configSetup()
+
     def configSetup(self):
         """
         PURPOSE
@@ -281,7 +313,7 @@ class UI(QMainWindow):
 
             # READ DIGITAL CAMERA SETTINGS
             self.digitalCameras.quantity, self.digitalCameras.labelList, self.digitalCameras.addressList, self.digitalCameras.defaultCameras, self.digitalCameras.selectedResolutions = configFile.readDigitalCamera()
-
+            
             # READ KEYBINDING SETTINGS
             self.keybindings.bindings = configFile.readKeyBinding()
 
@@ -388,6 +420,9 @@ class UI(QMainWindow):
 
         NONE
         """
+        # CLEAR TIMER LAYOUT
+        self.timer.reset()
+
         # RESET THRUSTER SETTINGS
         self.thrusters.reset()
 
@@ -440,13 +475,13 @@ class UI(QMainWindow):
 
         # ROV CONNECT BUTTON
         self.control_rov_connect.clicked.connect(self.control.rovSerialConnection)
-        self.control_rov_connect.setStyleSheet(self.style.blueButtonLarge)
+        self.control_rov_connect.setObjectName("large-button")
         self.style.applyGlow(self.control_rov_connect, "#0D47A1", 10)
         self.control_rov_connect.setFixedHeight(50)
         
         # CONTROLLER CONNECT BUTTON
         self.control_controller_connect.clicked.connect(self.control.controllerConnection)
-        self.control_controller_connect.setStyleSheet(self.style.blueButtonLarge)
+        self.control_controller_connect.setObjectName("large-button")
         self.style.applyGlow(self.control_controller_connect, "#0D47A1", 10)
         self.control_controller_connect.setFixedHeight(50)
         
@@ -468,9 +503,10 @@ class UI(QMainWindow):
         self.camera_feed_3.mousePressEvent = lambda event, cameraFeed = 2: self.changeCameraFeed(event, cameraFeed)
         self.camera_feed_4.mousePressEvent = lambda event, cameraFeed = 3: self.changeCameraFeed(event, cameraFeed)
 
+        # PROGRAM EXIT BUTTON
         self.program_exit.clicked.connect(lambda: self.app.quit())
-        self.program_exit.setStyleSheet(self.style.programExit)
-
+        self.program_exit.setObjectName("program-exit-button")
+        
     def linkConfigWidgets(self):
         """
         PURPOSE
@@ -487,13 +523,13 @@ class UI(QMainWindow):
         """
         # ROV CONNECT BUTTON
         self.config_rov_connect.clicked.connect(self.control.rovSerialConnection)
-        self.config_rov_connect.setStyleSheet(self.style.blueButtonLarge)
+        self.config_rov_connect.setObjectName("large-button")
         self.style.applyGlow(self.config_rov_connect, "#0D47A1", 10)
         self.config_rov_connect.setFixedHeight(50)
         
         # CONTROLLER CONNECT BUTTON
         self.config_controller_connect.clicked.connect(self.control.controllerConnection)
-        self.config_controller_connect.setStyleSheet(self.style.blueButtonLarge)
+        self.config_controller_connect.setObjectName("large-button")
         self.style.applyGlow(self.config_controller_connect, "#0D47A1", 10)
         self.config_controller_connect.setFixedHeight(50)
             
@@ -517,6 +553,7 @@ class UI(QMainWindow):
         """
         self.toolbar_load_settings.triggered.connect(self.toolbar.loadSettings)
         self.toolbar_reset_settings.triggered.connect(self.toolbar.resetSettings)
+        self.toolbar_change_pilot.triggered.connect(self.toolbar.changePilotProfile)
         self.toolbar_save_settings.triggered.connect(self.toolbar.saveSettings)
         self.toolbar_open_documentation.triggered.connect(self.toolbar.openDocumentation)
         self.toolbar_open_github.triggered.connect(self.toolbar.openGitHub)
@@ -745,18 +782,44 @@ class UI(QMainWindow):
         if theme == None:
             self.style.theme = not self.style.theme
 
+        # APPLY NEW APPLICATION COLOR PALETTE
+        self.style.setPalette(theme, self.app)
+
         # CHANGE PROGRAM STYLESHEETS
         self.style.setStyleSheets(self.style.theme)
 
-        # APPLY NEW APPLICATION PALETTE
-        self.style.setPalette(theme, self.app)
+        # SET STYLESHEETS
+        try: 
+            globalStylesheets = (
+                self.style.normalButton + 
+                self.style.largeButton +
+                self.style.actuatorButton + 
+                self.style.orientationButton +
+                self.style.timerStartButton +
+                self.style.renameButton +
+                self.style.deleteButton +
+                self.style.programExitButton +
+                self.style.timerLCD +
+                self.style.scrollArea +
+                self.style.comboBox + 
+                self.style.groupBox +
+                self.style.settingsFrame +
+                self.style.thrusterFrame +
+                self.style.actuatorFrame +
+                self.style.digitalCameraFrame +
+                self.style.keybindingFrame +
+                self.style.labelOnOff +
+                self.style.infoLabel)
 
-        # SET GLOBAL DEFAULT STYLESHEETS
-        self.centralwidget.setStyleSheet(self.style.groupBox + self.style.comboBox + self.style.blueButtonSmall)
-
+            self.setStyleSheet(globalStylesheets)
+            self.profileSelector.setStyleSheet(globalStylesheets)
+        
+        except:
+            pass
+        
         # LOAD AVALON LOGO
-        self.setLogo(self.style.theme)
-              
+        self.setLogo(self.style.theme)      
+
     def setLogo(self, theme):
         """
         PURPOSE
@@ -805,8 +868,10 @@ class UI(QMainWindow):
         screenWidth, screenHeight = self.getScreenSize()
 
         # SET DEFAULT SIDE BAR WIDTH
-        #self.con_panel_functions_widget.resize(int(screenWidth/3),self.con_panel_functions_widget.height())
         self.con_panel_functions_widget.resize(1000,self.con_panel_functions_widget.height())
+
+        # SET HEIGHT OF GROUP BOXES ON CONFIG TAB
+        #self.configuration_tab.
 
     def getScreenSize(self):
         """
@@ -914,20 +979,25 @@ class UI(QMainWindow):
         screenWidth, screenHeight = self.getScreenSize()
 
         widthProportion = width/screenWidth
-
-        if widthProportion < 0.6:
+        
+        if widthProportion < 0.4:
             objects = self.unparentGridWidgets()
             self.setNewGridOrder(objects, 3)
             self.setGridStretch()
 
-        elif widthProportion < 0.8:
+        elif widthProportion < 0.6:
             objects = self.unparentGridWidgets()
             self.setNewGridOrder(objects, 4)
             self.setGridStretch()
 
-        else:
+        elif widthProportion < 0.8:
             objects = self.unparentGridWidgets()
             self.setNewGridOrder(objects, 5)
+            self.setGridStretch()
+
+        else:
+            objects = self.unparentGridWidgets()
+            self.setNewGridOrder(objects, 6)
             self.setGridStretch()
 
     def unparentGridWidgets(self):
@@ -1023,6 +1093,8 @@ class UI(QMainWindow):
                 # IF OBJECT EXISTS ON CURRENT GRID ROW
                 if item != None:
                     self.config_grid_layout.setRowStretch(row, 1)
+                    # SET MINIMUM ROW HEIGHT
+                    self.config_grid_layout.setRowMinimumHeight(row, 800)
                 
         # HIDE UNUSED COLUMNS
         for column in range(columnCount):
@@ -1906,10 +1978,30 @@ class TOOLBAR():
 
         NONE
         """
-        # WRITE CURRENT PROGRAM CONFIGURATION TO XML FILE.
-        self.ui.writeConfigFile()
+        if self.ui.fileName == "":
+            self.ui.fileName, _ = QFileDialog.getSaveFileName(self.ui, 'Save File','./config', 'XML File (*.xml)')
+        
+        if self.ui.fileName != '': 
+            # WRITE CURRENT PROGRAM CONFIGURATION TO XML FILE.
+            self.ui.writeConfigFile()
 
-        self.ui.printTerminal("Current program configuration saved to {}.".format(self.ui.fileName))
+            self.ui.printTerminal("Current program configuration saved to {}.".format(self.ui.fileName))
+
+    def changePilotProfile(self):
+        """
+        PURPOSE
+
+        Opens a popup windows to select the pilot profile to load.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+        
+        NONE
+        """
+        self.ui.profileSelector.showPopup()
 
     def resetSettings(self):
         """
@@ -1927,7 +2019,7 @@ class TOOLBAR():
         """
         self.ui.printTerminal("Program configuration reset.")
         self.ui.resetConfig()
-        self.ui.programSetup()
+        #self.ui.programSetup()
 
     def loadSettings(self):
         """
@@ -1943,8 +2035,8 @@ class TOOLBAR():
 
         NONE
         """
-        # USER CHOOSES SEQUENCE FILE
-        self.ui.fileName, _ = QFileDialog.getOpenFileName(self.ui, 'Open File','./','XML File (*.xml)')
+        # USER CHOOSES CONFIGURATION FILE
+        self.ui.fileName, _ = QFileDialog.getOpenFileName(self.ui, 'Open File','./config','XML File (*.xml)')
         if self.ui.fileName != '':
             self.ui.printTerminal("Loading {} configuration file".format(self.ui.fileName))
             self.ui.resetConfig()
@@ -2017,7 +2109,7 @@ class TOOLBAR():
         NONE
         """
         self.ui.changeTheme()
-        self.restartProgram()
+        #self.restartProgram()
 
     def restartProgram(self):
         """

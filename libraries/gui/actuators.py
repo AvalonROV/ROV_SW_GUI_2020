@@ -173,14 +173,9 @@ class ACTUATORS(QObject):
         actuatorName = QLabel(labels[0])
         actuatorName.setFixedHeight(50)
         actuatorToggle = QPushButton(labels[1])
+        actuatorToggle.setObjectName("actuator-button")
         actuatorToggle.setCheckable(True)
         actuatorToggle.setFixedHeight(50)
-
-        # APPLY STYLING
-        try:
-            actuatorToggle.setStyleSheet(self.style.actuatorButton)
-        except:
-            pass
         
         # ADD TO FORM LAYOUT
         self.controlForm.addRow(actuatorName, actuatorToggle)
@@ -391,18 +386,11 @@ class ACTUATORS(QObject):
 
         # ADD LAYOUTS TO FRAMES (TO ALLOW STYLING)
         frame1 = QFrame()
+        frame1.setObjectName("actuator-frame")
         frame1.setLayout(layout1)
         frame2 = QFrame()
+        frame2.setObjectName("settings-frame")
         frame2.setLayout(layout2)
-        
-        # APPLY STYLING
-        try:
-            label1.setStyleSheet(self.style.infoLabel)
-            label2.setStyleSheet(self.style.infoLabel)
-            label3.setStyleSheet(self.style.infoLabel)
-            frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.actuatorFrame, self.style.settingsFrame)
-        except:
-            pass
 
         # ADD TO FORM LAYOUT
         self.configForm.addRow(frame1, frame2)

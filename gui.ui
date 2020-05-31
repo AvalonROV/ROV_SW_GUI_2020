@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="central_widget">
    <layout class="QGridLayout" name="gridLayout_12">
     <property name="topMargin">
      <number>10</number>
@@ -23,7 +23,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="page">
+      <widget class="QWidget" name="control_panel_tab">
        <layout class="QGridLayout" name="gridLayout_8">
         <item row="0" column="0">
          <widget class="QSplitter" name="control_panel_splitter">
@@ -325,556 +325,580 @@
            </layout>
           </widget>
           <widget class="QWidget" name="con_panel_functions_widget" native="true">
-           <layout class="QGridLayout" name="gridLayout_7">
+           <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
-             <layout class="QGridLayout" name="gridLayout_5">
-              <item row="0" column="0">
-               <widget class="QStackedWidget" name="control_vision_stacked_widget">
-                <property name="currentIndex">
-                 <number>0</number>
-                </property>
-                <widget class="QWidget" name="page_3">
-                 <layout class="QGridLayout" name="gridLayout_35">
-                  <item row="0" column="0">
-                   <widget class="QWidget" name="widget_2" native="true">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>0</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QGroupBox" name="group_box_minirov">
+             <widget class="QScrollArea" name="scrollArea">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="lineWidth">
+               <number>0</number>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="widgetResizable">
+               <bool>true</bool>
+              </property>
+              <widget class="QWidget" name="scrollAreaWidgetContents_2">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>280</width>
+                 <height>1002</height>
+                </rect>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_7">
+                <item row="0" column="0">
+                 <widget class="QStackedWidget" name="control_vision_stacked_widget">
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <widget class="QWidget" name="page_3">
+                   <layout class="QGridLayout" name="gridLayout_35">
+                    <item row="4" column="1">
+                     <spacer name="verticalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QGroupBox" name="digital_camera_control">
+                      <property name="title">
+                       <string>Cameras</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QWidget" name="widget_2" native="true">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>0</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QGroupBox" name="analog_camera_control">
+                      <property name="title">
+                       <string>External Camera Feeds</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QGroupBox" name="controller_control">
+                      <property name="title">
+                       <string>Controller Sensitivity</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QGroupBox" name="group_box_minirov">
+                      <property name="title">
+                       <string>Mini ROV</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout_3">
+                       <item row="0" column="0">
+                        <widget class="QPushButton" name="pushButton_18">
+                         <property name="text">
+                          <string>Activate</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="label_2">
+                         <property name="text">
+                          <string>Tether Length</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QProgressBar" name="progressBar">
+                         <property name="value">
+                          <number>24</number>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="0">
+                        <layout class="QHBoxLayout" name="horizontalLayout_6">
+                         <item>
+                          <widget class="QPushButton" name="pushButton_19">
+                           <property name="text">
+                            <string>Extend</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="pushButton_24">
+                           <property name="text">
+                            <string>Retract</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="page_4">
+                   <layout class="QGridLayout" name="gridLayout_25">
+                    <item row="0" column="0">
+                     <widget class="QGroupBox" name="group_box_mosaic_task">
+                      <property name="title">
+                       <string>Mosaic Task</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout_38">
+                       <item row="0" column="0">
+                        <widget class="QScrollArea" name="scroll_mosaic_task">
+                         <property name="styleSheet">
+                          <string notr="true">QScrollArea { background: transparent; }
+QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
+QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
+                         </property>
+                         <property name="widgetResizable">
+                          <bool>true</bool>
+                         </property>
+                         <widget class="QWidget" name="scrollAreaWidgetContents_5">
+                          <property name="geometry">
+                           <rect>
+                            <x>0</x>
+                            <y>0</y>
+                            <width>98</width>
+                            <height>28</height>
+                           </rect>
+                          </property>
+                         </widget>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="page_5">
+                   <layout class="QGridLayout" name="gridLayout_36">
+                    <item row="0" column="0">
+                     <widget class="QGroupBox" name="group_box_shape_detection">
+                      <property name="title">
+                       <string>Shape Detection</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <spacer name="verticalSpacer_4">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="page_7">
+                   <layout class="QGridLayout" name="gridLayout_37">
+                    <item row="0" column="0">
+                     <widget class="QGroupBox" name="group_box_transect_task">
+                      <property name="title">
+                       <string>Transect Line</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <spacer name="verticalSpacer_5">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="page_6">
+                   <layout class="QGridLayout" name="gridLayout_26">
+                    <item row="0" column="0">
+                     <widget class="QGroupBox" name="group_box_coral_health_task">
+                      <property name="title">
+                       <string>Coral Reef Health</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <spacer name="verticalSpacer_6">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </widget>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QScrollArea" name="control_panel_scroll">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="lineWidth">
+               <number>0</number>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="widgetResizable">
+               <bool>true</bool>
+              </property>
+              <widget class="QWidget" name="scrollAreaWidgetContents_3">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>248</width>
+                 <height>1002</height>
+                </rect>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_10">
+                <item row="2" column="0">
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="0">
+                 <layout class="QVBoxLayout" name="verticalLayout">
+                  <item>
+                   <widget class="QGroupBox" name="group_box_comms_connect">
                     <property name="title">
-                     <string>Mini ROV</string>
+                     <string>Communication Setup</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
                     </property>
-                    <layout class="QGridLayout" name="gridLayout_3">
-                     <item row="0" column="0">
-                      <widget class="QPushButton" name="pushButton_18">
+                    <layout class="QGridLayout" name="gridLayout_4">
+                     <item row="0" column="1">
+                      <widget class="QPushButton" name="control_rov_connect">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
                        <property name="text">
-                        <string>Activate</string>
+                        <string>CONNECT</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_2">
+                     <item row="1" column="1">
+                      <widget class="QPushButton" name="control_controller_connect">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
                        <property name="text">
-                        <string>Tether Length</string>
+                        <string>CONNECT</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_3">
+                       <property name="text">
+                        <string>ROV</string>
                        </property>
                        <property name="alignment">
                         <set>Qt::AlignCenter</set>
                        </property>
                       </widget>
                      </item>
-                     <item row="2" column="0">
-                      <widget class="QProgressBar" name="progressBar">
-                       <property name="value">
-                        <number>24</number>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_4">
+                       <property name="text">
+                        <string>Controller</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="actuator_control">
+                    <property name="title">
+                     <string>Actuators</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="sensor_control">
+                    <property name="title">
+                     <string>Sensors</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="group_box_tasks">
+                    <property name="title">
+                     <string>Tasks</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_18">
+                     <item row="3" column="1">
+                      <widget class="QPushButton" name="control_vision_coral_health">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Start</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QPushButton" name="control_vision_shape_detection">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Start</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_7">
+                       <property name="text">
+                        <string>Shape Detection</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
                        </property>
                       </widget>
                      </item>
                      <item row="3" column="0">
-                      <layout class="QHBoxLayout" name="horizontalLayout_6">
-                       <item>
-                        <widget class="QPushButton" name="pushButton_19">
-                         <property name="text">
-                          <string>Extend</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="pushButton_24">
-                         <property name="text">
-                          <string>Retract</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QGroupBox" name="controller_control">
-                    <property name="title">
-                     <string>Controller Sensitivity</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QGroupBox" name="digital_camera_control">
-                    <property name="title">
-                     <string>Cameras</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <spacer name="verticalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QGroupBox" name="analog_camera_control">
-                    <property name="title">
-                     <string>External Camera Feeds</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-                <widget class="QWidget" name="page_4">
-                 <layout class="QGridLayout" name="gridLayout_25">
-                  <item row="0" column="0">
-                   <widget class="QGroupBox" name="group_box_mosaic_task">
-                    <property name="title">
-                     <string>Mosaic Task</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_38">
-                     <item row="0" column="0">
-                      <widget class="QScrollArea" name="scroll_mosaic_task">
-                       <property name="styleSheet">
-                        <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
+                      <widget class="QLabel" name="label_12">
+                       <property name="text">
+                        <string>Coral Reef Health</string>
                        </property>
-                       <property name="widgetResizable">
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_6">
+                       <property name="text">
+                        <string>Mosaic</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QPushButton" name="control_vision_mosaic">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Start</string>
+                       </property>
+                       <property name="checkable">
                         <bool>true</bool>
                        </property>
-                       <widget class="QWidget" name="scrollAreaWidgetContents_5">
-                        <property name="geometry">
-                         <rect>
-                          <x>0</x>
-                          <y>0</y>
-                          <width>31</width>
-                          <height>16</height>
-                         </rect>
-                        </property>
-                       </widget>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QPushButton" name="control_vision_transect_line">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Start</string>
+                       </property>
+                       <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QLabel" name="label_13">
+                       <property name="text">
+                        <string>Transect Line</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignCenter</set>
+                       </property>
                       </widget>
                      </item>
                     </layout>
                    </widget>
                   </item>
-                 </layout>
-                </widget>
-                <widget class="QWidget" name="page_5">
-                 <layout class="QGridLayout" name="gridLayout_36">
-                  <item row="0" column="0">
-                   <widget class="QGroupBox" name="group_box_shape_detection">
+                  <item>
+                   <widget class="QGroupBox" name="orientation_control">
                     <property name="title">
-                     <string>Shape Detection</string>
+                     <string>Control Orientation</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <spacer name="verticalSpacer_4">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-                <widget class="QWidget" name="page_7">
-                 <layout class="QGridLayout" name="gridLayout_37">
-                  <item row="0" column="0">
-                   <widget class="QGroupBox" name="group_box_transect_task">
+                  <item>
+                   <widget class="QGroupBox" name="timer_control">
                     <property name="title">
-                     <string>Transect Line</string>
+                     <string>Competition Time</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <spacer name="verticalSpacer_5">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
-                </widget>
-                <widget class="QWidget" name="page_6">
-                 <layout class="QGridLayout" name="gridLayout_26">
-                  <item row="0" column="0">
-                   <widget class="QGroupBox" name="group_box_coral_health_task">
-                    <property name="title">
-                     <string>Coral Reef Health</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <spacer name="verticalSpacer_6">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QScrollArea" name="control_panel_scroll">
-                <property name="frameShape">
-                 <enum>QFrame::NoFrame</enum>
-                </property>
-                <property name="lineWidth">
-                 <number>0</number>
-                </property>
-                <property name="horizontalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="widgetResizable">
-                 <bool>true</bool>
-                </property>
-                <widget class="QWidget" name="scrollAreaWidgetContents_3">
-                 <property name="geometry">
-                  <rect>
-                   <x>0</x>
-                   <y>0</y>
-                   <width>248</width>
-                   <height>1000</height>
-                  </rect>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_10">
-                  <item row="2" column="0">
-                   <spacer name="verticalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item row="0" column="0">
-                   <layout class="QVBoxLayout" name="verticalLayout">
-                    <item>
-                     <widget class="QGroupBox" name="group_box_comms_connect">
-                      <property name="title">
-                       <string>Communication Setup</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <layout class="QGridLayout" name="gridLayout_4">
-                       <item row="0" column="1">
-                        <widget class="QPushButton" name="control_rov_connect">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>CONNECT</string>
-                         </property>
-                         <property name="checkable">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="1">
-                        <widget class="QPushButton" name="control_controller_connect">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>CONNECT</string>
-                         </property>
-                         <property name="checkable">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="0">
-                        <widget class="QLabel" name="label_3">
-                         <property name="text">
-                          <string>ROV</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="0">
-                        <widget class="QLabel" name="label_4">
-                         <property name="text">
-                          <string>Controller</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QGroupBox" name="actuator_control">
-                      <property name="title">
-                       <string>Actuators</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QGroupBox" name="sensor_control">
-                      <property name="title">
-                       <string>Sensors</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QGroupBox" name="group_box_tasks">
-                      <property name="title">
-                       <string>Tasks</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                      <layout class="QGridLayout" name="gridLayout_18">
-                       <item row="3" column="1">
-                        <widget class="QPushButton" name="control_vision_coral_health">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Start</string>
-                         </property>
-                         <property name="checkable">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="1">
-                        <widget class="QPushButton" name="control_vision_shape_detection">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Start</string>
-                         </property>
-                         <property name="checkable">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="0">
-                        <widget class="QLabel" name="label_7">
-                         <property name="text">
-                          <string>Shape Detection</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="0">
-                        <widget class="QLabel" name="label_12">
-                         <property name="text">
-                          <string>Coral Reef Health</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="0">
-                        <widget class="QLabel" name="label_6">
-                         <property name="text">
-                          <string>Mosaic</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="1">
-                        <widget class="QPushButton" name="control_vision_mosaic">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Start</string>
-                         </property>
-                         <property name="checkable">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="1">
-                        <widget class="QPushButton" name="control_vision_transect_line">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Start</string>
-                         </property>
-                         <property name="checkable">
-                          <bool>true</bool>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="0">
-                        <widget class="QLabel" name="label_13">
-                         <property name="text">
-                          <string>Transect Line</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QGroupBox" name="orientation_control">
-                      <property name="title">
-                       <string>Control Orientation</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QGroupBox" name="timer_control">
-                      <property name="title">
-                       <string>Competition Time</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </widget>
-               </widget>
-              </item>
-             </layout>
+                </item>
+               </layout>
+              </widget>
+             </widget>
             </item>
-            <item row="1" column="0">
+            <item row="1" column="0" colspan="2">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
                <spacer name="horizontalSpacer_3">
@@ -928,7 +952,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page_2">
+      <widget class="QWidget" name="configuration_tab">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QScrollArea" name="scrollArea_7">
@@ -953,10 +977,10 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
              <x>0</x>
              <y>0</y>
              <width>1738</width>
-             <height>1086</height>
+             <height>1091</height>
             </rect>
            </property>
-           <layout class="QGridLayout" name="gridLayout_45">
+           <layout class="QGridLayout" name="gridLayout_9">
             <item row="0" column="0">
              <layout class="QGridLayout" name="config_grid_layout" rowstretch="1,1" columnstretch="1,1,1,1,1">
               <property name="spacing">
@@ -1089,11 +1113,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <layout class="QGridLayout" name="gridLayout_13">
                  <item row="0" column="0">
                   <widget class="QScrollArea" name="scrollArea_5">
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -1109,7 +1128,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                       <x>0</x>
                       <y>0</y>
                       <width>307</width>
-                      <height>484</height>
+                      <height>355</height>
                      </rect>
                     </property>
                    </widget>
@@ -1129,11 +1148,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <layout class="QGridLayout" name="gridLayout_30">
                  <item row="0" column="0">
                   <widget class="QScrollArea" name="scrollArea_4">
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -1155,7 +1169,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                       <x>0</x>
                       <y>0</y>
                       <width>307</width>
-                      <height>483</height>
+                      <height>87</height>
                      </rect>
                     </property>
                    </widget>
@@ -1175,11 +1189,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <layout class="QGridLayout" name="gridLayout_19">
                  <item row="0" column="0">
                   <widget class="QScrollArea" name="scrollArea_2">
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -1201,7 +1210,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                       <x>0</x>
                       <y>0</y>
                       <width>307</width>
-                      <height>483</height>
+                      <height>87</height>
                      </rect>
                     </property>
                    </widget>
@@ -1227,11 +1236,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -1253,7 +1257,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                       <x>0</x>
                       <y>0</y>
                       <width>306</width>
-                      <height>484</height>
+                      <height>355</height>
                      </rect>
                     </property>
                    </widget>
@@ -1273,12 +1277,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <layout class="QGridLayout" name="gridLayout_16">
                  <item row="0" column="0">
                   <widget class="QScrollArea" name="thruster_scroll">
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
-</string>
-                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -1300,7 +1298,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
                       <x>0</x>
                       <y>0</y>
                       <width>307</width>
-                      <height>484</height>
+                      <height>355</height>
                      </rect>
                     </property>
                    </widget>
@@ -1326,11 +1324,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -1352,7 +1345,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                       <x>0</x>
                       <y>0</y>
                       <width>307</width>
-                      <height>483</height>
+                      <height>87</height>
                      </rect>
                     </property>
                    </widget>
@@ -1372,11 +1365,6 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                 <layout class="QGridLayout" name="gridLayout_43">
                  <item row="0" column="0">
                   <widget class="QScrollArea" name="scrollArea_6">
-                   <property name="styleSheet">
-                    <string notr="true">QScrollArea { background: transparent; }
-QScrollArea &gt; QWidget &gt; QWidget { background: transparent; }
-QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
-                   </property>
                    <property name="frameShape">
                     <enum>QFrame::NoFrame</enum>
                    </property>
@@ -1392,7 +1380,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                       <x>0</x>
                       <y>0</y>
                       <width>307</width>
-                      <height>484</height>
+                      <height>355</height>
                      </rect>
                     </property>
                    </widget>
@@ -1402,6 +1390,19 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
                </widget>
               </item>
              </layout>
+            </item>
+            <item row="1" column="0">
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>513</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>
@@ -1477,6 +1478,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
      <string>File</string>
     </property>
     <addaction name="toolbar_save_settings"/>
+    <addaction name="toolbar_change_pilot"/>
     <addaction name="toolbar_load_settings"/>
     <addaction name="toolbar_reset_settings"/>
     <addaction name="toolbar_toggle_theme"/>
@@ -1519,6 +1521,11 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: 0; }</string>
   <action name="toolbar_toggle_theme">
    <property name="text">
     <string>Toggle Theme</string>
+   </property>
+  </action>
+  <action name="toolbar_change_pilot">
+   <property name="text">
+    <string>Change Pilot Profile</string>
    </property>
   </action>
  </widget>

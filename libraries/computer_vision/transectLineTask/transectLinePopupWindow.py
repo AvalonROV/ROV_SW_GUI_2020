@@ -71,11 +71,9 @@ class TRANSECT_LINE_POPUP_WINDOW(QWidget):
         """
         if status:
             self.cameraFeed.processImage(self.transectLineTask)
-            buttonObject.setStyleSheet('background-color: #0D47A1; color: white; font-weight: bold;')
 
         else:
             self.cameraFeed.stopProcessing()
-            buttonObject.setStyleSheet("")
 
     @pyqtSlot(str)
     def dataReceived(self, data):

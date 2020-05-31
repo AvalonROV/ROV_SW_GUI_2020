@@ -21,7 +21,7 @@ class THRUSTERS(QObject):
     testSpeed = 10
     yawState = [0, 0]
 
-    def __init__(self, *, controlLayout = None, configLayout = None, style = None):
+    def __init__(self, *, controlLayout = None, configLayout = None):
         """
         PURPOSE
 
@@ -32,7 +32,6 @@ class THRUSTERS(QObject):
 
         - controlLayout = layout widget located on the control panel tab to add widgets to.
         - controlLayout = layout widget located on the configuration tab to add widgets to.
-        - style = pointer to the style library to access stylesheets.
 
         RETURNS
 
@@ -43,7 +42,6 @@ class THRUSTERS(QObject):
         # CREATE THRUSTER WIDGETS ON THE CONTROL PANEL AND CONFIGURATION TABS
         self.controlLayout = controlLayout
         self.configLayout = configLayout
-        self.style = style
 
         # ADD WIDGETS TO LAYOUT
         self.setupConfigLayout()
@@ -318,41 +316,36 @@ class THRUSTERS(QObject):
 
         NONE
         """
-        parentLayout = QHBoxLayout()
-    
-        # CREATE WIDGETS
-        self.forwardLabel = QLabel("FORWARD")
-        self.forwardLabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.reverseLabel = QLabel("REVERSE")
-        self.reverseLabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        changeButton = QPushButton()  
-        changeButton.setFixedSize(50, 50)        
-
-        # APPLY STYLING
-        try:
-            changeButton.setStyleSheet(self.style.orientationButton)
-            self.forwardLabel.setStyleSheet(self.style.greenText)
-            self.style.applyGlow(changeButton, "#679e37", 10)
-            # APPLY ICON TO BUTTON
-            if self.style.theme:
-                changeButton.setIcon(QIcon('graphics/switch_direction_white.png'))
-            else:
-                changeButton.setIcon(QIcon('graphics/switch_direction_black.png'))
-            changeButton.setIconSize(QSize(40,40))
-
-        except:
-            pass
+        # CHECK IF TIMER WIDGET HAS ALREADY BEEN SETUP
+        if self.controlLayout.layout() == None:
             
-        # ADD TO PARENT LAYOUT
-        parentLayout.addWidget(self.forwardLabel)
-        parentLayout.addWidget(changeButton)
-        parentLayout.addWidget(self.reverseLabel)
+            parentLayout = QHBoxLayout()
+        
+            # CREATE WIDGETS
+            self.forwardLabel = QLabel("FORWARD")
+            self.forwardLabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.forwardLabel.setEnabled(True)
+            self.forwardLabel.setObjectName("label-on-off")
+            self.reverseLabel = QLabel("REVERSE")
+            self.reverseLabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.reverseLabel.setEnabled(False)
+            self.reverseLabel.setObjectName("label-on-off")
+            changeButton = QPushButton() 
+            changeButton.setObjectName("change-orientation-button") 
+            changeButton.setFixedSize(50, 50)        
+            changeButton.setIcon(QIcon('graphics/switch_direction_white.png'))
+            changeButton.setIconSize(QSize(40,40))
+                
+            # ADD TO PARENT LAYOUT
+            parentLayout.addWidget(self.forwardLabel)
+            parentLayout.addWidget(changeButton)
+            parentLayout.addWidget(self.reverseLabel)
 
-        # LINK WIDGETS
-        changeButton.clicked.connect(self.toggleControlDirection)
+            # LINK WIDGETS
+            changeButton.clicked.connect(self.toggleControlDirection)
 
-        # ADD TO GUI
-        self.controlLayout.setLayout(parentLayout)        
+            # ADD TO GUI
+            self.controlLayout.setLayout(parentLayout)        
 
     def toggleControlDirection(self):
         """
@@ -371,14 +364,14 @@ class THRUSTERS(QObject):
         # REVERSE CONTROL
         if self.rovControlDirection == True:
             self.rovControlDirection = False
-            self.forwardLabel.setStyleSheet("")
-            self.reverseLabel.setStyleSheet(self.style.greenText)
+            self.forwardLabel.setEnabled(False)
+            self.reverseLabel.setEnabled(True)
         
         # FORWARD CONTROL
         else:
             self.rovControlDirection = True
-            self.forwardLabel.setStyleSheet(self.style.greenText)
-            self.reverseLabel.setStyleSheet("")
+            self.forwardLabel.setEnabled(True)
+            self.reverseLabel.setEnabled(False)
 
     def changeThrusterOrientation(self, thrusterSpeeds):
         """
@@ -522,18 +515,11 @@ class THRUSTERS(QObject):
 
         # ADD LAYOUTS TO FRAMES (TO ALLOW STYLING)
         frame1 = QFrame()
+        frame1.setObjectName("thruster-frame")
         frame1.setLayout(layout1)
         frame2 = QFrame()
+        frame2.setObjectName("settings-frame")
         frame2.setLayout(layout2)
-        
-        # APPLY STYLING
-        try:
-            label1.setStyleSheet(self.style.infoLabel)
-            label2.setStyleSheet(self.style.infoLabel)
-            thrusterTest.setStyleSheet(self.style.blueButtonSmall)
-            frame1, frame2 = self.style.setColouredFrame(frame1, frame2, self.style.thrusterFrame, self.style.settingsFrame)
-        except:
-            pass
 
         # ADD TO FORM LAYOUT
         self.configForm.addRow(frame1, frame2)
