@@ -781,9 +781,11 @@ class UI(QMainWindow):
         # TOGGLE CURRENT THEME
         if theme == None:
             self.style.theme = not self.style.theme
+        else: 
+            self.style.theme = theme
 
-        # APPLY NEW APPLICATION COLOR PALETTE
-        self.style.setPalette(theme, self.app)
+        # APPLY NEW APPLICATION DEFAULT COLOR PALETTE
+        self.style.setPalette(self.style.theme, self.app)
 
         # CHANGE PROGRAM STYLESHEETS
         self.style.setStyleSheets(self.style.theme)
@@ -811,7 +813,10 @@ class UI(QMainWindow):
                 self.style.labelOnOff +
                 self.style.infoLabel)
 
+            # APPLY TO MAIN PROGRAM
             self.setStyleSheet(globalStylesheets)
+
+            # APPLY TO PROFILE SELECTOR POPUP
             self.profileSelector.setStyleSheet(globalStylesheets)
         
         except:
@@ -2108,9 +2113,10 @@ class TOOLBAR():
 
         NONE
         """
+        # TOGGLE THEME
         self.ui.changeTheme()
-        #self.restartProgram()
-
+        self.saveSettings()
+        
     def restartProgram(self):
         """
         PURPOSE

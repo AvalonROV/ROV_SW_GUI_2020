@@ -52,7 +52,7 @@ class PROFILE_SELECTOR(QWidget):
         # LAUNCH WINDOW
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.show()
-        self.resize(600,300)
+        self.resize(600,400)
 
     def setupLayout(self):
         """
@@ -77,6 +77,7 @@ class PROFILE_SELECTOR(QWidget):
         logo.setPixmap(avalonPixmap)
 
         # PROFILE SELECTION
+        container = QGroupBox()
         layout = QVBoxLayout()
         title = QLabel("Select pilot profile:")
         title.setStyleSheet("font: 20pt;")
@@ -90,6 +91,7 @@ class PROFILE_SELECTOR(QWidget):
         self.profileLayout = QVBoxLayout()
         scrollWidget.setLayout(self.profileLayout)
         scroll.setWidget(scrollWidget)
+        container.setLayout(layout)
 
         # ADD NEW PROFILE
         addProfileButton = QPushButton("Add New")
@@ -97,7 +99,7 @@ class PROFILE_SELECTOR(QWidget):
 
         # ADD WIDGETS TO GRID LAYOUT
         parentLayout.addWidget(logo)
-        parentLayout.addLayout(layout)
+        parentLayout.addWidget(container)
 
         self.setLayout(parentLayout)
 
@@ -233,7 +235,7 @@ def guiInitiate():
     app.setStyle("Fusion")
     
     # INITIATE MAIN GUI OBJECT
-    program = PROFILE_SELECTOR(app)
+    program = PROFILE_SELECTOR()
     program.setWindowTitle("Profile Selector")
     
     # START EVENT LOOP
