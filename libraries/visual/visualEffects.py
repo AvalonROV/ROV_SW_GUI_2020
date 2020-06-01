@@ -209,8 +209,8 @@ class STYLE():
                                     "#timer-start-button:checked {background-color: #c62828; color: white;}"
                                     "#timer-start-button:checked:hover {background-color: #b71c1c;}")
 
-            self.renameButton = ("#rename-button {background-color: #43a047;}"
-                                    "#rename-button:hover {background-color: #388e3c}")
+            self.renameButton = ("#rename-button {background-color: #43a047; color: white;}"
+                                    "#rename-button:hover {background-color: #388e3c; color: white;}")
 
             self.deleteButton = ("#delete-button {background-color: #c62828;}"
                                     "#delete-button:hover {background-color: #b71c1c}")
@@ -256,7 +256,6 @@ class STYLE():
             
             self.infoLabel = ("#info-label {color: rgba(255, 255, 255, 0.7)}")
             
-
     def setColouredFrame(self, labelFrame, settingsFrame, labelStyleSheet, settingsStyleSheet):  
         """
         PURPOSE

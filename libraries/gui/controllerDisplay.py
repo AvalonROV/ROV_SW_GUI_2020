@@ -32,8 +32,9 @@ class CONTROLLER_DISPLAY(QObject):
         QObject.__init__(self)
         
         # CREATE THRUSTER WIDGETS ON THE CONTROL PANEL AND CONFIGURATION TABS
-        self.controlLayout = controlLayout
-        self.configLayout = configLayout
+        if configLayout != None and controlLayout != None:
+            self.controlLayout = controlLayout
+            self.configLayout = configLayout
 
     def setup(self):
         """

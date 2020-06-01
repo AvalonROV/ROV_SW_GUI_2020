@@ -73,7 +73,7 @@ class READ_CONFIG_FILE():
             return theme
         
         except:
-            pass
+            return
 
     def readThruster(self):
         """
@@ -106,7 +106,7 @@ class READ_CONFIG_FILE():
             return thrusterPositionList, thrusterReverseList
              
         except:
-            pass
+            return
 
     def readActuator(self):
         """
@@ -146,7 +146,7 @@ class READ_CONFIG_FILE():
             return actuatorNumber, actuatorLabelList
              
         except:
-            pass
+            return
 
     def readSensor(self):
         """
@@ -182,7 +182,7 @@ class READ_CONFIG_FILE():
             return sensorNumber, sensorSelectedType
              
         except:
-            pass
+            return
 
     def readAnalogCamera(self):
         """
@@ -225,7 +225,7 @@ class READ_CONFIG_FILE():
             return cameraNumber, cameraLabelList, defaultCameraList
              
         except:
-            pass
+            return
 
     def readDigitalCamera(self):
         """
@@ -285,7 +285,7 @@ class READ_CONFIG_FILE():
             return cameraNumber, cameraLabels, cameraAddresses, defaultCameraList, cameraResolutions
              
         except:
-            pass
+            return
 
     def readKeyBinding(self):
         """
@@ -312,7 +312,7 @@ class READ_CONFIG_FILE():
             return keyBindingList
              
         except:
-            pass
+            return
 
 class WRITE_CONFIG_FILE():
     """

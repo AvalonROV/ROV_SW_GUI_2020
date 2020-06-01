@@ -44,7 +44,8 @@ class THRUSTERS(QObject):
         self.configLayout = configLayout
 
         # ADD WIDGETS TO LAYOUT
-        self.setupConfigLayout()
+        if configLayout != None:
+            self.setupConfigLayout()
 
     def setup(self):
         """

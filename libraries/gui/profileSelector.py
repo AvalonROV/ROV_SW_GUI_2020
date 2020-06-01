@@ -1,7 +1,7 @@
 import sys, os
 
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
+from PyQt5.QtWidgets import (QMessageBox, QInputDialog, QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
                                 QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
                                 QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect, QShortcut)
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QKeyEvent, QKeySequence, QIcon, QFont, QColor, QPalette, QPainter
@@ -14,6 +14,7 @@ class PROFILE_SELECTOR(QWidget):
     """
     # SIGNALS TO CALL FUNCTIONS IN MAIN PROGRAM
     loadProfileSignal = pyqtSignal(str)
+    saveProfileSignal = pyqtSignal(str)
 
     def __init__(self):
         """
@@ -103,6 +104,9 @@ class PROFILE_SELECTOR(QWidget):
 
         self.setLayout(parentLayout)
 
+        # LINK WIDGETS
+        addProfileButton.clicked.connect(self.addNewProfile)
+
     def findProfiles(self):
         """
         PURPOSE
@@ -190,6 +194,8 @@ class PROFILE_SELECTOR(QWidget):
 
         # LINK WIDGETS
         profileButton.clicked.connect(lambda state, directory = directory: self.loadProfile(directory))
+        renameButton.clicked.connect(lambda state, directory = directory: self.renameProfile(directory))
+        deleteButton.clicked.connect(lambda state, directory = directory: self.deleteProfile(directory))
 
         return layout
 
@@ -209,6 +215,94 @@ class PROFILE_SELECTOR(QWidget):
         """
         self.loadProfileSignal.emit(directory)
         self.closeWindow()
+
+    def addNewProfile(self):
+        """
+        PURPOSE
+
+        Lets user create a new pilot profile.
+        A dialog box appears for the user to enter the profile name.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        renameDialog = QInputDialog()
+        newName, state = renameDialog.getText(self, "Rename Profile", "Enter new profile name:")
+
+        # CHANGE FILE NAME
+        if state:
+            if os.path.exists("./config/" + newName + ".xml"):
+
+                deleteMsg = QMessageBox()
+                result = deleteMsg.question(self,"Profile Overwrite", "This profile name already exists, would you like to overwrite it?", deleteMsg.Yes | deleteMsg.No)
+
+                # OVERWRITE FILE
+                if result == QMessageBox.Yes:
+                    self.saveProfileSignal.emit("./config/" + newName + ".xml")
+
+                # TRY AGAIN
+                else:
+                    self.addNewProfile()
+
+            else:
+                self.saveProfileSignal.emit("./config/" + newName + ".xml")
+
+            self.findProfiles()
+                
+    def renameProfile(self, directoryToRename):
+        """
+        PURPOSE
+        
+        Lets user rename a certain pilot profile.
+        Message box launches for user to enter new file name.
+
+        INPUT
+
+        - directoryToRename = the directory of the configuration XML file to rename.
+
+        RETURNS
+
+        NONE
+        """
+        renameDialog = QInputDialog()
+        newName, state = renameDialog.getText(self, "Rename Profile", "Enter new profile name:")
+
+        # CHANGE FILE NAME
+        if state:
+            if os.path.exists("./config/" + directoryToRename):
+                os.rename("./config/" + directoryToRename, "./config/" + newName + ".xml")
+
+            self.findProfiles()
+
+    def deleteProfile(self, directoryToDelete):
+        """
+        PURPOSE
+
+        Lets the user delete a profile.
+        A Message box launches to check if the user wants to proceed or not.
+
+        INPUT
+
+        - directoryToDelete = the directory of the configuration XML file to delete.
+
+        RETURNS
+
+        NONE
+        """
+        deleteMsg = QMessageBox()
+        result = deleteMsg.question(self,"Delete Profile", "Are you sure you want to delete this user profile?", deleteMsg.Yes | deleteMsg.No)
+
+        # DELETE FILE
+        if result == QMessageBox.Yes:
+            if os.path.exists("./config/" + directoryToDelete):
+                os.remove("./config/" + directoryToDelete)
+
+            self.findProfiles()
 
     def closeWindow(self):
         """

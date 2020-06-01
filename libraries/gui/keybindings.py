@@ -39,7 +39,8 @@ class KEYBINDINGS(QObject):
         self.configLayout = configLayout
 
         # INITIAL LAYOUT SETUP
-        self.setupConfigLayout()
+        if configLayout != None:
+            self.setupConfigLayout()
 
     def setup(self):
         """

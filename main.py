@@ -200,6 +200,7 @@ class UI(QMainWindow):
         """
         # PILOT PROFILE SELECTED SIGNAL
         self.profileSelector.loadProfileSignal.connect(self.pilotProfileSelected)
+        self.profileSelector.saveProfileSignal.connect(self.addNewProfile)
 
         # PROGRAM CLOSE SIGNAL
         self.app.aboutToQuit.connect(self.programExit)
@@ -257,6 +258,24 @@ class UI(QMainWindow):
         self.resetConfig()
         self.configSetup()
 
+    @pyqtSlot(str)
+    def addNewProfile(self, directory):
+        """
+        PURPOSE
+
+        Called by the pilot profile selector window when the user wants to add a new pilot profile.
+        The default program configuration is saved.
+
+        INPUT
+
+        - directory = the directory of the the new pilot profile.
+
+        RETURNS
+
+        NONE
+        """
+        self.writeDefaultConfigFile(directory)
+
     def configSetup(self):
         """
         PURPOSE
@@ -298,7 +317,7 @@ class UI(QMainWindow):
 
         if configFileStatus:
             self.printTerminal('Configuration file found.')
-    
+            
             # READ THEME SETTINGS
             self.style.theme = configFile.readTheme()
             
@@ -361,6 +380,55 @@ class UI(QMainWindow):
 
         # SAVE SENSOR SETTINGS
         configFile.saveSensor(self.sensors.quantity, self.sensors.selectedTypes)
+
+        # WRITE SETTINGS TO XML FILE
+        configFile.writeFile()
+
+    def writeDefaultConfigFile(self, directory):
+        """
+        PURPOSE
+
+        Saves a default program configuration to an XML file.
+
+        INPUT
+
+        - directory = the directory of the the new pilot profile.
+
+        RETURNS
+
+        NONE
+        """
+        # CREATE ROOT
+        configFile = WRITE_CONFIG_FILE(directory)
+        configFile.createFile()
+
+        # SAVE THEME SETTINGS
+        style = STYLE()
+        configFile.saveTheme(style.theme)
+
+        # SAVE THRUSTER SETTINGS
+        thrusters = THRUSTERS()
+        configFile.saveThruster(thrusters.rovPositions, thrusters.reverseStates)
+
+        # SAVE ACTUATOR SETTINGS
+        actuators = ACTUATORS()
+        configFile.saveActuator(actuators.quantity, actuators.labelList)
+
+        # SAVE ANALOG CAMERA SETTINGS
+        analogCameras = ANALOG_CAMERAS()
+        configFile.saveAnalogCamera(analogCameras.quantity, analogCameras.labelList, analogCameras.defaultCameras)
+
+        # SAVE DIGITAL CAMERA SETTINGS
+        digitalCameras = DIGITAL_CAMERAS()
+        configFile.saveDigitalCamera(digitalCameras.quantity, digitalCameras.labelList, digitalCameras.addressList, digitalCameras.defaultCameras, digitalCameras.selectedResolutions)
+        
+        # SAVE KEYBINDING SETTINGS
+        keybindings = KEYBINDINGS()
+        configFile.saveKeybinding(keybindings.bindings)
+
+        # SAVE SENSOR SETTINGS
+        sensors = SENSORS()
+        configFile.saveSensor(sensors.quantity, sensors.selectedTypes)
 
         # WRITE SETTINGS TO XML FILE
         configFile.writeFile()
@@ -502,6 +570,12 @@ class UI(QMainWindow):
         self.camera_feed_2.mousePressEvent = lambda event, cameraFeed = 1: self.changeCameraFeed(event, cameraFeed)
         self.camera_feed_3.mousePressEvent = lambda event, cameraFeed = 2: self.changeCameraFeed(event, cameraFeed)
         self.camera_feed_4.mousePressEvent = lambda event, cameraFeed = 3: self.changeCameraFeed(event, cameraFeed)
+
+        # SWITCH USER BUTTON
+        self.switch_user.clicked.connect(lambda: self.profileSelector.showPopup())
+        self.switch_user.setIcon(QIcon("./graphics/login-icon.png"))
+        self.switch_user.setIconSize(QSize(20,20))
+        self.switch_user.setObjectName("rename-button")
 
         # PROGRAM EXIT BUTTON
         self.program_exit.clicked.connect(lambda: self.app.quit())
@@ -1986,7 +2060,7 @@ class TOOLBAR():
         if self.ui.fileName == "":
             self.ui.fileName, _ = QFileDialog.getSaveFileName(self.ui, 'Save File','./config', 'XML File (*.xml)')
         
-        if self.ui.fileName != '': 
+        if self.ui.fileName != "": 
             # WRITE CURRENT PROGRAM CONFIGURATION TO XML FILE.
             self.ui.writeConfigFile()
 
@@ -2115,7 +2189,6 @@ class TOOLBAR():
         """
         # TOGGLE THEME
         self.ui.changeTheme()
-        self.saveSettings()
         
     def restartProgram(self):
         """
@@ -2163,6 +2236,7 @@ def guiInitiate():
     NONE
     """
     # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
+    QApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
     app = QApplication(sys.argv)
 
     # PROGRAM BOOT SPLASH SCREEN

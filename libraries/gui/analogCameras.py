@@ -41,8 +41,9 @@ class ANALOG_CAMERAS(QObject):
         self.configLayout = configLayout
 
         # INITIAL LAYOUT SETUP
-        self.setupConfigLayout()
-        self.setupControlLayout()
+        if configLayout != None and controlLayout != None:
+            self.setupConfigLayout()
+            self.setupControlLayout()
 
     def setup(self):
         """
