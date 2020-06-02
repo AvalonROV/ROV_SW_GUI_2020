@@ -1,0 +1,30 @@
+digraph "transectLineAlgorithm_v1.TRANSECT_LINE_TASK.runAlgorithm"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.runAlgorithm",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.average\l_slope_intercept",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#a18c8ca8b1be2c76880006b69cfc8e401",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.detect_edges",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#a071c7cde959a0554c4061dae3961a163",tooltip=" "];
+  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.detect\l_line_segments",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#abd61ef8bd75e0e8e9392e498a1ff6d13",tooltip=" "];
+  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.detect\l_red_edges",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#aa41fdb0efd9f0c61d728d272bdbe7e1c",tooltip=" "];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.display\l_heading_line",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#a325170b4f028556709d8f656cf00756c",tooltip=" "];
+  Node1 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.display_lines",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#a30a37cd88da0c6a2d28eadde22caf9af",tooltip=" "];
+  Node1 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.get\l_steering_angle",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#ac6b13547e180849a32ca12e844c5c283",tooltip=" "];
+  Node1 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.region\l_of_interest",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#a9cc16b6cba224cfc24b1e76e714716ed",tooltip=" "];
+  Node1 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="visionAlgorithmTemplate.\lTASK_NAME.sendData",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classvision_algorithm_template_1_1_t_a_s_k___n_a_m_e.html#a5de901de78edb7f51d48084ffdbcce38",tooltip=" "];
+  Node1 -> Node11 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.sendData",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#a499cf52e5d4c74e9bca19b089c30a515",tooltip=" "];
+  Node11 -> Node12 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="transectLineAlgorithm\l_v1.TRANSECT_LINE_TASK.make\l_points",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classtransect_line_algorithm__v1_1_1_t_r_a_n_s_e_c_t___l_i_n_e___t_a_s_k.html#a297876c78b210da22a9c548f54bf6ea9",tooltip=" "];
+}

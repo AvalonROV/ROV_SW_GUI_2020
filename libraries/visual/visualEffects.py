@@ -8,7 +8,7 @@ class STYLE():
     Contains a library of stylesheets and functions to modify the style of the program.
     """
     # VARIABLES
-    theme = False
+    theme = True
 
     # STYLESHEETS
     blueButtonLarge = ""
@@ -83,7 +83,7 @@ class STYLE():
             palette.setColor(QPalette.Base,QColor("#ffffff"))           # TEXT ENTRY BACKGROUND COLOR
             palette.setColor(QPalette.Text,QColor("#212121"))           # TEXT ENTRY COLOR
             palette.setColor(QPalette.Button,QColor("#eeeeee"))         # BUTTON COLOR
-            palette.setColor(QPalette.ButtonText,QColor("#fafafa"))     # BUTTON TEXT COLOR 
+            palette.setColor(QPalette.ButtonText,QColor("#212121"))     # BUTTON TEXT COLOR 
 
         # APPLY CUSTOM COLOR PALETTE
         appObject.setPalette(palette)
@@ -132,14 +132,14 @@ class STYLE():
                                     "#timer-start-button:checked {background-color: #c62828; color: white;}"
                                     "#timer-start-button:checked:hover {background-color: #b71c1c;}")
 
-            self.renameButton = ("#rename-button {background-color: #43a047;}"
-                                    "#rename-button:hover {background-color: #388e3c}")
+            self.blueButton = ("#blue-button {background-color: #1976d2; color: white;}"
+                                    "#blue-button:hover {background-color: #115293}")
 
-            self.deleteButton = ("#delete-button {background-color: #c62828;}"
-                                    "#delete-button:hover {background-color: #b71c1c}")
+            self.greenButton = ("#green-button {background-color: #43a047;}"
+                                    "#green-button:hover {background-color: #388e3c}")
 
-            self.programExitButton = ("#program-exit-button {background-color: #c62828; color: white; border-radius: 15px; padding: 5px 20px}" 
-                                "#program-exit-button:hover {background-color: #b71c1c}")
+            self.redButton = ("#red-button {background-color: #c62828; color: white;}"
+                                    "#red-button:hover {background-color: #b71c1c}")
 
             self.timerLCD = ("#timer-lcd {border: 0px;}")
 
@@ -186,7 +186,7 @@ class STYLE():
             ######## WIDGETS ########
             #########################
             self.normalButton = ("QPushButton {background-color: #E0E0E0; color: black; border-radius: 15px; padding: 5px 20px}" 
-                                "QPushButton:hover {background-color: #DDDDDD;}"
+                                "QPushButton:hover {background-color: #D1D1D1;}"
                                 "QPushButton:pressed {background-color: #1976d2; color: white;}"
                                 "QPushButton:checked {background-color: #1976d2; color: white;}"
                                 "QPushButton:checked:hover {background-color: #115293}")
@@ -209,14 +209,14 @@ class STYLE():
                                     "#timer-start-button:checked {background-color: #c62828; color: white;}"
                                     "#timer-start-button:checked:hover {background-color: #b71c1c;}")
 
-            self.renameButton = ("#rename-button {background-color: #43a047; color: white;}"
-                                    "#rename-button:hover {background-color: #388e3c; color: white;}")
+            self.blueButton = ("#blue-button {background-color: #1976d2; color: white;}"
+                                    "#blue-button:hover {background-color: #115293}")
 
-            self.deleteButton = ("#delete-button {background-color: #c62828;}"
-                                    "#delete-button:hover {background-color: #b71c1c}")
+            self.greenButton = ("#green-button {background-color: #43a047; color: white;}"
+                                    "#green-button:hover {background-color: #388e3c; color: white;}")
 
-            self.programExitButton = ("#program-exit-button {background-color: #c62828; color: white; border-radius: 15px; padding: 5px 20px}" 
-                                "#program-exit-button:hover {background-color: #b71c1c}")
+            self.redButton = ("#red-button {background-color: #c62828; color: white;}"
+                                    "#red-button:hover {background-color: #b71c1c}")
 
             self.timerLCD = ("#timer-lcd {border: 0px;}")
 

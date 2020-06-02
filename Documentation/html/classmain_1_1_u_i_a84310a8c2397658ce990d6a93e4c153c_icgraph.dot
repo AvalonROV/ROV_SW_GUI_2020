@@ -1,0 +1,14 @@
+digraph "main.UI.resetConfig"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="main.UI.resetConfig",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="main.UI.pilotProfileSelected",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a2be4bb668e70f07384bc4a8b95e94a83",tooltip="CONFIGURATION FUNCTIONS ###."];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.UI.connectSignals",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#aaaffef849d1212399006e9303c1d3132",tooltip=" "];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="main.UI.__init__",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a4da16ef68967e04e0716c62fb0a142ab",tooltip=" "];
+}

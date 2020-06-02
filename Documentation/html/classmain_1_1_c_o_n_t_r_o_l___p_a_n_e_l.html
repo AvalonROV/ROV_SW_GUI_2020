@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.16"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Avalon ROV Comms: main.CONTROL_PANEL Class Reference</title>
+<title>Avalon ROV Pilot Control Program: main.CONTROL_PANEL Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -30,10 +30,10 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="avalonLogo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Avalon ROV Comms
+   <div id="projectname">Avalon ROV Pilot Control Program
    &#160;<span id="projectnumber">N/A</span>
    </div>
-   <div id="projectbrief">A library for communication with the Avalon Remote Operated Vehicle (ROV) and other peripherals.</div>
+   <div id="projectbrief">A graphical user interface to pilot an underwater ROV.</div>
   </td>
  </tr>
  </tbody>
@@ -99,9 +99,10 @@ $(document).ready(function(){initNavTree('classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aef3c3cc22fb3a336bf1460d61662639d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aef3c3cc22fb3a336bf1460d61662639d">__init__</a> (self, Object1, Object2, Object3, Object4, Object5)</td></tr>
-<tr class="separator:aef3c3cc22fb3a336bf1460d61662639d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a5cc488a874c9e25745b0c50dc7566a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a1a5cc488a874c9e25745b0c50dc7566a">__init__</a> (self, Object1, Object2, Object3)</td></tr>
+<tr class="separator:a1a5cc488a874c9e25745b0c50dc7566a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4b29b924a75a8e53a074f735536462d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac4b29b924a75a8e53a074f735536462d">rovSerialConnection</a> (self, buttonState)</td></tr>
+<tr class="memdesc:ac4b29b924a75a8e53a074f735536462d"><td class="mdescLeft">&#160;</td><td class="mdescRight">SERIAL FUNCTIONS #####.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac4b29b924a75a8e53a074f735536462d">More...</a><br /></td></tr>
 <tr class="separator:ac4b29b924a75a8e53a074f735536462d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67c034013d8134f9b63a86dced3b8ea3"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a67c034013d8134f9b63a86dced3b8ea3">rovConnect</a> (self)</td></tr>
 <tr class="separator:a67c034013d8134f9b63a86dced3b8ea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,74 +110,58 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aeea7e36d53bbadd49964fffea2f48a23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fea42f1202d7bcbfa3c83b4f984e6d0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a3fea42f1202d7bcbfa3c83b4f984e6d0">serialFailEvent</a> (self, message)</td></tr>
 <tr class="separator:a3fea42f1202d7bcbfa3c83b4f984e6d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a345949de69ebcc491325680f3318b0a2"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a345949de69ebcc491325680f3318b0a2">controllerConnection</a> (self, buttonState)</td></tr>
+<tr class="memdesc:a345949de69ebcc491325680f3318b0a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">CONTROLLER FUNCTIONS ###.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a345949de69ebcc491325680f3318b0a2">More...</a><br /></td></tr>
+<tr class="separator:a345949de69ebcc491325680f3318b0a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd8e4b4f825d4c2dfa049937b2c6c814"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#abd8e4b4f825d4c2dfa049937b2c6c814">controllerConnect</a> (self)</td></tr>
-<tr class="memdesc:abd8e4b4f825d4c2dfa049937b2c6c814"><td class="mdescLeft">&#160;</td><td class="mdescRight">CONTROLLER FUNCTIONS ###.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#abd8e4b4f825d4c2dfa049937b2c6c814">More...</a><br /></td></tr>
 <tr class="separator:abd8e4b4f825d4c2dfa049937b2c6c814"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a754217725dc7fe02b33b6c9f98615951"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a754217725dc7fe02b33b6c9f98615951">controllerDisconnect</a> (self)</td></tr>
+<tr class="separator:a754217725dc7fe02b33b6c9f98615951"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f4335fb4de6149a9de33086d8fcbb0e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a0f4335fb4de6149a9de33086d8fcbb0e">processControllerInput</a> (self, buttonStates, joystickValues)</td></tr>
+<tr class="separator:a0f4335fb4de6149a9de33086d8fcbb0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac543ebfd92abbbbcf50a27f25e48ef77"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac543ebfd92abbbbcf50a27f25e48ef77">processButtons</a> (self, buttonStates)</td></tr>
 <tr class="separator:ac543ebfd92abbbbcf50a27f25e48ef77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecba82060305bfd7cb3585524b946d6b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aecba82060305bfd7cb3585524b946d6b">callBindingFunction</a> (self, control, state)</td></tr>
+<tr class="separator:aecba82060305bfd7cb3585524b946d6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb2e3f837c68ab700e88ba437dfa69ee"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aeb2e3f837c68ab700e88ba437dfa69ee">processJoysticks</a> (self, joystickValues)</td></tr>
 <tr class="separator:aeb2e3f837c68ab700e88ba437dfa69ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46689bd1f510efc1fcb87d5d73d5e0e5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a46689bd1f510efc1fcb87d5d73d5e0e5">changeActuators</a> (self, actuator, buttonObject)</td></tr>
-<tr class="memdesc:a46689bd1f510efc1fcb87d5d73d5e0e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">ROV CONTROL FUNCTIONS ##.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a46689bd1f510efc1fcb87d5d73d5e0e5">More...</a><br /></td></tr>
-<tr class="separator:a46689bd1f510efc1fcb87d5d73d5e0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd223f1ccef0db83d7a94b3671596d81"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#afd223f1ccef0db83d7a94b3671596d81">changeActuators</a> (self, actuatorStates)</td></tr>
+<tr class="memdesc:afd223f1ccef0db83d7a94b3671596d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">ROV CONTROL FUNCTIONS ##.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#afd223f1ccef0db83d7a94b3671596d81">More...</a><br /></td></tr>
+<tr class="separator:afd223f1ccef0db83d7a94b3671596d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56a0623c1fc5b69a612e61fc208a772b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a56a0623c1fc5b69a612e61fc208a772b">changeThrusters</a> (self, thrusterSpeeds)</td></tr>
 <tr class="separator:a56a0623c1fc5b69a612e61fc208a772b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a913dbccde53830bd855254a3d3b2339e"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a913dbccde53830bd855254a3d3b2339e">switchControlDirection</a> (self)</td></tr>
-<tr class="separator:a913dbccde53830bd855254a3d3b2339e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa99219b2fcb6a38b2304333804ec4e0d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aa99219b2fcb6a38b2304333804ec4e0d">changeSensitivity</a> (self, sensitivity)</td></tr>
-<tr class="separator:aa99219b2fcb6a38b2304333804ec4e0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09d20c1276c7ffdf611059504deb93f2"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a09d20c1276c7ffdf611059504deb93f2">changeYawSensitivity</a> (self, sensitivity)</td></tr>
-<tr class="separator:a09d20c1276c7ffdf611059504deb93f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac423942903ca9dfa20a8916aff38cb32"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac423942903ca9dfa20a8916aff38cb32">readSystemTime</a> (self)</td></tr>
-<tr class="memdesc:ac423942903ca9dfa20a8916aff38cb32"><td class="mdescLeft">&#160;</td><td class="mdescRight">TIMER FUNCTIONS #####.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac423942903ca9dfa20a8916aff38cb32">More...</a><br /></td></tr>
-<tr class="separator:ac423942903ca9dfa20a8916aff38cb32"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac58feecba22059ec8ef908ec66b20fb0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac58feecba22059ec8ef908ec66b20fb0">toggleTimer</a> (self)</td></tr>
-<tr class="separator:ac58feecba22059ec8ef908ec66b20fb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af600ae27180ace07064cd492960e67a7"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#af600ae27180ace07064cd492960e67a7">resetTimer</a> (self)</td></tr>
-<tr class="separator:af600ae27180ace07064cd492960e67a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a798638e33e1bc755cbe1681c5e3e9c83"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a798638e33e1bc755cbe1681c5e3e9c83">updateTimer</a> (self, currentSeconds)</td></tr>
-<tr class="separator:a798638e33e1bc755cbe1681c5e3e9c83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ce77bb7e54eb79d7fc6598b183375a2"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a4ce77bb7e54eb79d7fc6598b183375a2">startupProcedure</a> (self)</td></tr>
 <tr class="memdesc:a4ce77bb7e54eb79d7fc6598b183375a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">OTHER FUNCTIONS #####.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a4ce77bb7e54eb79d7fc6598b183375a2">More...</a><br /></td></tr>
 <tr class="separator:a4ce77bb7e54eb79d7fc6598b183375a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab77989a5c6190fd7891103abc67d0ea0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ab77989a5c6190fd7891103abc67d0ea0">getSensorReadings</a> (self)</td></tr>
 <tr class="separator:ab77989a5c6190fd7891103abc67d0ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06754cbe8fe48c44836340f68f7e6063"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a06754cbe8fe48c44836340f68f7e6063">changeExternalCameraFeed</a> (self, camera, display)</td></tr>
-<tr class="separator:a06754cbe8fe48c44836340f68f7e6063"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a725bcce85427dc2f31ea19a3ab08d209"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a725bcce85427dc2f31ea19a3ab08d209">initialiseVisionWidgets</a> (self)</td></tr>
 <tr class="memdesc:a725bcce85427dc2f31ea19a3ab08d209"><td class="mdescLeft">&#160;</td><td class="mdescRight">COMPUTER VISION TASKS ####.  <a href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a725bcce85427dc2f31ea19a3ab08d209">More...</a><br /></td></tr>
 <tr class="separator:a725bcce85427dc2f31ea19a3ab08d209"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e2ed3a6d0ce8adcdf4c43038203c068"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a1e2ed3a6d0ce8adcdf4c43038203c068">changeVisionButtons</a> (self, index, status)</td></tr>
 <tr class="separator:a1e2ed3a6d0ce8adcdf4c43038203c068"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac052116c333e5b1f66d75cecfcc4bca5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac052116c333e5b1f66d75cecfcc4bca5">popupMosaicTask</a> (self)</td></tr>
-<tr class="separator:ac052116c333e5b1f66d75cecfcc4bca5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf34b64c88ce113028d8b072ebe1a4e5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#acf34b64c88ce113028d8b072ebe1a4e5">popupShapeDetectionTask</a> (self)</td></tr>
-<tr class="separator:acf34b64c88ce113028d8b072ebe1a4e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47bde15fcf09927519c5c4949992c537"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a47bde15fcf09927519c5c4949992c537">popupTransectLineTask</a> (self)</td></tr>
-<tr class="separator:a47bde15fcf09927519c5c4949992c537"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9543c3a74bdb7fce672798250785fcea"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a9543c3a74bdb7fce672798250785fcea">popupCoralHealthTask</a> (self)</td></tr>
-<tr class="separator:a9543c3a74bdb7fce672798250785fcea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66c0376d5095a64cdd623d8a81c3199d"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a66c0376d5095a64cdd623d8a81c3199d">popupVisionTask</a> (self, task)</td></tr>
+<tr class="separator:a66c0376d5095a64cdd623d8a81c3199d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1827cef1a4d9c0bb76f0835cbdcb26fc"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a1827cef1a4d9c0bb76f0835cbdcb26fc">receiveMosaicTask</a> (self)</td></tr>
+<tr class="separator:a1827cef1a4d9c0bb76f0835cbdcb26fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af82dcefc2af8d473b631336f09635022"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#af82dcefc2af8d473b631336f09635022">receiveShapeDetectionTask</a> (self)</td></tr>
+<tr class="separator:af82dcefc2af8d473b631336f09635022"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab492a64279e5001750ef69a9509a8428"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ab492a64279e5001750ef69a9509a8428">receiveTransectLineTask</a> (self)</td></tr>
+<tr class="separator:ab492a64279e5001750ef69a9509a8428"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dc79c351dc054907878177a6ad7ba26"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a0dc79c351dc054907878177a6ad7ba26">receiveCoralHealthTask</a> (self)</td></tr>
+<tr class="separator:a0dc79c351dc054907878177a6ad7ba26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a0fab4102498c3f63c37f44d1d6fccca6"><td class="memItemLeft" align="right" valign="top"><a id="a0fab4102498c3f63c37f44d1d6fccca6"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ui</b></td></tr>
 <tr class="separator:a0fab4102498c3f63c37f44d1d6fccca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2f5378c4f9ba1b352013d0a4f3d116a"><td class="memItemLeft" align="right" valign="top"><a id="ad2f5378c4f9ba1b352013d0a4f3d116a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>data</b></td></tr>
-<tr class="separator:ad2f5378c4f9ba1b352013d0a4f3d116a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e4d38782900684190dc6d3b1b74c945"><td class="memItemLeft" align="right" valign="top"><a id="a2e4d38782900684190dc6d3b1b74c945"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>rov</b></td></tr>
-<tr class="separator:a2e4d38782900684190dc6d3b1b74c945"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a647038438d4d876b64c90d55588782bc"><td class="memItemLeft" align="right" valign="top"><a id="a647038438d4d876b64c90d55588782bc"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>controller</b></td></tr>
 <tr class="separator:a647038438d4d876b64c90d55588782bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7647cc29e8c7f94374b8c4ebbe4f022f"><td class="memItemLeft" align="right" valign="top"><a id="a7647cc29e8c7f94374b8c4ebbe4f022f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>comms</b></td></tr>
 <tr class="separator:a7647cc29e8c7f94374b8c4ebbe4f022f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03e5e3e0f5cb80953c04d3bb98e32dc7"><td class="memItemLeft" align="right" valign="top"><a id="a03e5e3e0f5cb80953c04d3bb98e32dc7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>startTime</b></td></tr>
-<tr class="separator:a03e5e3e0f5cb80953c04d3bb98e32dc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79c083ce637bcefbfaa6922c23c151f8"><td class="memItemLeft" align="right" valign="top"><a id="a79c083ce637bcefbfaa6922c23c151f8"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>timer</b></td></tr>
 <tr class="separator:a79c083ce637bcefbfaa6922c23c151f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -193,10 +178,10 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><pre class="fragment">PURPOSE
 
-Handles everything that happens on the Control Panel tab.
+Contains function relating to the control panel tab.
 </pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aef3c3cc22fb3a336bf1460d61662639d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef3c3cc22fb3a336bf1460d61662639d">&#9670;&nbsp;</a></span>__init__()</h2>
+<a id="a1a5cc488a874c9e25745b0c50dc7566a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a5cc488a874c9e25745b0c50dc7566a">&#9670;&nbsp;</a></span>__init__()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,19 +208,7 @@ Handles everything that happens on the Control Panel tab.
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>Object3</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>Object4</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>Object5</em>&#160;</td>
+          <td class="paramname"><em>Object3</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -246,15 +219,14 @@ Handles everything that happens on the Control Panel tab.
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
+Class constructor.
 Initialises objects.
 
 INPUT
 
 - Object1 = 'UI' class
-- Object2 = 'DATABASE' class
-- Object3 = 'ROV' class
-- Object4 = 'CONTROLLER' class
-- Object5 = 'ROV_SERIAL' class
+- Object2 = 'CONTROLLER' class
+- Object3 = 'ROV_SERIAL' class
 
 RETURNS
 
@@ -263,8 +235,59 @@ NONE
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a46689bd1f510efc1fcb87d5d73d5e0e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46689bd1f510efc1fcb87d5d73d5e0e5">&#9670;&nbsp;</a></span>changeActuators()</h2>
+<a id="aecba82060305bfd7cb3585524b946d6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecba82060305bfd7cb3585524b946d6b">&#9670;&nbsp;</a></span>callBindingFunction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.CONTROL_PANEL.callBindingFunction </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>control</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>state</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Links the keybinding being activated to a function to execute.
+
+INPUT
+
+- control = the index of the keybinding being activated.
+- state = state of the button linked to the control (1 or 0)
+
+RETURNS
+
+NONE
+</pre> <div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aecba82060305bfd7cb3585524b946d6b_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aecba82060305bfd7cb3585524b946d6b_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="afd223f1ccef0db83d7a94b3671596d81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd223f1ccef0db83d7a94b3671596d81">&#9670;&nbsp;</a></span>changeActuators()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -279,13 +302,7 @@ NONE
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>actuator</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>buttonObject</em>&#160;</td>
+          <td class="paramname"><em>actuatorStates</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -299,113 +316,15 @@ NONE
 <pre class="fragment">PURPOSE
 
 Sends commmand to ROV when an actuator has been toggled.
-Changes the appearance of the actuator button.
 
 INPUT
 
-- actuator = the actuator being toggled.
-- buttonObject = pointer to the actuator button widget.
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a46689bd1f510efc1fcb87d5d73d5e0e5_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a46689bd1f510efc1fcb87d5d73d5e0e5_icgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
-<a id="a06754cbe8fe48c44836340f68f7e6063"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06754cbe8fe48c44836340f68f7e6063">&#9670;&nbsp;</a></span>changeExternalCameraFeed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.changeExternalCameraFeed </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>camera</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>display</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Changes which analog camera is displayed on the camera feed.
-
-INPUT
-
-- camera = the camera number to be displayed.
-- display = the screen quadrant to display the camera feed on.
+- actuatorStates = array contaning the state of each actuator.
 
 RETURNS
 
 NONE
 </pre> 
-</div>
-</div>
-<a id="aa99219b2fcb6a38b2304333804ec4e0d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa99219b2fcb6a38b2304333804ec4e0d">&#9670;&nbsp;</a></span>changeSensitivity()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.changeSensitivity </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>sensitivity</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Selects the desired controller throttle sensitivity to control the ROV.
-Pilot can select between LOW, NORMAL and HIGH.
-
-INPUT
-
-- sensitivity = desired sensitivity of the controller (0 = LOW, 1 = NORMAL, 2 = HIGH).
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aa99219b2fcb6a38b2304333804ec4e0d_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aa99219b2fcb6a38b2304333804ec4e0d_icgraph" alt=""/></div>
-</div>
-
 </div>
 </div>
 <a id="a56a0623c1fc5b69a612e61fc208a772b"></a>
@@ -435,21 +354,16 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
-Prepares and sends desired thruster speeds to the communication library.
+Send command to ROV to set the speed of each thruster.
 
 INPUT
 
-- thrusterSpeed = array containing the desired speed of each thruster. (1 - 999).
+- thrusterSpeeds = array containing the desired speed of each thruster. (1 - 999).
 
 RETURNS
 
 NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a56a0623c1fc5b69a612e61fc208a772b_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a56a0623c1fc5b69a612e61fc208a772b_icgraph" alt=""/></div>
-</div>
-
+</pre> 
 </div>
 </div>
 <a id="a1e2ed3a6d0ce8adcdf4c43038203c068"></a>
@@ -503,51 +417,6 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="a09d20c1276c7ffdf611059504deb93f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09d20c1276c7ffdf611059504deb93f2">&#9670;&nbsp;</a></span>changeYawSensitivity()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.changeYawSensitivity </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>sensitivity</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Selects the desired yaw sensitivity to control the ROV.
-Pilot can select between LOW, NORMAL and HIGH.
-
-INPUT
-
-- sensitivity = desired sensitivity of the yaw control (0 = LOW, 1 = NORMAL, 2 = HIGH).
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a09d20c1276c7ffdf611059504deb93f2_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a09d20c1276c7ffdf611059504deb93f2_icgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
 <a id="abd8e4b4f825d4c2dfa049937b2c6c814"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abd8e4b4f825d4c2dfa049937b2c6c814">&#9670;&nbsp;</a></span>controllerConnect()</h2>
 
@@ -563,8 +432,6 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>CONTROLLER FUNCTIONS ###. </p>
 <pre class="fragment">PURPOSE
 
 Initialises communication with the XBOX controller.
@@ -580,6 +447,91 @@ NONE
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_abd8e4b4f825d4c2dfa049937b2c6c814_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_abd8e4b4f825d4c2dfa049937b2c6c814_cgraph" alt=""/></div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_abd8e4b4f825d4c2dfa049937b2c6c814_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_abd8e4b4f825d4c2dfa049937b2c6c814_icgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a345949de69ebcc491325680f3318b0a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a345949de69ebcc491325680f3318b0a2">&#9670;&nbsp;</a></span>controllerConnection()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.CONTROL_PANEL.controllerConnection </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>buttonState</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>CONTROLLER FUNCTIONS ###. </p>
+<pre class="fragment">PURPOSE
+
+Determines whether to connect or disconnect from the controller.
+
+INPUT
+
+- buttonState = the state of the button (checked or unchecked).
+
+RETURNS
+
+NONE
+</pre> <div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a345949de69ebcc491325680f3318b0a2_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a345949de69ebcc491325680f3318b0a2_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
+<a id="a754217725dc7fe02b33b6c9f98615951"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a754217725dc7fe02b33b6c9f98615951">&#9670;&nbsp;</a></span>controllerDisconnect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.CONTROL_PANEL.controllerDisconnect </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Disconnects from the controller.
+
+INPUT
+
+NONE
+
+RETURNS
+
+NONE
+</pre> <div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a754217725dc7fe02b33b6c9f98615951_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a754217725dc7fe02b33b6c9f98615951_icgraph" alt=""/></div>
 </div>
 
 </div>
@@ -654,28 +606,38 @@ NONE
 </pre> 
 </div>
 </div>
-<a id="a9543c3a74bdb7fce672798250785fcea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9543c3a74bdb7fce672798250785fcea">&#9670;&nbsp;</a></span>popupCoralHealthTask()</h2>
+<a id="a66c0376d5095a64cdd623d8a81c3199d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66c0376d5095a64cdd623d8a81c3199d">&#9670;&nbsp;</a></span>popupVisionTask()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def main.CONTROL_PANEL.popupCoralHealthTask </td>
+          <td class="memname">def main.CONTROL_PANEL.popupVisionTask </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>task</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
-Displays the widget for the Mosaic vision task.
+Reveals popup window for specific machine vision task.
 
 INPUT
 
-NONE
+- task = the index of the task being activated (0,1,2).
 
 RETURNS
 
@@ -683,109 +645,7 @@ NONE
 </pre> <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a9543c3a74bdb7fce672798250785fcea_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a9543c3a74bdb7fce672798250785fcea_cgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
-<a id="ac052116c333e5b1f66d75cecfcc4bca5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac052116c333e5b1f66d75cecfcc4bca5">&#9670;&nbsp;</a></span>popupMosaicTask()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.popupMosaicTask </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Displays the widget for the Mosaic vision task.
-
-INPUT
-
-NONE
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac052116c333e5b1f66d75cecfcc4bca5_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac052116c333e5b1f66d75cecfcc4bca5_cgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
-<a id="acf34b64c88ce113028d8b072ebe1a4e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf34b64c88ce113028d8b072ebe1a4e5">&#9670;&nbsp;</a></span>popupShapeDetectionTask()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.popupShapeDetectionTask </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Displays the widget for the Mosaic vision task.
-
-INPUT
-
-NONE
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_acf34b64c88ce113028d8b072ebe1a4e5_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_acf34b64c88ce113028d8b072ebe1a4e5_cgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
-<a id="a47bde15fcf09927519c5c4949992c537"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47bde15fcf09927519c5c4949992c537">&#9670;&nbsp;</a></span>popupTransectLineTask()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.popupTransectLineTask </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Displays the widget for the Mosaic vision task.
-
-INPUT
-
-NONE
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a47bde15fcf09927519c5c4949992c537_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a47bde15fcf09927519c5c4949992c537_cgraph" alt=""/></div>
+<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a66c0376d5095a64cdd623d8a81c3199d_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a66c0376d5095a64cdd623d8a81c3199d_cgraph" alt=""/></div>
 </div>
 
 </div>
@@ -840,6 +700,57 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
+<a id="a0f4335fb4de6149a9de33086d8fcbb0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f4335fb4de6149a9de33086d8fcbb0e">&#9670;&nbsp;</a></span>processControllerInput()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.CONTROL_PANEL.processControllerInput </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>buttonStates</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>joystickValues</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Processes the controller inputs to perform the desired actions.
+
+INPUT
+
+- buttonStates = array containing the state of each controller button.
+- joystickValues = array containing the value of each controller joystick.
+
+RETURNS
+
+NONE
+</pre> <div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a0f4335fb4de6149a9de33086d8fcbb0e_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a0f4335fb4de6149a9de33086d8fcbb0e_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
 <a id="aeb2e3f837c68ab700e88ba437dfa69ee"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeb2e3f837c68ab700e88ba437dfa69ee">&#9670;&nbsp;</a></span>processJoysticks()</h2>
 
@@ -867,7 +778,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
-Calculates the required speed of each thruster on the ROV to move a certain direction.
+Sends the joystick values through a series of filtering algorithms to calculate the speed of each thruster.
 
 INPUT
 
@@ -877,11 +788,6 @@ RETURNS
 
 NONE
 </pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aeb2e3f837c68ab700e88ba437dfa69ee_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aeb2e3f837c68ab700e88ba437dfa69ee_cgraph" alt=""/></div>
-</div>
-<div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aeb2e3f837c68ab700e88ba437dfa69ee_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_aeb2e3f837c68ab700e88ba437dfa69ee_icgraph" alt=""/></div>
@@ -889,55 +795,14 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="ac423942903ca9dfa20a8916aff38cb32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac423942903ca9dfa20a8916aff38cb32">&#9670;&nbsp;</a></span>readSystemTime()</h2>
+<a id="a0dc79c351dc054907878177a6ad7ba26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0dc79c351dc054907878177a6ad7ba26">&#9670;&nbsp;</a></span>receiveCoralHealthTask()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def main.CONTROL_PANEL.readSystemTime </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>TIMER FUNCTIONS #####. </p>
-<pre class="fragment">PURPOSE
-
-Reads the system time in a new thread and calculates the number of seconds elapsed since the timer was started.
-
-INPUT
-
-NONE
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac423942903ca9dfa20a8916aff38cb32_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac423942903ca9dfa20a8916aff38cb32_cgraph" alt=""/></div>
-</div>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac423942903ca9dfa20a8916aff38cb32_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac423942903ca9dfa20a8916aff38cb32_icgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
-<a id="af600ae27180ace07064cd492960e67a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af600ae27180ace07064cd492960e67a7">&#9670;&nbsp;</a></span>resetTimer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.resetTimer </td>
+          <td class="memname">def main.CONTROL_PANEL.receiveCoralHealthTask </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em></td><td>)</td>
@@ -947,7 +812,7 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">PURPOSE
 
-Resets the timer back to zero if the timer is stopped.
+Processes data sent back from the coral health algorithm.
 
 INPUT
 
@@ -956,12 +821,94 @@ NONE
 RETURNS
 
 NONE
-</pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_af600ae27180ace07064cd492960e67a7_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_af600ae27180ace07064cd492960e67a7_cgraph" alt=""/></div>
+</pre> 
 </div>
+</div>
+<a id="a1827cef1a4d9c0bb76f0835cbdcb26fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1827cef1a4d9c0bb76f0835cbdcb26fc">&#9670;&nbsp;</a></span>receiveMosaicTask()</h2>
 
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.CONTROL_PANEL.receiveMosaicTask </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Processes data sent back from the mosaic algorithm.
+
+INPUT
+
+NONE
+
+RETURNS
+
+NONE
+</pre> 
+</div>
+</div>
+<a id="af82dcefc2af8d473b631336f09635022"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af82dcefc2af8d473b631336f09635022">&#9670;&nbsp;</a></span>receiveShapeDetectionTask()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.CONTROL_PANEL.receiveShapeDetectionTask </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Processes data sent back from the shape detection algorithm.#
+
+INPUT
+
+NONE
+
+RETURNS
+
+NONE
+</pre> 
+</div>
+</div>
+<a id="ab492a64279e5001750ef69a9509a8428"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab492a64279e5001750ef69a9509a8428">&#9670;&nbsp;</a></span>receiveTransectLineTask()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def main.CONTROL_PANEL.receiveTransectLineTask </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<pre class="fragment">PURPOSE
+
+Processes data sent back from the transect line algorithm.
+
+INPUT
+
+NONE
+
+RETURNS
+
+NONE
+</pre> 
 </div>
 </div>
 <a id="a67c034013d8134f9b63a86dced3b8ea3"></a>
@@ -1065,6 +1012,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>SERIAL FUNCTIONS #####. </p>
 <pre class="fragment">PURPOSE
 
 Determines whether to connect or disconnect from the ROV serial interface.
@@ -1169,120 +1118,8 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="a913dbccde53830bd855254a3d3b2339e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a913dbccde53830bd855254a3d3b2339e">&#9670;&nbsp;</a></span>switchControlDirection()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.switchControlDirection </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Changes the control orientation of the ROV, to allow easy maneuvering in reverse.
-
-INPUT
-
-NONE
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a913dbccde53830bd855254a3d3b2339e_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a913dbccde53830bd855254a3d3b2339e_icgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
-<a id="ac58feecba22059ec8ef908ec66b20fb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac58feecba22059ec8ef908ec66b20fb0">&#9670;&nbsp;</a></span>toggleTimer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.toggleTimer </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Starts/Stops the timer.
-
-INPUT
-
-NONE
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac58feecba22059ec8ef908ec66b20fb0_cgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_ac58feecba22059ec8ef908ec66b20fb0_cgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
-<a id="a798638e33e1bc755cbe1681c5e3e9c83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a798638e33e1bc755cbe1681c5e3e9c83">&#9670;&nbsp;</a></span>updateTimer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def main.CONTROL_PANEL.updateTimer </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>currentSeconds</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<pre class="fragment">PURPOSE
-
-Converts seconds into DD:HH:MM:SS format and updates the timer widget on the GUI.
-
-INPUT
-
-- currentSeconds = the number of seconds since the timer was started.
-
-RETURNS
-
-NONE
-</pre> <div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a798638e33e1bc755cbe1681c5e3e9c83_icgraph.png" border="0" usemap="#classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l_a798638e33e1bc755cbe1681c5e3e9c83_icgraph" alt=""/></div>
-</div>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>D:/Google Drive/Avalon/ROV_SW_GUI_2020/main.py</li>
+<li>D:/Google Drive/ROV_SW_GUI_2020/main.py</li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

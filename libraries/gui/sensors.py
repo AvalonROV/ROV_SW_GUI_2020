@@ -207,8 +207,11 @@ class SENSORS(QObject):
         for i, reading in enumerate(readings):
             if i <= quantity:
                 # FIND LABEL WIDGET FOR EACH SENSOR
-                labelObject = self.controlForm.itemAt((2 * i) + 1).widget()
-                labelObject.setText(str(reading))
+                try:
+                    labelObject = self.controlForm.itemAt((2 * i) + 1).widget()
+                    labelObject.setText(str(reading))
+                except:
+                    pass
 
     def updateControlLabels(self):
         """

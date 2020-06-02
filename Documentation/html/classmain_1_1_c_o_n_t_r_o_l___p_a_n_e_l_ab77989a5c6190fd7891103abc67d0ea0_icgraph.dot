@@ -11,5 +11,7 @@ digraph "main.CONTROL_PANEL.getSensorReadings"
   Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node3 [label="main.CONTROL_PANEL.rovConnect",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a67c034013d8134f9b63a86dced3b8ea3",tooltip=" "];
   Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="main.CONTROL_PANEL.rovSerial\lConnection",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac4b29b924a75a8e53a074f735536462d",tooltip=" "];
+  Node4 [label="rovComms.ROV_SERIAL.find\lComPorts",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classrov_comms_1_1_r_o_v___s_e_r_i_a_l.html#a790f013933dafb05a242cce41492c5ed",tooltip=" "];
+  Node3 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="main.CONTROL_PANEL.rovSerial\lConnection",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#ac4b29b924a75a8e53a074f735536462d",tooltip="SERIAL FUNCTIONS #####."];
 }

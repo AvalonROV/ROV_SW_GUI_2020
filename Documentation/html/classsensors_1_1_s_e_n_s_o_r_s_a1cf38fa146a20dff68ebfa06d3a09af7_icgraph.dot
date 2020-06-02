@@ -1,0 +1,18 @@
+digraph "sensors.SENSORS.addSensor"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="sensors.SENSORS.addSensor",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="sensors.SENSORS.changeSensors\lNumber",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classsensors_1_1_s_e_n_s_o_r_s.html#ac51d7b0243f14ee35f64209c5f4916a6",tooltip=" "];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="sensors.SENSORS.setupConfig\lLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classsensors_1_1_s_e_n_s_o_r_s.html#a8408af1ba50e54adaf078b028c90796c",tooltip="CONFIGURATION TAB ###."];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="sensors.SENSORS.__init__",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classsensors_1_1_s_e_n_s_o_r_s.html#a3b6ba836891b8c7ded1c9d03add9a1b9",tooltip=" "];
+  Node3 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="thrusters.THRUSTERS.\l__init__",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a9654c1af6cff7087023a7476747ae95f",tooltip=" "];
+  Node1 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="sensors.SENSORS.setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classsensors_1_1_s_e_n_s_o_r_s.html#a9fe0e3a64a84cc1ecf20b4c97ce3f45f",tooltip=" "];
+}

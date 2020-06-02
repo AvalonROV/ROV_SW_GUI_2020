@@ -1,0 +1,18 @@
+digraph "keybindings.KEYBINDINGS.autoKeyBinding"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="keybindings.KEYBINDINGS.auto\lKeyBinding",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="keybindings.KEYBINDINGS.enable\lAutoBindingButtons",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkeybindings_1_1_k_e_y_b_i_n_d_i_n_g_s.html#a201d35d3016cc79c2b0fb9aa652eba2e",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="keybindings.KEYBINDINGS.find\lKeyBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkeybindings_1_1_k_e_y_b_i_n_d_i_n_g_s.html#a52d2abcca1faa8ae1bda0b28265e028b",tooltip=" "];
+  Node3 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="keybindings.KEYBINDINGS.set\lKeyBindings",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkeybindings_1_1_k_e_y_b_i_n_d_i_n_g_s.html#a4dedf014f8336a4e87d397ffb7ebfe13",tooltip=" "];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="keybindings.KEYBINDINGS.uncheck\lAutoBindingButtons",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkeybindings_1_1_k_e_y_b_i_n_d_i_n_g_s.html#a63f4f091cd2cb0f96612630c38afc20d",tooltip=" "];
+}

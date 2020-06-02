@@ -22,14 +22,17 @@ for the JavaScript code in this file
 */
 var NAVTREE =
 [
-  [ "Avalon ROV Comms", "index.html", [
+  [ "Avalon ROV Pilot Control Program", "index.html", [
+    [ "Packages", "namespaces.html", [
+      [ "Packages", "namespaces.html", "namespaces_dup" ]
+    ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
-        [ "All", "functions.html", null ],
-        [ "Functions", "functions_func.html", null ],
+        [ "All", "functions.html", "functions_dup" ],
+        [ "Functions", "functions_func.html", "functions_func" ],
         [ "Variables", "functions_vars.html", null ]
       ] ]
     ] ]
@@ -38,7 +41,9 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-".html"
+".html",
+"classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aeea7e36d53bbadd49964fffea2f48a23",
+"classvisual_effects_1_1_s_t_y_l_e.html#a75d6a3c8ab24b597ba9aa931a60df835"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -6,11 +6,5 @@ digraph "main.CONTROL_PANEL.processButtons"
   rankdir="LR";
   Node1 [label="main.CONTROL_PANEL.process\lButtons",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node2 [label="main.CONTROL_PANEL.change\lActuators",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a46689bd1f510efc1fcb87d5d73d5e0e5",tooltip="ROV CONTROL FUNCTIONS ##."];
-  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node3 [label="main.CONTROL_PANEL.change\lSensitivity",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aa99219b2fcb6a38b2304333804ec4e0d",tooltip=" "];
-  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node4 [label="main.CONTROL_PANEL.change\lYawSensitivity",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a09d20c1276c7ffdf611059504deb93f2",tooltip=" "];
-  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node5 [label="main.CONTROL_PANEL.switch\lControlDirection",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#a913dbccde53830bd855254a3d3b2339e",tooltip=" "];
+  Node2 [label="main.CONTROL_PANEL.callBinding\lFunction",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_c_o_n_t_r_o_l___p_a_n_e_l.html#aecba82060305bfd7cb3585524b946d6b",tooltip=" "];
 }

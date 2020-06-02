@@ -1,0 +1,29 @@
+digraph "profileSelector.PROFILE_SELECTOR.addNewProfile"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="profileSelector.PROFILE\l_SELECTOR.addNewProfile",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node1 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="main.UI.addNewProfile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#af93e7da0eced61ee208660a6d0ad9981",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="main.UI.writeDefaultConfigFile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#af15556f95b081b7636bf56705172b641",tooltip=" "];
+  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="profileSelector.PROFILE\l_SELECTOR.findProfiles",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classprofile_selector_1_1_p_r_o_f_i_l_e___s_e_l_e_c_t_o_r.html#a24d5138b6e6611eaefdc20e0ebfb6830",tooltip=" "];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="profileSelector.PROFILE\l_SELECTOR.clearList",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classprofile_selector_1_1_p_r_o_f_i_l_e___s_e_l_e_c_t_o_r.html#adf71ad70d9bda619efedaee75eefb5d2",tooltip=" "];
+  Node4 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="profileSelector.PROFILE\l_SELECTOR.createProfileButton",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classprofile_selector_1_1_p_r_o_f_i_l_e___s_e_l_e_c_t_o_r.html#ad7fec80fb6c0703d1f877d547bc3606e",tooltip=" "];
+  Node6 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="profileSelector.PROFILE\l_SELECTOR.deleteProfile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classprofile_selector_1_1_p_r_o_f_i_l_e___s_e_l_e_c_t_o_r.html#a134d80650a5543921f01d9275781513e",tooltip=" "];
+  Node7 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="profileSelector.PROFILE\l_SELECTOR.loadProfile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classprofile_selector_1_1_p_r_o_f_i_l_e___s_e_l_e_c_t_o_r.html#a3709833b87db2d47a3b525cc203058f2",tooltip=" "];
+  Node8 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="profileSelector.PROFILE\l_SELECTOR.closeWindow",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classprofile_selector_1_1_p_r_o_f_i_l_e___s_e_l_e_c_t_o_r.html#a19da55bf9f067053d1438b1c53726682",tooltip=" "];
+  Node6 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="profileSelector.PROFILE\l_SELECTOR.renameProfile",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classprofile_selector_1_1_p_r_o_f_i_l_e___s_e_l_e_c_t_o_r.html#a290adc332d7ed9f89368b3fbc37ceb8f",tooltip=" "];
+  Node10 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+}

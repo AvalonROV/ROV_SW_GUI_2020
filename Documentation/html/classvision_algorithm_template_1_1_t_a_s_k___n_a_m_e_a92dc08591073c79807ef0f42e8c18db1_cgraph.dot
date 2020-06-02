@@ -1,0 +1,12 @@
+digraph "visionAlgorithmTemplate.TASK_NAME.runAlgorithm"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="visionAlgorithmTemplate.\lTASK_NAME.runAlgorithm",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="visionAlgorithmTemplate.\lTASK_NAME.processingFunction1",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classvision_algorithm_template_1_1_t_a_s_k___n_a_m_e.html#a8e39fab0378a838d3424054c51a2a242",tooltip="PROCESSING FUNCTIONS ###."];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="visionAlgorithmTemplate.\lTASK_NAME.sendData",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classvision_algorithm_template_1_1_t_a_s_k___n_a_m_e.html#a5de901de78edb7f51d48084ffdbcce38",tooltip=" "];
+}

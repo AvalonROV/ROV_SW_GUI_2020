@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['filename_209',['fileName',['../classmain_1_1_d_a_t_a_b_a_s_e.html#a142ffe79cb8705a8e65c2e623d20e4e3',1,'main::DATABASE']]]
+  ['labelonoff_484',['labelOnOff',['../classvisual_effects_1_1_s_t_y_l_e.html#a78d49584c2576189137242dc94e8b5b5',1,'visualEffects::STYLE']]]
 ];

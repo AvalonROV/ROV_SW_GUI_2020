@@ -51,6 +51,18 @@ from libraries.gui.keybindings import KEYBINDINGS
 from libraries.gui.controllerDisplay import CONTROLLER_DISPLAY
 from libraries.gui.sensors import SENSORS
 
+def getResourcePath(relativePath):
+        """ 
+        Get absolute path to resource, works for dev and for PyInstaller 
+        """
+        try:
+            # PYINSTALLER CREATES A TEMP FOLDER AND STORES PATH IN _MEIPASS
+            basePath = sys._MEIPASS
+        except Exception:
+            basePath = os.path.abspath(".")
+
+        return os.path.join(basePath, relativePath)
+
 class UI(QMainWindow):
     """
     PURPOSE
@@ -83,7 +95,8 @@ class UI(QMainWindow):
         super(UI,self).__init__()
         
         # LOAD UI FILE
-        uic.loadUi('gui.ui',self)
+        uiFile = getResourcePath("gui.ui")
+        uic.loadUi(uiFile,self)
 
         # APPLICATION OBJECT TO ALLOW THEME CHANGING
         self.app = app
@@ -575,11 +588,11 @@ class UI(QMainWindow):
         self.switch_user.clicked.connect(lambda: self.profileSelector.showPopup())
         self.switch_user.setIcon(QIcon("./graphics/login-icon.png"))
         self.switch_user.setIconSize(QSize(20,20))
-        self.switch_user.setObjectName("rename-button")
+        self.switch_user.setObjectName("green-button")
 
         # PROGRAM EXIT BUTTON
         self.program_exit.clicked.connect(lambda: self.app.quit())
-        self.program_exit.setObjectName("program-exit-button")
+        self.program_exit.setObjectName("red-button")
         
     def linkConfigWidgets(self):
         """
@@ -872,9 +885,9 @@ class UI(QMainWindow):
                 self.style.actuatorButton + 
                 self.style.orientationButton +
                 self.style.timerStartButton +
-                self.style.renameButton +
-                self.style.deleteButton +
-                self.style.programExitButton +
+                self.style.blueButton +
+                self.style.greenButton +
+                self.style.redButton +
                 self.style.timerLCD +
                 self.style.scrollArea +
                 self.style.comboBox + 
@@ -923,7 +936,7 @@ class UI(QMainWindow):
         # LIGHT THEME
         else:
             self.avalon_logo.clear()
-            avalonPixmap = QPixmap('graphics/logo.png')
+            avalonPixmap = QPixmap('graphics/thumbnail.png')
             avalonPixmap = avalonPixmap.scaledToWidth(200, Qt.SmoothTransformation)
             self.avalon_logo.setPixmap(avalonPixmap)
 
@@ -944,13 +957,8 @@ class UI(QMainWindow):
 
         NONE
         """
-        screenWidth, screenHeight = self.getScreenSize()
-
         # SET DEFAULT SIDE BAR WIDTH
         self.con_panel_functions_widget.resize(1000,self.con_panel_functions_widget.height())
-
-        # SET HEIGHT OF GROUP BOXES ON CONFIG TAB
-        #self.configuration_tab.
 
     def getScreenSize(self):
         """
@@ -1797,7 +1805,7 @@ class CONTROL_PANEL():
         self.animation.setSpeed(300)
 
         # MOSIAC TASK
-        self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.ui.scroll_mosaic_task)
+        self.mosaicPopup = MOSAIC_POPUP_WINDOW(self.ui.group_box_mosaic_task)
         
         # TRANSECT LINE TASK
         self.transectLinePopup = TRANSECT_LINE_POPUP_WINDOW(self.ui.group_box_transect_task, self.ui.cameraThreadList[0])
@@ -1866,6 +1874,9 @@ class CONTROL_PANEL():
             if True in self.ui.visionTaskStatus:
                 activeTask = self.ui.visionTaskStatus.index(True)
                 self.changeVisionButtons(activeTask, True)
+
+        # RESIZE PIXMAPS
+        self.ui.changePixmapSize()
 
     @pyqtSlot()       
     def receiveMosaicTask(self):

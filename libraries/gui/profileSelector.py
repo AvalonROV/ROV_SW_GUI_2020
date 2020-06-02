@@ -1,7 +1,7 @@
 import sys, os
 
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-from PyQt5.QtWidgets import (QMessageBox, QInputDialog, QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
+from PyQt5.QtWidgets import (QSpacerItem, QMessageBox, QInputDialog, QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
                                 QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
                                 QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect, QShortcut)
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QKeyEvent, QKeySequence, QIcon, QFont, QColor, QPalette, QPainter
@@ -31,6 +31,7 @@ class PROFILE_SELECTOR(QWidget):
         NONE
         """
         QWidget.__init__(self)
+        self.setWindowTitle("Profile Selector")
         self.setupLayout()
 
     def showPopup(self):
@@ -70,12 +71,22 @@ class PROFILE_SELECTOR(QWidget):
         NONE
         """
         parentLayout = QHBoxLayout()
+        parentLayout.setSpacing(30)
 
         # LOGO
+        logoLayout = QVBoxLayout()
         logo = QLabel()
+        logo.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         avalonPixmap = QPixmap('graphics/thumbnail.png')
         avalonPixmap = avalonPixmap.scaledToWidth(200, Qt.SmoothTransformation)
         logo.setPixmap(avalonPixmap)
+        label = QLabel("ROV\nCONTROL\nPROGRAM")
+        label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        label.setStyleSheet("font: 20pt;")
+        author = QLabel("Developed by:\nBenjamin Griffiths")
+        logoLayout.addWidget(logo)
+        logoLayout.addWidget(label)
+        logoLayout.addWidget(author)
 
         # PROFILE SELECTION
         container = QGroupBox()
@@ -87,19 +98,31 @@ class PROFILE_SELECTOR(QWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         layout.addWidget(title)
         layout.addWidget(scroll)
+        addProfileButton = QPushButton("Add New")
+        addProfileButton.setObjectName("blue-button")
+        layout.addWidget(addProfileButton)
         
+        # SETUP SCROLL AREA
         scrollWidget = QWidget()
-        self.profileLayout = QVBoxLayout()
-        scrollWidget.setLayout(self.profileLayout)
         scroll.setWidget(scrollWidget)
+        
+        # LAYOUT INSIDE SCROLL WIDGET
+        scrollLayout = QVBoxLayout()
+        scrollWidget.setLayout(scrollLayout)
+
+        # LAYOUT FOR PROFILE BUTTONS
+        self.profileLayout = QVBoxLayout()
+
+        # SPACER TO PUSH ALL BUTTON TO TOP OF SCROLL WIDGET
+        vSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        
+        scrollLayout.addLayout(self.profileLayout)
+        scrollLayout.addItem(vSpacer)
+        
         container.setLayout(layout)
 
-        # ADD NEW PROFILE
-        addProfileButton = QPushButton("Add New")
-        layout.addWidget(addProfileButton)
-
         # ADD WIDGETS TO GRID LAYOUT
-        parentLayout.addWidget(logo)
+        parentLayout.addLayout(logoLayout)
         parentLayout.addWidget(container)
 
         self.setLayout(parentLayout)
@@ -175,15 +198,14 @@ class PROFILE_SELECTOR(QWidget):
 
         # RENAME PROFILE
         renameButton = QPushButton()
-        renameButton.setObjectName("rename-button")
+        renameButton.setObjectName("green-button")
         renameButton.setFixedSize(30, 30)
         renameButton.setIcon(QIcon("./graphics/rename-icon.png"))
         renameButton.setIconSize(QSize(20,20))
         
-        
         # DELETE PROFILE
         deleteButton = QPushButton()
-        deleteButton.setObjectName("delete-button")
+        deleteButton.setObjectName("red-button")
         deleteButton.setFixedSize(30, 30)
         deleteButton.setIcon(QIcon("./graphics/delete-icon.png"))
         deleteButton.setIconSize(QSize(20,20))
@@ -319,22 +341,3 @@ class PROFILE_SELECTOR(QWidget):
         NONE
         """
         self.close()
-
-def guiInitiate(): 
-    # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
-    app = QApplication(sys.argv)
-
-    # SET PROGRAM STYLE
-    app.setFont(QFont("Bahnschrift Regular", 10))
-    app.setStyle("Fusion")
-    
-    # INITIATE MAIN GUI OBJECT
-    program = PROFILE_SELECTOR()
-    program.setWindowTitle("Profile Selector")
-    
-    # START EVENT LOOP
-    app.exec_()
-
-if __name__ == '__main__':
-    guiInitiate()
-

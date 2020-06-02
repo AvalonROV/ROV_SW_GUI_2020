@@ -1,0 +1,25 @@
+var classsensors_1_1_s_e_n_s_o_r_s =
+[
+    [ "__init__", "classsensors_1_1_s_e_n_s_o_r_s.html#a3b6ba836891b8c7ded1c9d03add9a1b9", null ],
+    [ "addConfigSensor", "classsensors_1_1_s_e_n_s_o_r_s.html#a168606ded3ef890b25180bfa870cf071", null ],
+    [ "addControlSensor", "classsensors_1_1_s_e_n_s_o_r_s.html#a204eb9944086526d5491657c76a1ffc6", null ],
+    [ "addSensor", "classsensors_1_1_s_e_n_s_o_r_s.html#a1cf38fa146a20dff68ebfa06d3a09af7", null ],
+    [ "changeSensorsNumber", "classsensors_1_1_s_e_n_s_o_r_s.html#ac51d7b0243f14ee35f64209c5f4916a6", null ],
+    [ "changeSensorType", "classsensors_1_1_s_e_n_s_o_r_s.html#ae6d0a3d91c58eca80dfb0a104b87a876", null ],
+    [ "removeConfigSensor", "classsensors_1_1_s_e_n_s_o_r_s.html#a617af526a2b9b26b3ffd2b8d7e412c8c", null ],
+    [ "removeControlSensor", "classsensors_1_1_s_e_n_s_o_r_s.html#a50b0937c1f4b78df013d3ef0df979447", null ],
+    [ "removeSensor", "classsensors_1_1_s_e_n_s_o_r_s.html#abfc34b64bc7d1d13a2305e794ad88356", null ],
+    [ "reset", "classsensors_1_1_s_e_n_s_o_r_s.html#a3ccc6ac2ef31dd5589d67e55a776766c", null ],
+    [ "setup", "classsensors_1_1_s_e_n_s_o_r_s.html#a9fe0e3a64a84cc1ecf20b4c97ce3f45f", null ],
+    [ "setupConfigLayout", "classsensors_1_1_s_e_n_s_o_r_s.html#a8408af1ba50e54adaf078b028c90796c", null ],
+    [ "setupControlLayout", "classsensors_1_1_s_e_n_s_o_r_s.html#ae887560a1f920394ffde4c7246459950", null ],
+    [ "updateControlLabels", "classsensors_1_1_s_e_n_s_o_r_s.html#ab7f2337e2a4baa3d8ecb758d24f2fb59", null ],
+    [ "updateSensorReadings", "classsensors_1_1_s_e_n_s_o_r_s.html#a675a2ea4fbe2a8003b0cbce78332d58d", null ],
+    [ "configForm", "classsensors_1_1_s_e_n_s_o_r_s.html#aeeb51134ec38515f4e49082e238dd436", null ],
+    [ "configLayout", "classsensors_1_1_s_e_n_s_o_r_s.html#a8343662fe482da52e952d802cab50170", null ],
+    [ "controlForm", "classsensors_1_1_s_e_n_s_o_r_s.html#a33daaa465f5922345f7a33e3b9be5c24", null ],
+    [ "controlLayout", "classsensors_1_1_s_e_n_s_o_r_s.html#ab798255825d7cbd383c0995bf9aad86a", null ],
+    [ "quantity", "classsensors_1_1_s_e_n_s_o_r_s.html#aada6f26a91fc65f90fe0670ca5d1eed5", null ],
+    [ "selectedTypes", "classsensors_1_1_s_e_n_s_o_r_s.html#ad07acafbfadd8621bbf1a01f00c4d6cc", null ],
+    [ "sensorNumber", "classsensors_1_1_s_e_n_s_o_r_s.html#a9816b34d048ca8234a7e8c3aaa66a95b", null ]
+];

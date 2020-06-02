@@ -86,7 +86,7 @@ class ROV_SERIAL(QObject):
                 if identity == rovIdentity:
                     rovComPort = port
                     menuIndex = availableComPorts.index(rovComPort) + 1
-                    #menuObject.setCurrentIndex(menuIndex)
+                    menuObject.setCurrentIndex(menuIndex)
                     break
                     
             # SKIP COM PORT IF UNAVAILABLE

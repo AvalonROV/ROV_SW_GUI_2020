@@ -2,7 +2,7 @@ import sys
 from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt
-from PyQt5.QtWidgets import (QScrollArea, QWidget, QLabel, QApplication, QGridLayout, QPushButton, QSizePolicy)
+from PyQt5.QtWidgets import (QSpacerItem, QScrollArea, QWidget, QLabel, QApplication, QVBoxLayout, QHBoxLayout, QGridLayout, QPushButton, QSizePolicy)
 from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QFont
 
 class VIEW(QWidget):
@@ -20,26 +20,21 @@ class MOSAIC_POPUP_WINDOW(QWidget):
     Each side of the object can be captured, then an openCV algorithm will stitch them together.
     """
     images = [None] * 5
+    imageWidgets = []
 
-    def __init__(self, viewWidget):
+    def __init__(self, controlLayout = None):
         QWidget.__init__(self) 
-        self.mainLayout = QGridLayout()
-        self.scroll = QScrollArea()
-        # self.scroll.setStyleSheet("""QScrollArea { background: transparent;
-        #                             background: transparent; }
-        #                             background: 0; }""")
-        self.mainLayout.addWidget(self.scroll)
-        self.layout = QGridLayout()
-        self.scroll.setLayout(self.layout)
-        # ADD IMAGE CAPTURE BUTTONS
-        self.addWidgets()
-        viewWidget.setLayout(self.mainLayout)
 
-    def addWidgets(self):
+        self.controlLayout = controlLayout
+
+        if controlLayout != None:
+            self.setupControlLayout()
+
+    def setupControlLayout(self):
         """
         PURPOSE
 
-        Adds the image view and capture button for each side of the object.
+        Add a label to paint pixmaps to, and a button for each side of the mosaic.
 
         INPUT
 
@@ -49,68 +44,66 @@ class MOSAIC_POPUP_WINDOW(QWidget):
 
         NONE
         """
-        defaultView = QPixmap('graphics/blank.png')
-        # ADD CAMERA VIEW AND CAPTURE BUTTON FOR EACH SIDE OF THE UNDERWATER OBJECT
-        for index in range(5):
-            self.images[index] = defaultView
-            button = QPushButton("Capture {}".format(index + 1))
-            image = QLabel()
-            image.setSizePolicy(QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored))
-            image.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            image.setPixmap(defaultView.scaledToHeight(200))
-            # ADD TO GRID LAYOUT
-            self.layout.addWidget(image, (index * 2), 0)
-            self.layout.addWidget(button, (index * 2) + 1, 0)
-            button.clicked.connect(lambda state, index = index, buttonObject = button, imageObject = image: self.captureImage(index, buttonObject, imageObject))
+        parentLayout = QVBoxLayout()
 
+        for index in range(5):
+            childLayout = self.addWidgets(index)
+            parentLayout.addLayout(childLayout)
+
+        # ADD FINAL BUTTON TO COMPUTE MOSAIC
         computeButton = QPushButton("Compute Mosaic")
-        computeButton.setFixedHeight(80)
-        computeButton.setStyleSheet('background-color: #0D47A1; color: white; font-weight: bold;')
-        self.layout.addWidget(computeButton, 10, 0)
+        computeButton.setObjectName("blue-button")
+        computeButton.setFixedHeight(50)
+        parentLayout.addWidget(computeButton)
+
+        self.controlLayout.setLayout(parentLayout)
+
+        # LINK WIDGETS
         computeButton.clicked.connect(self.computeMosaic)
 
-    def captureImage(self, index, buttonObject, imageObject):  
+        # CORRECT IMAGE SIZE
+        self.imageResizeEvent()
+
+    def addWidgets(self, index):
         """
         PURPOSE
 
-        Grabs a frame from the primary camera feed and displays it in the popup window.
+        Creates an image view and capture button, and add them to a layout.
 
         INPUT
 
-        - index = the index of the mosaic item being photographed.
-        - buttonObject = pointer to the button pressed.
-        - imageObject = pointer to the label object to paint the pixmap onto.
+        - index = the side of the mosaic (0,1,2,3 etc.)
 
         RETURNS
 
-        NONE
-        """      
-        channel = 0
+        - layout = A layout containing all the widgets for that specific side.
+        """
+        defaultView = QPixmap('graphics/blank.png')
+        self.images[index] = defaultView
 
-        # INITIATE PRIMARY CAMERA
-        cameraFeed = VideoCapture(channel, CAP_DSHOW)
-        cameraFeed.set(CAP_PROP_FRAME_WIDTH, 1280)
-        cameraFeed.set(CAP_PROP_FRAME_HEIGHT, 720)
-        
-        # CAPTURE FRAME
-        ret, frame = cameraFeed.read()
-    
-        # IF FRAME IS SUCCESSFULLY CAPTURED            
-        if ret:
-            # CONVERT TO RGB COLOUR
-            cameraFrame = cvtColor(frame, COLOR_BGR2RGB)
-            # GET FRAME DIMENSIONS AND NUMBER OF COLOUR CHANNELS
-            height, width, _ = cameraFrame.shape
-            # CONVERT TO QIMAGE
-            cameraFrame = QImage(cameraFrame.data, width, height, cameraFrame.strides[0], QImage.Format_RGB888)
-            # CONVERT TO PIXMAP
-            camSize = [imageObject.size().width(),imageObject.size().height()]
-            cameraFrame = QPixmap.fromImage(cameraFrame)
-            # SAVE PIXMAP
-            self.images[index] = cameraFrame
-            cameraFrame = cameraFrame.scaled(camSize[0]*0.99, camSize[1]*0.99, Qt.KeepAspectRatio)
-            # VIEW IMAGE
-            imageObject.setPixmap(cameraFrame)
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 30)
+
+        # CREATE LABEL, IMAGE VIEW AND CAPTURE BUTTON
+        label = QLabel("Side {}".format(index + 1))
+        imageView = QLabel()
+        imageView.setPixmap(defaultView)
+        imageView.setSizePolicy(QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Expanding))
+        imageView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        self.imageWidgets.append(imageView)
+        buttonLayout = QHBoxLayout()
+        capture = QPushButton("Capture")
+        spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        buttonLayout.addWidget(capture)
+        buttonLayout.addItem(spacer)
+        layout.addWidget(label)
+        layout.addWidget(imageView, 1)
+        layout.addLayout(buttonLayout)
+
+        # LINK WIDGETS
+        #button.clicked.connect(lambda state, index = index: self.captureImage(index))        
+
+        return layout
 
     def computeMosaic(self):
         """
@@ -142,12 +135,11 @@ class MOSAIC_POPUP_WINDOW(QWidget):
 
         NONE
         """
-        for image in range(5):
-            widget = self.layout.itemAt(image*2).widget()
-            cameraPixmap = self.images[image]
-            widgetSize = [widget.size().width(), widget.height()]
-            adjustedImage = cameraPixmap.scaled(widgetSize[0], widgetSize[1], Qt.KeepAspectRatio)
-            widget.setPixmap(adjustedImage)
+        for index, image in enumerate(self.imageWidgets):
+            cameraPixmap = self.images[index]
+            widgetSize = [image.size().width(), image.size().height()]
+            adjustedImage = cameraPixmap.scaledToWidth(widgetSize[0])
+            image.setPixmap(adjustedImage)
 
 class MOSAIC_RESULT(QWidget):
     """

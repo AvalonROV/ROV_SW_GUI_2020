@@ -1,0 +1,12 @@
+digraph "keybindings.KEYBINDINGS.addConfigBinding"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node1 [label="keybindings.KEYBINDINGS.add\lConfigBinding",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="keybindings.KEYBINDINGS.add\lBinding",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkeybindings_1_1_k_e_y_b_i_n_d_i_n_g_s.html#a26da3f54ebe7d7fa8cd80acda55da744",tooltip=" "];
+  Node2 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="keybindings.KEYBINDINGS.setup",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classkeybindings_1_1_k_e_y_b_i_n_d_i_n_g_s.html#aec8e82cce98d0b7cb72489d7f14c3212",tooltip=" "];
+}

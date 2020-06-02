@@ -1,0 +1,54 @@
+digraph "thrusters.THRUSTERS.setup"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="thrusters.THRUSTERS.setup",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="thrusters.THRUSTERS.addThruster",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a3fb2e8e49c67a8f45b2de9414db6f69e",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="thrusters.THRUSTERS.addConfig\lThruster",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a5d8677fd561c80236226557d055fea4d",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="thrusters.THRUSTERS.thruster\lPosition",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a938526e1dd83abfc770c99f5352fc41a",tooltip=" "];
+  Node3 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="thrusters.THRUSTERS.thruster\lReverse",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a10d2ff45599de2e8979bc9dd56f40aed",tooltip=" "];
+  Node3 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="thrusters.THRUSTERS.thrusterTest",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a7bb121019216e87e576237b45c3e32fc",tooltip=" "];
+  Node6 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="thrusters.THRUSTERS.reverse\lThrusterDirection",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a5cb325c15a7831c380ae06495fdbaf74",tooltip=" "];
+  Node1 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="controllerDisplay.CONTROLLER\l_DISPLAY.setupControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcontroller_display_1_1_c_o_n_t_r_o_l_l_e_r___d_i_s_p_l_a_y.html#a254c501f80c06eca2b15dc2c60510eca",tooltip="CONTROL PANEL TAB ###."];
+  Node8 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="controllerDisplay.CONTROLLER\l_DISPLAY.setupControllerSensitivity",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcontroller_display_1_1_c_o_n_t_r_o_l_l_e_r___d_i_s_p_l_a_y.html#a893116aa35369e09ef7f6d9c18c0815d",tooltip=" "];
+  Node9 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="controllerDisplay.CONTROLLER\l_DISPLAY.changeJoystickSensitivity",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcontroller_display_1_1_c_o_n_t_r_o_l_l_e_r___d_i_s_p_l_a_y.html#ac58d7bb1df5d078d2652c2e461616d1e",tooltip=" "];
+  Node8 -> Node11 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="controllerDisplay.CONTROLLER\l_DISPLAY.setupYawSensitivity",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcontroller_display_1_1_c_o_n_t_r_o_l_l_e_r___d_i_s_p_l_a_y.html#aa4af291fe0ae5ce1edf67571c79ac451",tooltip=" "];
+  Node11 -> Node12 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="controllerDisplay.CONTROLLER\l_DISPLAY.changeYawSensitivity",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcontroller_display_1_1_c_o_n_t_r_o_l_l_e_r___d_i_s_p_l_a_y.html#a42c852b31f542c9505cf377195a795cd",tooltip=" "];
+  Node1 -> Node13 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="sensors.SENSORS.setupControl\lLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classsensors_1_1_s_e_n_s_o_r_s.html#ae887560a1f920394ffde4c7246459950",tooltip="CONTROL PANEL TAB ###."];
+  Node1 -> Node14 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node14 [label="analogCameras.ANALOG\l_CAMERAS.setupControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classanalog_cameras_1_1_a_n_a_l_o_g___c_a_m_e_r_a_s.html#abb35a0c31be9904df1c949b71217f4eb",tooltip="CONTROL PANEL TAB ###."];
+  Node14 -> Node15 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node15 [label="analogCameras.ANALOG\l_CAMERAS.changeSelectedCameras",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classanalog_cameras_1_1_a_n_a_l_o_g___c_a_m_e_r_a_s.html#a7457fcd633cbf1b6389fe577578d29bf",tooltip=" "];
+  Node15 -> Node16 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node16 [label="analogCameras.ANALOG\l_CAMERAS.updateSelectedMenus",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classanalog_cameras_1_1_a_n_a_l_o_g___c_a_m_e_r_a_s.html#aac2d5e5f7c1b4d3ea0a632f5eed89585",tooltip=" "];
+  Node1 -> Node17 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node17 [label="actuators.ACTUATORS.setup\lControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classactuators_1_1_a_c_t_u_a_t_o_r_s.html#a9d73c1ed8fde6fbd358edd3634d9c921",tooltip="CONTROL PANEL TAB ###."];
+  Node1 -> Node18 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node18 [label="digitalCameras.DIGITAL\l_CAMERAS.setupControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classdigital_cameras_1_1_d_i_g_i_t_a_l___c_a_m_e_r_a_s.html#af632ff2bcd0be4632c7c64c0b9285d90",tooltip="CONTROL PANEL TAB ###."];
+  Node18 -> Node19 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node19 [label="cameraCapture.CAMERA\l_CAPTURE.changeResolution",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classcamera_capture_1_1_c_a_m_e_r_a___c_a_p_t_u_r_e.html#acde251476ee95827d76f64ba8c15c578",tooltip=" "];
+  Node18 -> Node20 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node20 [label="digitalCameras.DIGITAL\l_CAMERAS.changeResolution",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classdigital_cameras_1_1_d_i_g_i_t_a_l___c_a_m_e_r_a_s.html#a7174c9fc5767a9835e46e5d6f368554b",tooltip=" "];
+  Node18 -> Node21 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node21 [label="digitalCameras.DIGITAL\l_CAMERAS.toggleCameraFeed",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classdigital_cameras_1_1_d_i_g_i_t_a_l___c_a_m_e_r_a_s.html#a58d0546941846ba3289f3e6eebf671a4",tooltip=" "];
+  Node18 -> Node22 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node22 [label="main.UI.toggleCameraFeed",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#ada1257062060358b26465ec51c2d2e82",tooltip=" "];
+  Node1 -> Node23 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node23 [label="thrusters.THRUSTERS.setup\lControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a3f965ff522b7cfa1f81edc5276a5d057",tooltip="CONTROL PANEL TAB ###."];
+  Node23 -> Node24 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node24 [label="thrusters.THRUSTERS.toggle\lControlDirection",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classthrusters_1_1_t_h_r_u_s_t_e_r_s.html#a62a822c5d5da479b81646c86243c61de",tooltip=" "];
+}
