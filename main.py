@@ -17,7 +17,7 @@ try:
     from datetime import datetime
     from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW, CAP_FFMPEG
     from xml.etree.ElementTree import parse, Element, SubElement, ElementTree
-    from subprocess import call
+    from subprocess import call, Popen
     from webbrowser import open
     from pygame import init
     from pygame.joystick import quit, Joystick, get_count
@@ -130,7 +130,7 @@ class UI(QMainWindow):
         self.showFullScreen()
 
         # LAUNCH PILOT PROFILE SELECTOR
-        self.profileSelector.showPopup()     
+        self.profileSelector.showPopup()    
 
     def initiateObjects(self):
         """
@@ -638,13 +638,17 @@ class UI(QMainWindow):
 
         NONE
         """
+        # FILE MENU
+        self.toolbar_save_settings.triggered.connect(self.toolbar.saveSettings)
+        self.toolbar_change_pilot.triggered.connect(self.toolbar.changePilotProfile)
         self.toolbar_load_settings.triggered.connect(self.toolbar.loadSettings)
         self.toolbar_reset_settings.triggered.connect(self.toolbar.resetSettings)
-        self.toolbar_change_pilot.triggered.connect(self.toolbar.changePilotProfile)
-        self.toolbar_save_settings.triggered.connect(self.toolbar.saveSettings)
+        self.toolbar_toggle_theme.triggered.connect(self.toolbar.toggleTheme)
+
+        # HELP MENU
         self.toolbar_open_documentation.triggered.connect(self.toolbar.openDocumentation)
         self.toolbar_open_github.triggered.connect(self.toolbar.openGitHub)
-        self.toolbar_toggle_theme.triggered.connect(self.toolbar.toggleTheme)
+        self.toolbar_open_user_guide.triggered.connect(self.toolbar.openUserGuide)
 
     ################################
     #### CAMERA FEEDS FUNCTIONS ####
@@ -2135,22 +2139,6 @@ class TOOLBAR():
             # SET BACK TO DEFAULT NAME IF USER DOES NOT SELECT A FILE
             self.ui.fileName = 'config/config.xml'
 
-    def openUserManual(self):
-        """
-        PURPOSE
-
-        Opens user manual that demonstrates how to use the program.
-
-        INPUT 
-
-        NONE
-
-        RETURNS
-
-        NONE
-        """
-        pass
-
     def openDocumentation(self):
         """
         PURPOSE
@@ -2165,13 +2153,16 @@ class TOOLBAR():
 
         NONE
         """
-        call(['open_documentation.bat'])
+        try:
+            call(['open_documentation.bat'])
+        except:
+            self.ui.printTerminal("Error: Code documentation could not be opened.")
 
     def openGitHub(self):
         """
         PURPOSE
 
-        Open the Avalon ROV GitHub page.
+        Opens the Avalon ROV GitHub page.
 
         INPUT
 
@@ -2181,8 +2172,29 @@ class TOOLBAR():
 
         NONE
         """
-        # OPEN AVALON GITHUB PAGE IN BROWSER
-        open('https://github.com/AvalonROV')
+        try:
+            open('https://github.com/AvalonROV')
+        except:
+            self.ui.printTerminal("Error: GitHub repository could not be opened.")
+
+    def openUserGuide(self):
+        """
+        PURPOSE
+
+        Opens the programs user guide PDF.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        try:
+            Popen(["./documentation/User Guide.pdf"], shell=True)
+        except:
+            self.ui.printTerminal("Error: User guide could not be opened.")
 
     def toggleTheme(self):
         """

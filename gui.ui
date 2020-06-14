@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2264</width>
-    <height>1192</height>
+    <width>1920</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -344,7 +344,7 @@
                      <x>0</x>
                      <y>0</y>
                      <width>241</width>
-                     <height>966</height>
+                     <height>854</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_12">
@@ -463,8 +463,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>257</width>
-                     <height>966</height>
+                     <width>112</width>
+                     <height>45</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_15">
@@ -509,8 +509,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>257</width>
-                     <height>966</height>
+                     <width>135</width>
+                     <height>45</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_20">
@@ -555,8 +555,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>257</width>
-                     <height>966</height>
+                     <width>119</width>
+                     <height>45</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_25">
@@ -601,8 +601,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>257</width>
-                     <height>966</height>
+                     <width>142</width>
+                     <height>45</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_26">
@@ -656,8 +656,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>263</width>
-                 <height>990</height>
+                 <width>248</width>
+                 <height>878</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -1167,8 +1167,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>164</width>
-                      <height>359</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1208,8 +1208,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>125</width>
-                      <height>85</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1249,8 +1249,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>164</width>
-                      <height>85</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1296,8 +1296,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>124</width>
-                      <height>359</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1337,8 +1337,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>125</width>
-                      <height>359</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1384,8 +1384,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>160</width>
-                      <height>85</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1419,8 +1419,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>160</width>
-                      <height>359</height>
+                      <width>100</width>
+                      <height>30</height>
                      </rect>
                     </property>
                    </widget>
@@ -1559,7 +1559,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2264</width>
+     <width>1920</width>
      <height>26</height>
     </rect>
    </property>
@@ -1579,6 +1579,7 @@
     </property>
     <addaction name="toolbar_open_documentation"/>
     <addaction name="toolbar_open_github"/>
+    <addaction name="toolbar_open_user_guide"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -1616,6 +1617,11 @@
   <action name="toolbar_change_pilot">
    <property name="text">
     <string>Change Pilot Profile</string>
+   </property>
+  </action>
+  <action name="toolbar_open_user_guide">
+   <property name="text">
+    <string>Open User Guide</string>
    </property>
   </action>
  </widget>

@@ -88,8 +88,10 @@ class TRANSECT_LINE_TASK(QObject):
         NONE
         """
         self.transmitData.emit(data)
-
-    # ALL PROCESSING FUNCTIONS
+    
+    ###########################
+    ### ALGORITHM FUNCTIONS ###
+    ###########################
 
     def detect_edges(self, frame):
         # filter for blue lane lines
@@ -143,8 +145,6 @@ class TRANSECT_LINE_TASK(QObject):
 
         return line_segments
 
-    # takes the frame under processing and lane segments detected using
-    # Hough transform and returns the average slope and intercept of two lane lines
     def average_slope_intercept(self, frame, line_segments):
         lane_lines = []
 
@@ -187,9 +187,6 @@ class TRANSECT_LINE_TASK(QObject):
 
         return lane_lines
 
-    # helper function for average_slope_intercept() function which will return
-    # the bounded coordinates of the lane lines
-    # (from the bottom to # the middle of the frame)
     def make_points(self, frame, line):
         height, width, _ = frame.shape
 
@@ -205,8 +202,7 @@ class TRANSECT_LINE_TASK(QObject):
         x2 = int((y2 - intercept) / slope)
 
         return [[x1, y1, x2, y2]]
-
-    # display the lane lines on the frames
+   
     def display_lines(self, frame, lines, line_color=(0, 255, 0), line_width=6):
         line_image = np.zeros_like(frame)
 
@@ -219,10 +215,6 @@ class TRANSECT_LINE_TASK(QObject):
 
         return line_image
 
-    # If steering_angle = 90, it means that the car has a heading line perpendicular
-    # to "height / 2" line and the car will move forward without steering.
-    # If steering_angle > 90, the car should steer to right otherwise
-    # it should steer left
     def display_heading_line(self, frame, steering_angle, line_color=(0, 0, 255), line_width=5):
         heading_image = np.zeros_like(frame)
         height, width, _ = frame.shape
@@ -278,63 +270,3 @@ class TRANSECT_LINE_TASK(QObject):
         steering_angle = angle_to_mid_deg + 90
 
         return steering_angle
-
-# video = VideoCapture(0, CAP_DSHOW)
-# video.set(CAP_PROP_FRAME_WIDTH, 320)
-# video.set(CAP_PROP_FRAME_HEIGHT, 240)
-
-# time.sleep(1)
-# lastTime = 0
-
-# kp = 0.4
-# kd = kp * 0.65
-
-# while True:
-#     k = waitKey(1) & 0xFF
-#     ret, frame = video.read()
-#     frame = flip(frame, -1)
-
-#     imshow("original", frame)
-#     edges = detect_edges(frame)
-#     roi = region_of_interest(edges)
-#     line_segments = detect_line_segments(roi)
-#     edges_2 = detect_red_edges(frame)
-#     roi_2 = region_of_interest(edges_2)
-#     line_segments_2 = detect_line_segments(roi_2)
-#     if line_segments_2 is not None:
-#         print("Go down!")
-#     lane_lines = average_slope_intercept(frame, line_segments)
-#     lane_lines_image = display_lines(frame, lane_lines)
-#     steering_angle = get_steering_angle(frame, lane_lines)
-#     heading_image = display_heading_line(lane_lines_image, steering_angle)
-#     imshow("heading line", heading_image)
-
-#     now = time.time()
-#     dt = now - lastTime
-
-#     deviation = steering_angle - 90
-#     error = abs(deviation)
-
-#     if deviation < 5 and deviation > -5:
-#         deviation = 0
-#         error = 0
-#         print("do not steer if there is a 10-degree error range - move forward")
-
-#     elif deviation > 5:
-#         print("steer right if the deviation is positive")
-
-#     elif deviation < -5:
-#         print("steer left if the deviation is positive")
-
-#     lastError = error
-#     lastTime = time.time()
-#     key = waitKey(1)
-#     if key == ord('q'):
-#         break
-
-# video.release()
-
-
-
-
-
