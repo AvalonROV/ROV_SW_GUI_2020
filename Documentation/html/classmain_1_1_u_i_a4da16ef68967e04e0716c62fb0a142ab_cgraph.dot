@@ -81,5 +81,4 @@ digraph "main.UI.__init__"
   Node35 [label="main.UI.setKeyShortcuts",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a695be3e22d73f04e43c8f2b5f2ea285a",tooltip=" "];
   Node1 -> Node36 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node36 [label="main.UI.setupDefaultScaling",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmain_1_1_u_i.html#a279c4719af1db4e6f6186aee12715470",tooltip="SCALING FUNCTIONS ####."];
-  Node36 -> Node20 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
 }

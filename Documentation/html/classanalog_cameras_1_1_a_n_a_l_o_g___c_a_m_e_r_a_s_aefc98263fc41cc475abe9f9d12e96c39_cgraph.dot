@@ -53,10 +53,18 @@ digraph "analogCameras.ANALOG_CAMERAS.__init__"
   Node20 -> Node22 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
   Node22 [label="actuators.ACTUATORS.remove\lControlActuator",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classactuators_1_1_a_c_t_u_a_t_o_r_s.html#aad1c13b1ef02f97858dda75c5a00ba39",tooltip=" "];
   Node1 -> Node23 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node23 [label="analogCameras.ANALOG\l_CAMERAS.setupControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classanalog_cameras_1_1_a_n_a_l_o_g___c_a_m_e_r_a_s.html#abb35a0c31be9904df1c949b71217f4eb",tooltip="CONTROL PANEL TAB ###."];
+  Node23 [label="mosaicPopupWindow.MOSAIC\l_POPUP_WINDOW.setupControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmosaic_popup_window_1_1_m_o_s_a_i_c___p_o_p_u_p___w_i_n_d_o_w.html#ae1793df9a855dbc4a00b06d7c031441e",tooltip=" "];
   Node23 -> Node24 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node24 [label="analogCameras.ANALOG\l_CAMERAS.changeSelectedCameras",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classanalog_cameras_1_1_a_n_a_l_o_g___c_a_m_e_r_a_s.html#a7457fcd633cbf1b6389fe577578d29bf",tooltip=" "];
-  Node24 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node1 -> Node25 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
-  Node25 [label="actuators.ACTUATORS.setup\lControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classactuators_1_1_a_c_t_u_a_t_o_r_s.html#a9d73c1ed8fde6fbd358edd3634d9c921",tooltip="CONTROL PANEL TAB ###."];
+  Node24 [label="mosaicPopupWindow.MOSAIC\l_POPUP_WINDOW.addWidgets",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmosaic_popup_window_1_1_m_o_s_a_i_c___p_o_p_u_p___w_i_n_d_o_w.html#a9265638d99a1e9bb4dce26e0c3697efe",tooltip=" "];
+  Node23 -> Node25 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node25 [label="mosaicPopupWindow.MOSAIC\l_POPUP_WINDOW.computeMosaic",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmosaic_popup_window_1_1_m_o_s_a_i_c___p_o_p_u_p___w_i_n_d_o_w.html#ac9c3b7124335be2c2fe0aafda7884101",tooltip=" "];
+  Node23 -> Node26 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node26 [label="mosaicPopupWindow.MOSAIC\l_POPUP_WINDOW.imageResizeEvent",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classmosaic_popup_window_1_1_m_o_s_a_i_c___p_o_p_u_p___w_i_n_d_o_w.html#a731668777361dec5c0aeb8b27537696f",tooltip=" "];
+  Node1 -> Node27 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node27 [label="analogCameras.ANALOG\l_CAMERAS.setupControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classanalog_cameras_1_1_a_n_a_l_o_g___c_a_m_e_r_a_s.html#abb35a0c31be9904df1c949b71217f4eb",tooltip="CONTROL PANEL TAB ###."];
+  Node27 -> Node28 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node28 [label="analogCameras.ANALOG\l_CAMERAS.changeSelectedCameras",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classanalog_cameras_1_1_a_n_a_l_o_g___c_a_m_e_r_a_s.html#a7457fcd633cbf1b6389fe577578d29bf",tooltip=" "];
+  Node28 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node29 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node29 [label="actuators.ACTUATORS.setup\lControlLayout",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classactuators_1_1_a_c_t_u_a_t_o_r_s.html#a9d73c1ed8fde6fbd358edd3634d9c921",tooltip="CONTROL PANEL TAB ###."];
 }

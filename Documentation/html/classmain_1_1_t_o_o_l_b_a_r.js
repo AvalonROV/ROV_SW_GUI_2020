@@ -5,7 +5,7 @@ var classmain_1_1_t_o_o_l_b_a_r =
     [ "loadSettings", "classmain_1_1_t_o_o_l_b_a_r.html#a3de0b2b773b3c5cfd834a487b9e4298f", null ],
     [ "openDocumentation", "classmain_1_1_t_o_o_l_b_a_r.html#a9a2324610b0b0a7dc8b20b94028bd111", null ],
     [ "openGitHub", "classmain_1_1_t_o_o_l_b_a_r.html#a20c38656f5c361aafe3fa0148515308b", null ],
-    [ "openUserManual", "classmain_1_1_t_o_o_l_b_a_r.html#a34fa33f2ed8b68aa728231d2be9c9073", null ],
+    [ "openUserGuide", "classmain_1_1_t_o_o_l_b_a_r.html#a6c52dabc70cb94ce44a6befbe64b9210", null ],
     [ "resetSettings", "classmain_1_1_t_o_o_l_b_a_r.html#af690de30566ab78ff3e4fbb91fadffe8", null ],
     [ "restartProgram", "classmain_1_1_t_o_o_l_b_a_r.html#a5e6998caa0f9de17fa8210bdbe14f5d7", null ],
     [ "saveSettings", "classmain_1_1_t_o_o_l_b_a_r.html#ad6f976c44269e6b48d9ec9998f4201c1", null ],

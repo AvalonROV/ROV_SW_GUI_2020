@@ -1,7 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"classvisual_effects_1_1_s_t_y_l_e.html#a75d6a3c8ab24b597ba9aa931a60df835":[1,0,19,0,23],
-"classvisual_effects_1_1_s_t_y_l_e.html#a78d49584c2576189137242dc94e8b5b5":[1,0,19,0,14],
 "classvisual_effects_1_1_s_t_y_l_e.html#a7c2ca897237031fa993591b8fdfc5f5f":[1,0,19,0,11],
 "classvisual_effects_1_1_s_t_y_l_e.html#a8d592dc257f5615d7060ba2bb1853b7d":[1,0,19,0,20],
 "classvisual_effects_1_1_s_t_y_l_e.html#a99209d8bdf3e348036454c40be367c60":[1,0,19,0,18],
@@ -42,8 +40,8 @@ var NAVTREEINDEX2 =
 "classxbox_controller_1_1_v_i_e_w.html#ae4d8572d78b55cb963b84e42bc37cf94":[1,0,20,2,4],
 "classxbox_controller_1_1_v_i_e_w.html#ae8c479f4d33d4d112854b6247fbd38ac":[1,0,20,2,2],
 "classxbox_controller_1_1_v_i_e_w.html#afb5e00cec8dccd697c0764f63b305cdf":[1,0,20,2,8],
-"functions.html":[1,3,0],
 "functions.html":[1,3,0,0],
+"functions.html":[1,3,0],
 "functions_a.html":[1,3,0,1],
 "functions_c.html":[1,3,0,2],
 "functions_d.html":[1,3,0,3],
@@ -83,7 +81,7 @@ var NAVTREEINDEX2 =
 "hierarchy.html":[1,2],
 "index.html":[],
 "namespaces.html":[0,0],
-"namespacevision_algorithm_template.html":[1,0,18],
 "namespacevision_algorithm_template.html":[0,0,0],
+"namespacevision_algorithm_template.html":[1,0,18],
 "pages.html":[]
 };
