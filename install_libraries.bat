@@ -9,6 +9,16 @@ pause
 pip install pyqt5
 echo.
 
+echo #--- About to install PyQt5 chart ---#
+pause
+pip install PyQtChart
+echo.
+
+echo ~--- About to install PyQt5 tools (GUI design software) ---#
+pause
+pip install pyqt5-tools
+echo.
+
 echo #--- About to install OpenCV ---#
 pause
 pip install opencv-python

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1094</width>
+    <height>806</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,106 @@
   </property>
   <widget class="QWidget" name="central_widget">
    <layout class="QGridLayout" name="gridLayout_11">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QPushButton" name="switch_user">
+          <property name="text">
+           <string>CHANGE USER</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="change_gui_control">
+          <property name="text">
+           <string>CONTROL PANEL</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="change_gui_config">
+          <property name="text">
+           <string>CONFIGURATION</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_13">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
     <item row="1" column="0">
      <widget class="QStackedWidget" name="gui_view_widget">
       <property name="currentIndex">
@@ -344,7 +444,7 @@
                      <x>0</x>
                      <y>0</y>
                      <width>241</width>
-                     <height>854</height>
+                     <height>562</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_12">
@@ -463,8 +563,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>112</width>
-                     <height>45</height>
+                     <width>98</width>
+                     <height>42</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_15">
@@ -509,8 +609,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>135</width>
-                     <height>45</height>
+                     <width>120</width>
+                     <height>42</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_20">
@@ -555,8 +655,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>119</width>
-                     <height>45</height>
+                     <width>105</width>
+                     <height>42</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_25">
@@ -601,8 +701,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>142</width>
-                     <height>45</height>
+                     <width>126</width>
+                     <height>42</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_26">
@@ -656,8 +756,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>248</width>
-                 <height>878</height>
+                 <width>233</width>
+                 <height>607</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -1011,16 +1111,16 @@
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents_10">
+          <widget class="QWidget" name="config_grid_widget">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>941</width>
-             <height>1083</height>
+             <width>1029</width>
+             <height>1072</height>
             </rect>
            </property>
-           <layout class="QGridLayout" name="gridLayout_9">
+           <layout class="QGridLayout" name="config_grid_widget_layout">
             <item row="0" column="0">
              <layout class="QGridLayout" name="config_grid_layout" rowstretch="1,1" columnstretch="1,1,1,1,1">
               <property name="spacing">
@@ -1167,8 +1267,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>100</width>
-                      <height>30</height>
+                      <width>165</width>
+                      <height>354</height>
                      </rect>
                     </property>
                    </widget>
@@ -1208,8 +1308,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>100</width>
-                      <height>30</height>
+                      <width>165</width>
+                      <height>85</height>
                      </rect>
                     </property>
                    </widget>
@@ -1249,8 +1349,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>100</width>
-                      <height>30</height>
+                      <width>165</width>
+                      <height>85</height>
                      </rect>
                     </property>
                    </widget>
@@ -1296,8 +1396,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>100</width>
-                      <height>30</height>
+                      <width>165</width>
+                      <height>354</height>
                      </rect>
                     </property>
                    </widget>
@@ -1337,8 +1437,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>100</width>
-                      <height>30</height>
+                      <width>165</width>
+                      <height>354</height>
                      </rect>
                     </property>
                    </widget>
@@ -1384,8 +1484,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>100</width>
-                      <height>30</height>
+                      <width>165</width>
+                      <height>85</height>
                      </rect>
                     </property>
                    </widget>
@@ -1419,8 +1519,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>100</width>
-                      <height>30</height>
+                      <width>165</width>
+                      <height>354</height>
                      </rect>
                     </property>
                    </widget>
@@ -1452,106 +1552,6 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <property name="leftMargin">
-       <number>10</number>
-      </property>
-      <property name="topMargin">
-       <number>10</number>
-      </property>
-      <property name="rightMargin">
-       <number>10</number>
-      </property>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QPushButton" name="switch_user">
-          <property name="text">
-           <string>CHANGE USER</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_12">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="change_gui_control">
-          <property name="text">
-           <string>CONTROL PANEL</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="change_gui_config">
-          <property name="text">
-           <string>CONFIGURATION</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_13">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1559,7 +1559,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1920</width>
+     <width>1094</width>
      <height>26</height>
     </rect>
    </property>

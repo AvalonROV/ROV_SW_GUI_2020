@@ -1,5 +1,8 @@
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QFrame, QLineEdit, QSpinBox, QFormLayout, QLabel, QSizePolicy, QComboBox, QCheckBox, QSpacerItem
-from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot, QPointF
+from PyQt5.QtChart import QChart, QChartView, QLineSeries
+from PyQt5.QtGui import QPainter
+
 
 class SENSORS(QObject):
     """
@@ -157,9 +160,29 @@ class SENSORS(QObject):
         nextSensor = self.controlForm.rowCount()
 
         # CREATE SENSOR READINGS TEXT BOX
-        sensorView = QLineEdit()
-        sensorView.setReadOnly(True)
-        sensorView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        # sensorView = QLineEdit()
+        # sensorView.setReadOnly(True)
+        # sensorView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        # CREATE SENSOR READINGS GRAPH
+        series = QLineSeries(self)
+        series.append(0,6)
+        series.append(2, 4)
+        series.append(3, 8)
+        series.append(7, 4)
+        series.append(10, 5)
+ 
+        chart =  QChart()
+        chart.addSeries(series)
+        chart.createDefaultAxes()
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+        chart.setTitle("Temperature")
+ 
+        chart.legend().setVisible(True)
+        chart.legend().setAlignment(Qt.AlignBottom)
+ 
+        chartView = QChartView(chart)
+        chartView.setRenderHint(QPainter.Antialiasing)
 
         # CREATE SENSOR LABEL
         selectedType = self.selectedTypes[nextSensor]
@@ -167,7 +190,8 @@ class SENSORS(QObject):
         sensorLabel = QLabel(typeLabel)
 
         # ADD TO CONTROL PANEL TAB
-        self.controlForm.addRow(sensorLabel, sensorView)
+        # self.controlForm.addRow(sensorLabel, sensorView)
+        self.controlForm.addRow(sensorLabel, chartView)
 
     def removeControlSensor(self):
         """
@@ -235,6 +259,22 @@ class SENSORS(QObject):
             labelObject = self.controlForm.itemAt(2 * i).widget()
             label = self.typeOptions[self.selectedTypes[i]]
             labelObject.setText(label)
+
+    def toggleDisplay(self):
+        """
+        PURPOSE
+
+        Toggles the sensor reading display between a number and a graph.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        pass
 
     #########################
     ### CONFIGURATION TAB ###

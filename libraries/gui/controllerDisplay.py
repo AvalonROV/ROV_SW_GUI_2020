@@ -346,9 +346,13 @@ class CONTROLLER_DISPLAY(QObject):
         # TEXT BOX STARTING INDEX FOR BUTTON STATES
         pos = len(joystickValues)        
         
+        print(buttonStates)
         # DISLAY BUTTON VALUES
         for i, button in enumerate(buttonStates):
-            self.textBoxObjects[i + pos].setText(str(button))
+            try:
+                self.textBoxObjects[i + pos].setText(str(button))
+            except:
+                pass
 
 
 

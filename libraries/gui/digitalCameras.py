@@ -229,15 +229,16 @@ class DIGITAL_CAMERAS(QObject):
         parentLayout.addRow(label1, label2)
 
         # PRIMARY AND SECONDARY CAMERA ICONS FOR EACH BUTTON
-        icons = ["graphics/cam_1.png", "graphics/cam_2.png", "graphics/cam_3.png", "graphics/cam_4.png"]
+        texts = ["1st", "2nd-1", "2nd-2", "2nd-3"]
 
-        for feed, icon in enumerate(icons):
+        for feed, text in enumerate(texts):
             # ENABLE/DISABLE BUTTON
             button = QPushButton()
             button.setCheckable(True)
             button.setChecked(True)
-            button.setIcon(QIcon(icon))
-            button.setIconSize(QSize(100, 22))
+            button.setText(text)
+            button.setIcon(QIcon("./graphics/white_camera.png"))
+            button.setIconSize(QSize(15,15))
 
             self.feedStatus.append(True)
 

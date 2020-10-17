@@ -53,7 +53,7 @@ class MOSAIC_POPUP_WINDOW(QWidget):
         # ADD FINAL BUTTON TO COMPUTE MOSAIC
         computeButton = QPushButton("Compute Mosaic")
         computeButton.setObjectName("blue-button")
-        computeButton.setFixedHeight(50)
+        computeButton.setFixedHeight(int(computeButton.sizeHint().height() * 1.5))
         parentLayout.addWidget(computeButton)
 
         self.controlLayout.setLayout(parentLayout)

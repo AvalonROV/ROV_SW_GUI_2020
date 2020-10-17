@@ -327,6 +327,9 @@ class CONTROLLER_UPDATE(QThread):
         # GET NUMBER OF BUTTONS
         buttons = joystick.get_numbuttons()
 
+        # LATEST PYGAME VERSION RETRIEVES 11 BUTTONS, WE ONLY NEED 10
+        buttons = 10
+
         # GET STATE OF EACH BUTTON
         for i in range(buttons):
             button = joystick.get_button(i)

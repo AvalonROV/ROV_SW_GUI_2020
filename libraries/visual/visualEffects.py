@@ -32,6 +32,8 @@ class STYLE():
     keybindingFrame = ""
     infoLabel = ""
 
+    widgetHeight = 0
+
     def __init__(self):
         """
         PURPOSE
@@ -102,30 +104,33 @@ class STYLE():
 
         NONE
         """
+        normalBorderRadius = self.widgetHeight/2
+        bigBorderRadius = int(normalBorderRadius * 1.5)
+
         # DARK THEME
         if theme:
 
             #########################
             ######## WIDGETS ########
             #########################
-            self.normalButton = ("QPushButton {background-color: #424242; color: white; border-radius: 15px; padding: 5px 20px}" 
+            self.normalButton = ("QPushButton {background-color: #424242; color: white; border-radius: %d; padding: 5px 20px}"
                                 "QPushButton:hover {background-color: #393939;}"
                                 "QPushButton:pressed {background-color: #1976d2;}"
                                 "QPushButton:checked {background-color: #1976d2;}"
-                                "QPushButton:checked:hover {background-color: #115293}")
+                                "QPushButton:checked:hover {background-color: #115293}") % (normalBorderRadius)
 
-            self.largeButton = ("#large-button {background-color: #424242; color: white; border-radius: 25px;}" 
+            self.largeButton = ("#large-button {background-color: #424242; color: white; border-radius: %d;}" 
                                 "#large-button:hover {background-color: #393939;}"
                                 "#large-button:pressed {background-color: #1976d2;}"
                                 "#large-button:checked {background-color: #1976d2;}"
-                                "#large-button:checked:hover {background-color: #115293}")
+                                "#large-button:checked:hover {background-color: #115293}") % (bigBorderRadius)
             
-            self.actuatorButton = ("#actuator-button {background-color: #43a047; font-size: 20px; font-weight: bold; color: white; border-radius: 25px}" 
+            self.actuatorButton = ("#actuator-button {background-color: #43a047; font-weight: bold; color: white; border-radius: %d}" 
                                     "#actuator-button:hover {background-color: #388e3c}"
                                     "#actuator-button:checked {background-color: #c62828;}"
-                                    "#actuator-button:checked:hover {background-color: #b71c1c}")
+                                    "#actuator-button:checked:hover {background-color: #b71c1c}") % (bigBorderRadius)
 
-            self.orientationButton = ("#change-orientation-button {background-color: #424242; border-radius: 25px;}")
+            self.orientationButton = ("#change-orientation-button {background-color: #424242; border-radius: %d}") % (bigBorderRadius)
 
             self.timerStartButton = ("#timer-start-button {background-color: #43a047; color: white;}"
                                     "#timer-start-button:hover {background-color: #388e3c;}" 
@@ -155,10 +160,10 @@ class STYLE():
                                 "QScrollBar:sub-line  {background-image: none;}"
                                 "QScrollBar:add-line  {background-image: none;}")
 
-            self.comboBox = ("QComboBox {background-color: #363636; border-radius: 15px; padding: 5px 20px 5px 10px;}"
+            self.comboBox = ("QComboBox {background-color: #363636; border-radius: %d; padding: 5px 20px 5px 10px;}"
                                 "QComboBox:hover {background-color: #333333;}"
                                 "QComboBox:down-arrow {image: url(./graphics/arrow_down_white.png); height: 30px; width: 30px; padding-right: 20px;}"
-                                "QComboBox:drop-down {border: 0px;}")
+                                "QComboBox:drop-down {border: 0px;}") % (normalBorderRadius)
           
             self.groupBox = ("QGroupBox {background-color: #212121; border-radius: 20px; font-size: 12pt; margin-top: 1.2em; padding: 10px}")
            
@@ -185,24 +190,24 @@ class STYLE():
             #########################
             ######## WIDGETS ########
             #########################
-            self.normalButton = ("QPushButton {background-color: #E0E0E0; color: black; border-radius: 15px; padding: 5px 20px}" 
+            self.normalButton = ("QPushButton {background-color: #E0E0E0; color: black; border-radius: %d; padding: 5px 20px}" 
                                 "QPushButton:hover {background-color: #D1D1D1;}"
                                 "QPushButton:pressed {background-color: #1976d2; color: white;}"
                                 "QPushButton:checked {background-color: #1976d2; color: white;}"
-                                "QPushButton:checked:hover {background-color: #115293}")
+                                "QPushButton:checked:hover {background-color: #115293}") % (normalBorderRadius)
 
-            self.largeButton = ("#large-button {background-color: #E0E0E0; color: black; border-radius: 25px;}" 
+            self.largeButton = ("#large-button {background-color: #E0E0E0; color: black; border-radius: %d;}" 
                                 "#large-button:hover {background-color: #DDDDDD;}"
                                 "#large-button:pressed {background-color: #1976d2; color: white;}"
                                 "#large-button:checked {background-color: #1976d2; color: white;}"
-                                "#large-button:checked:hover {background-color: #115293}")
+                                "#large-button:checked:hover {background-color: #115293}") % (bigBorderRadius)
             
-            self.actuatorButton = ("#actuator-button {background-color: #43a047; font-size: 20px; font-weight: bold; color: white; border-radius: 25px}" 
+            self.actuatorButton = ("#actuator-button {background-color: #43a047; font-size: 20px; font-weight: bold; color: white; border-radius: %d}" 
                                     "#actuator-button:hover {background-color: #388e3c}"
                                     "#actuator-button:checked {background-color: #c62828;}"
-                                    "#actuator-button:checked:hover {background-color: #b71c1c}")
+                                    "#actuator-button:checked:hover {background-color: #b71c1c}") % (bigBorderRadius)
 
-            self.orientationButton = ("#change-orientation-button {background-color: #424242; border-radius: 25px;}")
+            self.orientationButton = ("#change-orientation-button {background-color: #424242; border-radius: %d;}") % (bigBorderRadius)
 
             self.timerStartButton = ("#timer-start-button {background-color: #43a047; color: white;}"
                                     "#timer-start-button:hover {background-color: #388e3c;}" 
@@ -232,10 +237,10 @@ class STYLE():
                                 "QScrollBar:sub-line  {background-image: none;}"
                                 "QScrollBar:add-line  {background-image: none;}")
 
-            self.comboBox = ("QComboBox {background-color: #D1D1D1; border-radius: 15px; padding: 5px 20px 5px 10px;}"
+            self.comboBox = ("QComboBox {background-color: #D1D1D1; border-radius: %d; padding: 5px 20px 5px 10px;}"
                                 "QComboBox:hover {background-color: #C0C0C0;}"
                                 "QComboBox:down-arrow {image: url(./graphics/arrow_down_white.png); height: 30px; width: 30px; padding-right: 20px;}"
-                                "QComboBox:drop-down {border: 0px;}")
+                                "QComboBox:drop-down {border: 0px;}") % (normalBorderRadius)
           
             self.groupBox = ("QGroupBox {background-color: #f5f5f5; border-radius: 20px; font-size: 12pt; margin-top: 1.2em; padding: 10px}")
            

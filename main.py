@@ -5,17 +5,24 @@
 try:
     # PYQT5 MODULES
     from PyQt5 import uic
-    from PyQt5.QtCore import pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt, QPropertyAnimation, QPoint, QEasingCurve, QTimeLine
-    from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
-                                QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, QGridLayout, QVBoxLayout, QLabel, QSlider, 
-                                QLineEdit, QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, QFileDialog, QGraphicsDropShadowEffect, QShortcut)
-    from PyQt5.QtGui import QPixmap, QImage, QResizeEvent, QKeyEvent, QKeySequence, QIcon, QFont, QColor, QPalette, QPainter
+    from PyQt5.QtCore import (pyqtSignal, QObject, pyqtSlot, QThread, QTimer, QSize, Qt,  
+                              QPropertyAnimation, QPoint, QEasingCurve, QTimeLine)
+    from PyQt5.QtWidgets import (QSplashScreen, QProgressBar, QScrollArea, QGroupBox, 
+                                 QHBoxLayout, QFrame, QWidget, QStyleFactory, QMainWindow, 
+                                 QApplication, QComboBox, QRadioButton, QVBoxLayout, QFormLayout, 
+                                 QGridLayout, QVBoxLayout, QLabel, QSlider, QLineEdit, 
+                                 QPushButton, QCheckBox, QSizePolicy, QDesktopWidget, 
+                                 QFileDialog, QGraphicsDropShadowEffect, QShortcut)
+    from PyQt5.QtGui import (QPixmap, QImage, QResizeEvent, QKeyEvent, QKeySequence, 
+                             QIcon, QFont, QColor, QPalette, QPainter)
 
     # ADDITIONAL MODULES
     import sys, os
-    from threading import Thread, Timer
+    import threading
+    #from threading import Thread, Timer
     from datetime import datetime
-    from cv2 import VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_DSHOW, CAP_FFMPEG
+    from cv2 import (VideoCapture, resize, cvtColor, COLOR_BGR2RGB, CAP_PROP_FRAME_WIDTH, 
+                     CAP_PROP_FRAME_HEIGHT, CAP_DSHOW, CAP_FFMPEG)
     from xml.etree.ElementTree import parse, Element, SubElement, ElementTree
     from subprocess import call, Popen
     from webbrowser import open
@@ -28,46 +35,51 @@ try:
     import subprocess
 except:
     sys.exit("\n###################################################################################################"
-                "\nSome libraries are missing! Run the 'install_libraries.bat' file to install the required libraries."
-                "\n###################################################################################################")
+             "\nSome libraries are missing! Run the 'install_libraries.bat' file to install the required libraries."
+             "\n###################################################################################################")
 
-# CUSTOM LIBRARIES
-from libraries.configuration_file.configurationFile import READ_CONFIG_FILE, WRITE_CONFIG_FILE
-from libraries.serial.rovComms import ROV_SERIAL
-from libraries.controller.xboxController import CONTROLLER
-from libraries.computer_vision.mosaicTask.mosaicPopupWindow import MOSAIC_POPUP_WINDOW
-from libraries.computer_vision.transectLineTask.transectLinePopupWindow import TRANSECT_LINE_POPUP_WINDOW
-from libraries.computer_vision.transectLineTask.transectLineAlgorithm_v1 import TRANSECT_LINE_TASK
-from libraries.camera.cameraCapture import CAMERA_CAPTURE
 from libraries.animation.slideAnimation import SLIDE_ANIMATION
-from libraries.visual.visualEffects import STYLE
-from libraries.gui.profileSelector import PROFILE_SELECTOR
-from libraries.gui.timerWidget import TIMER
-from libraries.gui.thrusters import THRUSTERS
+from libraries.camera.cameraCapture import CAMERA_CAPTURE
+from libraries.computer_vision.mosaicTask.mosaicPopupWindow import \
+    MOSAIC_POPUP_WINDOW
+from libraries.computer_vision.transectLineTask.transectLineAlgorithm_v1 import \
+    TRANSECT_LINE_TASK
+from libraries.computer_vision.transectLineTask.transectLinePopupWindow import \
+    TRANSECT_LINE_POPUP_WINDOW
+# CUSTOM LIBRARIES
+from libraries.configuration_file.configurationFile import (READ_CONFIG_FILE,
+                                                            WRITE_CONFIG_FILE)
+from libraries.controller.xboxController import CONTROLLER
 from libraries.gui.actuators import ACTUATORS
 from libraries.gui.analogCameras import ANALOG_CAMERAS
+from libraries.gui.controllerDisplay import CONTROLLER_DISPLAY
 from libraries.gui.digitalCameras import DIGITAL_CAMERAS
 from libraries.gui.keybindings import KEYBINDINGS
-from libraries.gui.controllerDisplay import CONTROLLER_DISPLAY
+from libraries.gui.profileSelector import PROFILE_SELECTOR
 from libraries.gui.sensors import SENSORS
+from libraries.gui.thrusters import THRUSTERS
+from libraries.gui.timerWidget import TIMER
+from libraries.serial.rovComms import ROV_SERIAL
+from libraries.visual.visualEffects import STYLE
 
 def getResourcePath(relativePath):
-        """ 
-        Get absolute path to resource, works for dev and for PyInstaller 
-        """
-        try:
-            # PYINSTALLER CREATES A TEMP FOLDER AND STORES PATH IN _MEIPASS
-            basePath = sys._MEIPASS
-        except Exception:
-            basePath = os.path.abspath(".")
+    """ 
+    Get absolute path to resource, works for dev and for PyInstaller 
+    """
+    try:
+        # PYINSTALLER CREATES A TEMP FOLDER AND STORES PATH IN _MEIPASS
+        basePath = sys._MEIPASS
+    except Exception:
+        basePath = os.path.abspath(".")
 
-        return os.path.join(basePath, relativePath)
+    return os.path.join(basePath, relativePath)
 
 class UI(QMainWindow):
     """
     PURPOSE
 
-    Contains functions to initiate the GUI, link the widgets and connect all the signals/slots from external libraries together.
+    Contains functions to initiate the GUI, link the widgets and connect 
+    all the signals/slots from external libraries together.
     """
     # DATABASE
     fileName = ""
@@ -83,7 +95,6 @@ class UI(QMainWindow):
         Class constructor.
         Loads GUI, call functions to initiate all the libraries and connects the signal/slots together.
 
-
         INPUT
 
         - app = QApplication object (required to allow theme changing).
@@ -92,11 +103,11 @@ class UI(QMainWindow):
 
         NONE
         """
-        super(UI,self).__init__()
+        super(UI, self).__init__()
         
         # LOAD UI FILE
         uiFile = getResourcePath("gui.ui")
-        uic.loadUi(uiFile,self)
+        uic.loadUi(uiFile, self)
 
         # APPLICATION OBJECT TO ALLOW THEME CHANGING
         self.app = app
@@ -128,6 +139,7 @@ class UI(QMainWindow):
     
         # LAUNCH GUI
         self.showFullScreen()
+        #self.show()
 
         # LAUNCH PILOT PROFILE SELECTOR
         self.profileSelector.showPopup()    
@@ -558,13 +570,13 @@ class UI(QMainWindow):
         self.control_rov_connect.clicked.connect(self.control.rovSerialConnection)
         self.control_rov_connect.setObjectName("large-button")
         self.style.applyGlow(self.control_rov_connect, "#0D47A1", 10)
-        self.control_rov_connect.setFixedHeight(50)
-        
+        self.control_rov_connect.setFixedHeight(int(self.control_rov_connect.sizeHint().height() * 1.5))
+
         # CONTROLLER CONNECT BUTTON
         self.control_controller_connect.clicked.connect(self.control.controllerConnection)
         self.control_controller_connect.setObjectName("large-button")
         self.style.applyGlow(self.control_controller_connect, "#0D47A1", 10)
-        self.control_controller_connect.setFixedHeight(50)
+        self.control_controller_connect.setFixedHeight(int(self.control_controller_connect.sizeHint().height() * 1.5))
         
         # MACHINE VISION TASK BUTTONS
         self.control_vision_mosaic.clicked.connect(lambda status, task = 0: self.control.popupVisionTask(task)) 
@@ -587,7 +599,7 @@ class UI(QMainWindow):
         # SWITCH USER BUTTON
         self.switch_user.clicked.connect(lambda: self.profileSelector.showPopup())
         self.switch_user.setIcon(QIcon("./graphics/login-icon.png"))
-        self.switch_user.setIconSize(QSize(20,20))
+        self.switch_user.setIconSize(QSize(15,15))
         self.switch_user.setObjectName("green-button")
 
         # PROGRAM EXIT BUTTON
@@ -612,13 +624,13 @@ class UI(QMainWindow):
         self.config_rov_connect.clicked.connect(self.control.rovSerialConnection)
         self.config_rov_connect.setObjectName("large-button")
         self.style.applyGlow(self.config_rov_connect, "#0D47A1", 10)
-        self.config_rov_connect.setFixedHeight(50)
+        self.config_rov_connect.setFixedHeight(int(self.config_rov_connect.sizeHint().height() * 1.5))
         
         # CONTROLLER CONNECT BUTTON
         self.config_controller_connect.clicked.connect(self.control.controllerConnection)
         self.config_controller_connect.setObjectName("large-button")
         self.style.applyGlow(self.config_controller_connect, "#0D47A1", 10)
-        self.config_controller_connect.setFixedHeight(50)
+        self.config_controller_connect.setFixedHeight(int(self.config_controller_connect.sizeHint().height() * 1.5))
             
         # SERIAL COMMUNICATION BUTTONS
         self.config_com_port_list.activated.connect(self.config.changeComPort)
@@ -878,6 +890,9 @@ class UI(QMainWindow):
         # APPLY NEW APPLICATION DEFAULT COLOR PALETTE
         self.style.setPalette(self.style.theme, self.app)
 
+        # GET CURRENT WIDGET HEIGHT (TO CORRECTLY SET BORDER RADIUS)
+        self.style.widgetHeight = self.getDefaultButtonSize()
+
         # CHANGE PROGRAM STYLESHEETS
         self.style.setStyleSheets(self.style.theme)
 
@@ -962,7 +977,8 @@ class UI(QMainWindow):
         NONE
         """
         # SET DEFAULT SIDE BAR WIDTH
-        self.con_panel_functions_widget.resize(1000,self.con_panel_functions_widget.height())
+        width,_ = self.getScreenSize()
+        self.con_panel_functions_widget.resize(int(width/3),self.con_panel_functions_widget.height())
 
     def getScreenSize(self):
         """
@@ -984,6 +1000,28 @@ class UI(QMainWindow):
         screenHeight = sizeObject.height()
         
         return screenWidth, screenHeight
+
+    def getDefaultButtonSize(self):
+        """
+        PURPOSE
+
+        Gets the default height of a button. 
+        This is used to correctly set the border radius of 
+        the buttons for different display resolutions.
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        - width = the width of the button in pixels.
+        - height = the height of the button in pixels.
+        """
+        # USE CONTROL PANEL BUTTON AS SIZE REFERENCE
+        height = self.change_gui_control.sizeHint().height()
+        
+        return height
 
     def resizeEvent(self, event):
         """
@@ -1066,30 +1104,45 @@ class UI(QMainWindow):
         width = self.frameGeometry().width()
         height = self.frameGeometry().height()
 
+        minCardWidth = 400
+        maxCardWidth = 800
+
         # FIND SCREEN SIZE
         screenWidth, screenHeight = self.getScreenSize()
 
-        widthProportion = width/screenWidth
+        # FIND NUMBER OF ACTIVE COLUMNS
+        columnCount = self.config_grid_layout.columnCount()
+        activeColumnCount = columnCount
         
-        if widthProportion < 0.4:
+        for column in range(columnCount):
+            item = self.config_grid_layout.itemAtPosition(0, column)
+            
+            # IF GRID LOCATION DOES NOT CONTAIN OBJECT
+            if item == None:
+                activeColumnCount -= 1
+
+        #widthProportion = width/screenWidth
+        widthProportion = width/minCardWidth
+        #print(widthProportion)
+
+        print("COLUMN NUMBER:",activeColumnCount)
+
+        cardWidth = width/activeColumnCount
+
+        print(cardWidth)
+        
+        if cardWidth < minCardWidth:
             objects = self.unparentGridWidgets()
-            self.setNewGridOrder(objects, 3)
+            self.setNewGridOrder(objects, activeColumnCount - 1)
             self.setGridStretch()
 
-        elif widthProportion < 0.6:
+        elif cardWidth > maxCardWidth:
             objects = self.unparentGridWidgets()
-            self.setNewGridOrder(objects, 4)
-            self.setGridStretch()
-
-        elif widthProportion < 0.8:
-            objects = self.unparentGridWidgets()
-            self.setNewGridOrder(objects, 5)
+            self.setNewGridOrder(objects, activeColumnCount + 1)
             self.setGridStretch()
 
         else:
-            objects = self.unparentGridWidgets()
-            self.setNewGridOrder(objects, 6)
-            self.setGridStretch()
+            pass
 
     def unparentGridWidgets(self):
         """
@@ -1175,6 +1228,8 @@ class UI(QMainWindow):
         rowCount = self.config_grid_layout.rowCount()            
         columnCount = self.config_grid_layout.columnCount()
 
+        minCardHeight = 800
+
         # HIDE UNUSED ROWS
         for row in range(rowCount):
             self.config_grid_layout.setRowStretch(row, 0)
@@ -1185,7 +1240,7 @@ class UI(QMainWindow):
                 if item != None:
                     self.config_grid_layout.setRowStretch(row, 1)
                     # SET MINIMUM ROW HEIGHT
-                    self.config_grid_layout.setRowMinimumHeight(row, 800)
+                    self.config_grid_layout.setRowMinimumHeight(row, minCardHeight)
                 
         # HIDE UNUSED COLUMNS
         for column in range(columnCount):
@@ -1200,7 +1255,7 @@ class UI(QMainWindow):
     ###########################
     ##### OTHER FUNCTIONS #####
     ###########################
-    def changeView(self, view):
+    def changeView(self, view = None):
         """
         PURPOSE
 
@@ -1209,13 +1264,16 @@ class UI(QMainWindow):
 
         INPUT
 
-        - view = the page to transition to. (0 = Control Panel) (1 = Configuration)
+        - view = the page to transition to. (0 = Control Panel) (1 = Configuration). 
+                 If not set, program will switch away from current view.
 
         RETURNS
 
         NONE
         """
+        
         if self.animation.animationComplete:
+
             # TRANSITION TO CONTROL PANEL TAB
             if view == 0:
                 self.animation.screenPrevious()
@@ -1226,13 +1284,23 @@ class UI(QMainWindow):
                 self.digitalCameras.toggleAllFeeds(True)
 
             # TRANSITION TO CONFIGURATION TAB
-            if view == 1:
+            elif view == 1:
                 # TURN OFF CAMERA FEEDS
                 self.digitalCameras.toggleAllFeeds(False)
                 
                 self.animation.screenNext()
                 self.change_gui_control.setChecked(False)
                 self.change_gui_config.setChecked(True)
+
+            # IF DESIRED VIEW IS NOT GIVEN
+            else:
+                currentView = self.gui_view_widget.currentIndex()
+
+                if currentView == 0:
+                    self.changeView(1)
+
+                elif currentView == 1:
+                    self.changeView(0)
 
         else:
             # IGNORE BUTTONS WHILE ANIMATION IS IN PROGRESS
@@ -1284,6 +1352,10 @@ class UI(QMainWindow):
         # ESC TO EXIT FULL SCREEN
         exitFullscreen = QShortcut(QKeySequence(Qt.Key_Escape), self)
         exitFullscreen.activated.connect(self.showMaximized)
+
+        # TAB TO SWITCH BETWEEN CONTROL AND CONFIGURATION MODES
+        switchModes = QShortcut(QKeySequence(Qt.Key_Tab), self)
+        switchModes.activated.connect(self.changeView)
 
     def programExit(self):
         """
@@ -2258,8 +2330,8 @@ def guiInitiate():
 
     NONE
     """
-    # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
     QApplication.setAttribute(Qt.AA_DisableHighDpiScaling)
+    # CREATE QAPPLICATION INSTANCE (PASS SYS.ARGV TO ALLOW COMMAND LINE ARGUMENTS)
     app = QApplication(sys.argv)
 
     # PROGRAM BOOT SPLASH SCREEN

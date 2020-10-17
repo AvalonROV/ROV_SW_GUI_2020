@@ -199,14 +199,16 @@ class PROFILE_SELECTOR(QWidget):
         # RENAME PROFILE
         renameButton = QPushButton()
         renameButton.setObjectName("green-button")
-        renameButton.setFixedSize(30, 30)
+        # MAKE BUTTON CIRCULAR
+        renameButton.setFixedSize(renameButton.sizeHint().height(), renameButton.sizeHint().height())
         renameButton.setIcon(QIcon("./graphics/rename-icon.png"))
         renameButton.setIconSize(QSize(20,20))
         
         # DELETE PROFILE
         deleteButton = QPushButton()
         deleteButton.setObjectName("red-button")
-        deleteButton.setFixedSize(30, 30)
+        # MAKE BUTTON CIRCULAR
+        deleteButton.setFixedSize(deleteButton.sizeHint().height(), deleteButton.sizeHint().height())
         deleteButton.setIcon(QIcon("./graphics/delete-icon.png"))
         deleteButton.setIconSize(QSize(20,20))
 

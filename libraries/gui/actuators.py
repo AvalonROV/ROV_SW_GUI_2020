@@ -172,14 +172,16 @@ class ACTUATORS(QObject):
 
         # CREATE WIDGETS ON CONTROL PANEL TAB
         actuatorName = QLabel(labels[0])
-        actuatorName.setFixedHeight(50)
+       
         actuatorToggle = QPushButton(labels[1])
         actuatorToggle.setObjectName("actuator-button")
         actuatorToggle.setCheckable(True)
-        actuatorToggle.setFixedHeight(50)
         
         # ADD TO FORM LAYOUT
         self.controlForm.addRow(actuatorName, actuatorToggle)
+
+        actuatorName.setFixedHeight(int(actuatorName.sizeHint().height() * 1.5))
+        actuatorToggle.setFixedHeight(int(actuatorToggle.sizeHint().height() * 1.5))
 
         # LINK WIDGETS
         actuatorToggle.clicked.connect(lambda state, actuator = nextActuator: self.toggleActuator(actuator))
