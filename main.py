@@ -362,7 +362,7 @@ class UI(QMainWindow):
             self.keybindings.bindings = configFile.readKeyBinding()
 
             # READ SENSOR SETTINGS
-            self.sensors.quantity, self.sensors.selectedTypes = configFile.readSensor()
+            self.sensors.quantity, self.sensors.viewType, self.sensors.selectedTypes = configFile.readSensor()
 
         else:
             self.printTerminal('Configuration file not found.')
@@ -404,7 +404,7 @@ class UI(QMainWindow):
         configFile.saveKeybinding(self.keybindings.bindings)
 
         # SAVE SENSOR SETTINGS
-        configFile.saveSensor(self.sensors.quantity, self.sensors.selectedTypes)
+        configFile.saveSensor(self.sensors.quantity, self.sensors.viewType, self.sensors.selectedTypes)
 
         # WRITE SETTINGS TO XML FILE
         configFile.writeFile()
@@ -453,7 +453,7 @@ class UI(QMainWindow):
 
         # SAVE SENSOR SETTINGS
         sensors = SENSORS()
-        configFile.saveSensor(sensors.quantity, sensors.selectedTypes)
+        configFile.saveSensor(sensors.quantity, sensors.viewType, sensors.selectedTypes)
 
         # WRITE SETTINGS TO XML FILE
         configFile.writeFile()
@@ -605,6 +605,8 @@ class UI(QMainWindow):
         # PROGRAM EXIT BUTTON
         self.program_exit.clicked.connect(lambda: self.app.quit())
         self.program_exit.setObjectName("red-button")
+
+        self.mini_rov_activate.clicked.connect(lambda sensor = 0, reading = None: self.sensors.updateSensorGraph(sensor, reading))
         
     def linkConfigWidgets(self):
         """
@@ -1121,16 +1123,8 @@ class UI(QMainWindow):
             if item == None:
                 activeColumnCount -= 1
 
-        #widthProportion = width/screenWidth
-        widthProportion = width/minCardWidth
-        #print(widthProportion)
-
-        print("COLUMN NUMBER:",activeColumnCount)
-
         cardWidth = width/activeColumnCount
 
-        print(cardWidth)
-        
         if cardWidth < minCardWidth:
             objects = self.unparentGridWidgets()
             self.setNewGridOrder(objects, activeColumnCount - 1)
@@ -1847,7 +1841,7 @@ class CONTROL_PANEL():
         self.timer = QTimer()
         self.timer.setTimerType(Qt.PreciseTimer)
         self.timer.timeout.connect(self.getSensorReadings)
-        self.timer.start(1000*1/refreshRate)
+        self.timer.start(int(1000*1/refreshRate))
         
         # STOP REQUESTING SENSOR VALUES IF ROV IS DISCONNECTED
         if self.comms.commsStatus == False:

@@ -443,8 +443,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>241</width>
-                     <height>562</height>
+                     <width>196</width>
+                     <height>617</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_12">
@@ -478,19 +478,6 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="4" column="0">
-                     <spacer name="verticalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>706</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
                     <item row="0" column="0">
                      <widget class="QGroupBox" name="group_box_minirov">
                       <property name="title">
@@ -501,7 +488,7 @@
                       </property>
                       <layout class="QGridLayout" name="gridLayout_3">
                        <item row="0" column="0">
-                        <widget class="QPushButton" name="pushButton_18">
+                        <widget class="QPushButton" name="mini_rov_activate">
                          <property name="text">
                           <string>Activate</string>
                          </property>
@@ -545,6 +532,19 @@
                       </layout>
                      </widget>
                     </item>
+                    <item row="4" column="0">
+                     <spacer name="verticalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>706</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
                    </layout>
                   </widget>
                  </widget>
@@ -563,8 +563,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>98</width>
-                     <height>42</height>
+                     <width>94</width>
+                     <height>37</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_15">
@@ -609,8 +609,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>120</width>
-                     <height>42</height>
+                     <width>116</width>
+                     <height>37</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_20">
@@ -655,8 +655,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>105</width>
-                     <height>42</height>
+                     <width>101</width>
+                     <height>37</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_25">
@@ -701,8 +701,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>126</width>
-                     <height>42</height>
+                     <width>122</width>
+                     <height>37</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_26">
@@ -756,24 +756,11 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>233</width>
-                 <height>607</height>
+                 <width>206</width>
+                 <height>637</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
-                <item row="2" column="0">
-                 <spacer name="verticalSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item row="0" column="0">
                  <layout class="QVBoxLayout" name="verticalLayout">
                   <item>
@@ -1034,6 +1021,19 @@
                   </item>
                  </layout>
                 </item>
+                <item row="2" column="0">
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                </layout>
               </widget>
              </widget>
@@ -1116,8 +1116,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1029</width>
-             <height>1072</height>
+             <width>812</width>
+             <height>1023</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="config_grid_widget_layout">
@@ -1267,8 +1267,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
-                      <height>354</height>
+                      <width>140</width>
+                      <height>334</height>
                      </rect>
                     </property>
                    </widget>
@@ -1308,8 +1308,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
-                      <height>85</height>
+                      <width>108</width>
+                      <height>69</height>
                      </rect>
                     </property>
                    </widget>
@@ -1349,8 +1349,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
-                      <height>85</height>
+                      <width>139</width>
+                      <height>69</height>
                      </rect>
                     </property>
                    </widget>
@@ -1396,8 +1396,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
-                      <height>354</height>
+                      <width>109</width>
+                      <height>334</height>
                      </rect>
                     </property>
                    </widget>
@@ -1437,8 +1437,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
-                      <height>354</height>
+                      <width>108</width>
+                      <height>334</height>
                      </rect>
                     </property>
                    </widget>
@@ -1484,8 +1484,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
-                      <height>85</height>
+                      <width>136</width>
+                      <height>69</height>
                      </rect>
                     </property>
                    </widget>
@@ -1519,8 +1519,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>165</width>
-                      <height>354</height>
+                      <width>136</width>
+                      <height>334</height>
                      </rect>
                     </property>
                    </widget>
@@ -1560,7 +1560,7 @@
      <x>0</x>
      <y>0</y>
      <width>1094</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

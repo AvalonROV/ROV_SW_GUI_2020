@@ -1,8 +1,7 @@
-from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QFrame, QLineEdit, QSpinBox, QFormLayout, QLabel, QSizePolicy, QComboBox, QCheckBox, QSpacerItem
-from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot, QPointF
-from PyQt5.QtChart import QChart, QChartView, QLineSeries
+from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QPushButton, QFrame, QLineEdit, QSpinBox, QFormLayout, QLabel, QSizePolicy, QComboBox, QCheckBox, QSpacerItem, QRadioButton
+from PyQt5.QtCore import QObject, Qt, pyqtSignal, pyqtSlot, QPoint, QPointF
+from PyQt5.QtChart import QChart, QChartView, QLineSeries, QXYSeries, QValueAxis, QSplineSeries
 from PyQt5.QtGui import QPainter
-
 
 class SENSORS(QObject):
     """
@@ -15,7 +14,12 @@ class SENSORS(QObject):
     # DATABASE
     quantity = 0
     typeOptions = ['None','Temperature (°C)','Depth (m)', 'Yaw (°)', 'Pitch (°)', 'Roll (°)']
+    axisRange = [[0,0],[0,50],[0,10],[0,180],[0,180],[0,180]]
     selectedTypes = []
+    viewType = 1
+    data = []
+    dataPoints = 100
+    seriesObjects = []
 
     def __init__(self, *, controlLayout = None, configLayout = None):
         """
@@ -62,6 +66,11 @@ class SENSORS(QObject):
 
         self.sensorNumber.setValue(sensorNumber)
 
+        if self.viewType == 0:
+            self.textBoxViewButton.setChecked(True)
+        elif self.viewType == 1:
+            self.graphViewButton.setChecked(True)
+
         for i in range(sensorNumber):
             self.addSensor()
 
@@ -81,6 +90,8 @@ class SENSORS(QObject):
         """
         self.addConfigSensor()
         self.addControlSensor()
+
+        self.data.append([0])
 
     def removeSensor(self):
         """
@@ -118,6 +129,7 @@ class SENSORS(QObject):
 
         self.quantity = 0
         self.selectedTypes = []
+        self.seriesObjects = []
 
         # UPDATE WIDGETS
         self.sensorNumber.setValue(self.quantity)
@@ -159,39 +171,93 @@ class SENSORS(QObject):
         # THE INDEX OF THE NEXT SENSOR
         nextSensor = self.controlForm.rowCount()
 
-        # CREATE SENSOR READINGS TEXT BOX
-        # sensorView = QLineEdit()
-        # sensorView.setReadOnly(True)
-        # sensorView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-
-        # CREATE SENSOR READINGS GRAPH
-        series = QLineSeries(self)
-        series.append(0,6)
-        series.append(2, 4)
-        series.append(3, 8)
-        series.append(7, 4)
-        series.append(10, 5)
- 
-        chart =  QChart()
-        chart.addSeries(series)
-        chart.createDefaultAxes()
-        chart.setAnimationOptions(QChart.SeriesAnimations)
-        chart.setTitle("Temperature")
- 
-        chart.legend().setVisible(True)
-        chart.legend().setAlignment(Qt.AlignBottom)
- 
-        chartView = QChartView(chart)
-        chartView.setRenderHint(QPainter.Antialiasing)
-
-        # CREATE SENSOR LABEL
+        # GET SENSOR LABEL
         selectedType = self.selectedTypes[nextSensor]
         typeLabel = self.typeOptions[selectedType]
-        sensorLabel = QLabel(typeLabel)
 
-        # ADD TO CONTROL PANEL TAB
-        # self.controlForm.addRow(sensorLabel, sensorView)
-        self.controlForm.addRow(sensorLabel, chartView)
+        # CREATE SENSOR READINGS TEXT BOX
+        if self.viewType == 0:
+            sensorView, sensorLabel = self.addSensorTextBox(typeLabel)
+
+            # ADD TO CONTROL PANEL TAB
+            self.controlForm.addRow(sensorLabel, sensorView)
+        
+        # CREATE SENSOR READINGS GRAPH
+        elif self.viewType == 1:
+            # GET GRAPH AXIS RANGE
+            rangeMin, rangeMax = self.axisRange[selectedType]
+
+            sensorView = self.addSensorGraph(typeLabel, rangeMin, rangeMax)
+
+            # ADD TO CONTROL PANEL TAB (BLANK LABEL)
+            self.controlForm.addRow(QLabel(), sensorView)
+
+    def addSensorTextBox(self, label):
+        """
+        PURPOSE
+
+        Creates a text box to display the sensor readings.
+
+        INPUT
+
+        - label = text to describe the sensor.
+
+        OUTPUT
+
+        - sensorView = the textbox object.
+        """
+        sensorView = QLineEdit()
+        sensorView.setReadOnly(True)
+        sensorView.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        sensorLabel = QLabel(label)
+
+        return sensorView, sensorLabel
+
+    def addSensorGraph(self, label, rangeMin = 0, rangeMax = 100):
+        """
+        PURPOSE
+
+        Creates a live graph to display the sensor readings.
+
+        INPUT
+
+        - label = text to describe the sensor.
+
+        OUTPUT
+
+        - sensorView = the graph object.
+        """
+        chart =  QChart()
+        #chart.setAnimationOptions(QChart.SeriesAnimations)
+        chart.setTitle(label)
+        chart.legend().setVisible(False)
+        #chart.legend().setAlignment(Qt.AlignBottom)
+
+        # DATA SERIES TO ADD DATA TO
+        series = QSplineSeries(self)
+    
+        chart.addSeries(series)
+        chart.createDefaultAxes()
+
+        xAxis = QValueAxis()
+        xAxis.setRange(0, self.dataPoints)
+        xAxis.setLabelsVisible(False)
+
+        yAxis = QValueAxis()
+        yAxis.setRange(rangeMin, rangeMax)
+        yAxis.setLabelsVisible(True)
+
+        chart.setAxisX(xAxis, series)
+        chart.setAxisY(yAxis, series)
+ 
+        sensorView = QChartView(chart)
+        sensorView.setContentsMargins(0, 0, 0, 0)
+        sensorView.setRenderHint(QPainter.Antialiasing)
+
+        self.seriesObjects.append(series)
+
+        return sensorView
 
     def removeControlSensor(self):
         """
@@ -211,6 +277,42 @@ class SENSORS(QObject):
         sensorNumber = self.controlForm.rowCount() - 1
         self.controlForm.removeRow(sensorNumber)
 
+        # DELETE ANY EXCESS GRAPH OBJECTS
+        while len(self.seriesObjects) > sensorNumber:
+            self.seriesObjects.pop()
+
+    def removeSensorTextBox(self):
+        """
+        PURPOSE
+
+        Remove sensor display text box from control panel
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        pass
+
+    def removeSensorGraph(self):
+        """
+        PURPOSE
+
+        Remove sensor display graph from control panel
+
+        INPUT
+
+        NONE
+
+        RETURNS
+
+        NONE
+        """
+        pass
+
     def updateSensorReadings(self, readings):
         """
         PURPOSE
@@ -229,14 +331,70 @@ class SENSORS(QObject):
 
         # UPDATE EACH SENSOR LABEL
         for i, reading in enumerate(readings):
-            if i <= quantity:
-                # FIND LABEL WIDGET FOR EACH SENSOR
-                try:
-                    labelObject = self.controlForm.itemAt((2 * i) + 1).widget()
-                    labelObject.setText(str(reading))
-                except:
-                    pass
 
+            # ADD READINGS TO HISTORY
+            self.data[i].append(float(reading))
+            
+            # IF HISTORY IS FULL, REMOVE FIRST DATA POINT
+            if len(self.data[i]) > self.dataPoints:
+                
+                self.data[i].pop(0)
+
+            if i <= quantity:
+
+                # TEXT BOX DISPLAY
+                if self.viewType == 0:
+                    self.updateSensorTextBox(i, reading)
+                
+                # GRAPH DISPLAY
+                if self.viewType == 1:
+                    self.updateSensorGraph(i, reading)
+
+    def updateSensorTextBox(self, sensor, reading):
+        """
+        PURPOSE
+
+        Update each sensor text box with the latest reading.
+
+        INPUT
+
+        - sensor = the index of the sensor text box to modify.
+        - reading = the value to display.
+
+        OUTPUT
+
+        NONE
+        """
+        # FIND LABEL WIDGET FOR EACH SENSOR
+        try:
+            labelObject = self.controlForm.itemAt((2 * sensor) + 1).widget()
+            labelObject.setText(str(reading))
+        except:
+            pass
+
+    def updateSensorGraph(self, sensor, reading):
+        """
+        PURPOSE
+
+        Update each sensor graph, adding the latest value to the series.
+
+        INPUT
+
+        - sensor = the index of the sensor graph to modify.
+        - reading = the value to display.
+
+        OUTPUT
+
+        NONE
+        """
+        try:
+            # CREATE ARRAY OF QPOINTS FROM DATA HISTORY
+            newData = [QPoint(x, y) for x, y in enumerate(self.data[sensor])]
+        
+            self.seriesObjects[sensor].replace(newData)
+        except:
+            pass
+        
     def updateControlLabels(self):
         """
         PURPOSE
@@ -252,13 +410,34 @@ class SENSORS(QObject):
         NONE
         """
         quantity = self.controlForm.rowCount()
-
-        # UPDATE EACH SENSOR LABEL
+        
         for i in range(quantity):
-            # FIND LABEL WIDGET FOR EACH SENSOR
-            labelObject = self.controlForm.itemAt(2 * i).widget()
+
+            # FIND NEW LABEL
             label = self.typeOptions[self.selectedTypes[i]]
-            labelObject.setText(label)
+
+            # UPDATE EACH SENSOR LABEL
+            if self.viewType == 0:
+                try:
+                    # FIND LABEL WIDGET FOR EACH SENSOR
+                    labelObject = self.controlForm.itemAt(2 * i).widget()
+                    labelObject.setText(label)
+                except:
+                    pass
+            
+            elif self.viewType == 1:
+                try:
+                    # UPDATE GRAPH TITLE
+                    chartView = self.controlForm.itemAt((2 * i) + 1).widget() 
+                    chart = chartView.chart()
+                    chart.setTitle(label)
+
+                    # UPDATE GRAPH AXIS RANGES
+                    rangeMin, rangeMax = self.axisRange[self.selectedTypes[i]]
+                    xAxis, yAxis = chart.axes()
+                    yAxis.setRange(rangeMin, rangeMax)
+                except:
+                    pass
 
     def toggleDisplay(self):
         """
@@ -301,7 +480,15 @@ class SENSORS(QObject):
         self.sensorNumber.setMaximum(10)
         settingsLayout.addRow(QLabel("Quantity"), self.sensorNumber) 
 
-        # LAYOUT TO SHOW THRUSTER SETTINGS
+        # WIDGETS TO CHANGE SENSOR VIEW TYPE (TEXTBOX, GRAPH ETC.)
+        settingsChildLayout = QVBoxLayout()
+        self.textBoxViewButton = QRadioButton("Text Box")
+        self.graphViewButton = QRadioButton("Graph")
+        settingsChildLayout.addWidget(self.textBoxViewButton)
+        settingsChildLayout.addWidget(self.graphViewButton)
+        settingsLayout.addRow(QLabel("Display Type"), settingsChildLayout)
+
+        # LAYOUT TO SHOW SENSOR SETTINGS
         self.configForm = QFormLayout()
 
         # SPACER TO PUSH ALL WIDGETS UP
@@ -314,6 +501,8 @@ class SENSORS(QObject):
         
         # LINK WIDGETS
         self.sensorNumber.editingFinished.connect(self.changeSensorsNumber)
+        self.textBoxViewButton.clicked.connect(self.changeViewType)
+        self.graphViewButton.clicked.connect(self.changeViewType)
         
         # ADD TO GUI
         self.configLayout.setLayout(parentLayout)
@@ -349,6 +538,34 @@ class SENSORS(QObject):
             for i in range(-delta):
                 self.removeSensor()
 
+    def changeViewType(self):
+        """
+        PURPOSE
+
+        Changes the way sensors are displayed on the control panel.
+
+        INPUT
+
+        NONE
+
+        OUTPUT
+
+        NONE
+        """
+        if self.textBoxViewButton.isChecked():
+            self.viewType = 0
+            
+        elif self.graphViewButton.isChecked():
+            self.viewType = 1
+        
+        while self.controlForm.rowCount():
+            self.removeControlSensor()
+        
+        for i in range(self.quantity):
+            self.addControlSensor()
+
+        print(self.seriesObjects)
+           
     def addConfigSensor(self):
         """
         PURPOSE

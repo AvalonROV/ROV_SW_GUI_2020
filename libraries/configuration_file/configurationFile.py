@@ -167,19 +167,23 @@ class READ_CONFIG_FILE():
             child = self.root.find('sensors')
 
             sensorNumber = 0
+            sensorViewType = 1
             sensorSelectedType = []
 
             for sensor in child:
                 # NUMBER OF SENSORS
                 if sensor.tag == 'quantity':
                     sensorNumber = int(sensor.text)
+
+                if sensor.tag == 'viewType':
+                    sensorViewType = int(sensor.text)
                 
                 # SENSOR TYPES
                 else:
                     for sensorType in sensor:
                         sensorSelectedType.append(int(sensorType.text))
 
-            return sensorNumber, sensorSelectedType
+            return sensorNumber, sensorViewType, sensorSelectedType
              
         except:
             return
@@ -453,7 +457,7 @@ class WRITE_CONFIG_FILE():
         except:
             pass
 
-    def saveSensor(self, sensorNumber, sensorSelectedType):
+    def saveSensor(self, sensorNumber, sensorViewType, sensorSelectedType):
         """
         PURPOSE
 
@@ -462,6 +466,7 @@ class WRITE_CONFIG_FILE():
         INPUT
 
         - sensorNumber = number of sensors.
+        - viewType = how readings are displayed on the control panel (0 = text box, 1 = graph).
         - sensorSelectedType = array containing the type of each sensor.
 
         RETURNS
@@ -471,6 +476,8 @@ class WRITE_CONFIG_FILE():
         try:
             sensors = SubElement(self.root, "sensors")
             SubElement(sensors, "quantity").text = str(sensorNumber)
+
+            SubElement(sensors, "viewType").text = str(sensorViewType)
             
             for index in range(sensorNumber):
                 sensor = SubElement(sensors, "sensor{}".format(index))

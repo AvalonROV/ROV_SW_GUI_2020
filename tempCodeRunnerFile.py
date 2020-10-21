@@ -1,2 +1,0 @@
-
-        newRowCount = ceil(widgetCount/newColumnCount)
