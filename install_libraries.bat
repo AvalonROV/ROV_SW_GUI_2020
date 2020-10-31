@@ -19,6 +19,11 @@ pause
 pip install pyqt5-tools
 echo.
 
+echo ~--- About to install PyInstaller (For generating executable) ---#
+pause
+pip install pyinstaller
+echo.
+
 echo #--- About to install OpenCV ---#
 pause
 pip install opencv-python

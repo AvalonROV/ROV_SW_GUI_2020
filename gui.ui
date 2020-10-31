@@ -444,7 +444,7 @@
                      <x>0</x>
                      <y>0</y>
                      <width>196</width>
-                     <height>617</height>
+                     <height>638</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_12">
@@ -757,7 +757,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>206</width>
-                 <height>637</height>
+                 <height>658</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
@@ -1064,25 +1064,11 @@
                </widget>
               </item>
               <item>
-               <layout class="QVBoxLayout" name="verticalLayout_2">
-                <item>
-                 <widget class="QLabel" name="avalon_logo">
-                  <property name="text">
-                   <string>TextLabel</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="program_exit">
-                  <property name="text">
-                   <string>Exit Program</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QPushButton" name="program_exit">
+                <property name="text">
+                 <string>Exit Program</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>

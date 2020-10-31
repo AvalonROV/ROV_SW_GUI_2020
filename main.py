@@ -139,7 +139,6 @@ class UI(QMainWindow):
     
         # LAUNCH GUI
         self.showFullScreen()
-        #self.show()
 
         # LAUNCH PILOT PROFILE SELECTOR
         self.profileSelector.showPopup()    
@@ -570,13 +569,13 @@ class UI(QMainWindow):
         self.control_rov_connect.clicked.connect(self.control.rovSerialConnection)
         self.control_rov_connect.setObjectName("large-button")
         self.style.applyGlow(self.control_rov_connect, "#0D47A1", 10)
-        self.control_rov_connect.setFixedHeight(int(self.control_rov_connect.sizeHint().height() * 1.5))
+        #self.control_rov_connect.setFixedHeight(int(self.control_rov_connect.sizeHint().height() * 1.5))
 
         # CONTROLLER CONNECT BUTTON
         self.control_controller_connect.clicked.connect(self.control.controllerConnection)
         self.control_controller_connect.setObjectName("large-button")
         self.style.applyGlow(self.control_controller_connect, "#0D47A1", 10)
-        self.control_controller_connect.setFixedHeight(int(self.control_controller_connect.sizeHint().height() * 1.5))
+        #self.control_controller_connect.setFixedHeight(int(self.control_controller_connect.sizeHint().height() * 1.5))
         
         # MACHINE VISION TASK BUTTONS
         self.control_vision_mosaic.clicked.connect(lambda status, task = 0: self.control.popupVisionTask(task)) 
@@ -604,6 +603,8 @@ class UI(QMainWindow):
 
         # PROGRAM EXIT BUTTON
         self.program_exit.clicked.connect(lambda: self.app.quit())
+        self.program_exit.setIcon(QIcon("./graphics/exit-icon.png"))
+        self.program_exit.setIconSize(QSize(15,15))
         self.program_exit.setObjectName("red-button")
 
         self.mini_rov_activate.clicked.connect(lambda sensor = 0, reading = None: self.sensors.updateSensorGraph(sensor, reading))
@@ -626,13 +627,13 @@ class UI(QMainWindow):
         self.config_rov_connect.clicked.connect(self.control.rovSerialConnection)
         self.config_rov_connect.setObjectName("large-button")
         self.style.applyGlow(self.config_rov_connect, "#0D47A1", 10)
-        self.config_rov_connect.setFixedHeight(int(self.config_rov_connect.sizeHint().height() * 1.5))
+        #self.config_rov_connect.setFixedHeight(int(self.config_rov_connect.sizeHint().height() * 1.5))
         
         # CONTROLLER CONNECT BUTTON
         self.config_controller_connect.clicked.connect(self.control.controllerConnection)
         self.config_controller_connect.setObjectName("large-button")
         self.style.applyGlow(self.config_controller_connect, "#0D47A1", 10)
-        self.config_controller_connect.setFixedHeight(int(self.config_controller_connect.sizeHint().height() * 1.5))
+        #self.config_controller_connect.setFixedHeight(int(self.config_controller_connect.sizeHint().height() * 1.5))
             
         # SERIAL COMMUNICATION BUTTONS
         self.config_com_port_list.activated.connect(self.config.changeComPort)
@@ -892,7 +893,7 @@ class UI(QMainWindow):
         # APPLY NEW APPLICATION DEFAULT COLOR PALETTE
         self.style.setPalette(self.style.theme, self.app)
 
-        # GET CURRENT WIDGET HEIGHT (TO CORRECTLY SET BORDER RADIUS)
+        # GET CURRENT DEFAULT WIDGET HEIGHT (TO CORRECTLY SET BORDER RADIUS)
         self.style.widgetHeight = self.getDefaultButtonSize()
 
         # CHANGE PROGRAM STYLESHEETS
@@ -931,7 +932,7 @@ class UI(QMainWindow):
             pass
         
         # LOAD AVALON LOGO
-        self.setLogo(self.style.theme)      
+        #self.setLogo(self.style.theme)      
 
     def setLogo(self, theme):
         """
@@ -1009,7 +1010,7 @@ class UI(QMainWindow):
 
         Gets the default height of a button. 
         This is used to correctly set the border radius of 
-        the buttons for different display resolutions.
+        the buttons for different display resolutions.w
 
         INPUT
 
@@ -1023,6 +1024,7 @@ class UI(QMainWindow):
         # USE CONTROL PANEL BUTTON AS SIZE REFERENCE
         height = self.change_gui_control.sizeHint().height()
         
+
         return height
 
     def resizeEvent(self, event):
@@ -2162,6 +2164,7 @@ class TOOLBAR():
         NONE
         """
         self.ui.profileSelector.showPopup()
+        
 
     def resetSettings(self):
         """

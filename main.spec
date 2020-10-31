@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['D:\\Google Drive\\ROV_SW_GUI_2020'],
+             pathex=[],
              binaries=[],
              datas=[('gui.ui', '.'), ('graphics', 'graphics'), ('libraries', 'libraries'), ('config', 'config')],
              hiddenimports=[],
@@ -19,15 +19,20 @@ pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
-          a.binaries,
-          a.zipfiles,
-          a.datas,
           [],
-          name='main',
+          exclude_binaries=True,
+          name='Pilot Control Program',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          upx_exclude=[],
-          runtime_tmpdir=None,
-          console=True )
+          console=False,
+          icon='graphics/icon.ico')
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               upx_exclude=[],
+               name='main')

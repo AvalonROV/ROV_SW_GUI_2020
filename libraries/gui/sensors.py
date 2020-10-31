@@ -229,9 +229,9 @@ class SENSORS(QObject):
         - sensorView = the graph object.
         """
         chart =  QChart()
-        #chart.setAnimationOptions(QChart.SeriesAnimations)
         chart.setTitle(label)
         chart.legend().setVisible(False)
+        chart.setBackgroundRoundness(20)
         #chart.legend().setAlignment(Qt.AlignBottom)
 
         # DATA SERIES TO ADD DATA TO
@@ -252,7 +252,9 @@ class SENSORS(QObject):
         chart.setAxisY(yAxis, series)
  
         sensorView = QChartView(chart)
-        sensorView.setContentsMargins(0, 0, 0, 0)
+        sensorView.setFixedHeight(200)
+        chart.layout().setContentsMargins(0, 0, 0, 0)
+        
         sensorView.setRenderHint(QPainter.Antialiasing)
 
         self.seriesObjects.append(series)
@@ -332,23 +334,27 @@ class SENSORS(QObject):
         # UPDATE EACH SENSOR LABEL
         for i, reading in enumerate(readings):
 
-            # ADD READINGS TO HISTORY
-            self.data[i].append(float(reading))
-            
-            # IF HISTORY IS FULL, REMOVE FIRST DATA POINT
-            if len(self.data[i]) > self.dataPoints:
-                
-                self.data[i].pop(0)
+            if i <= self.quantity:
+                try:
+                    # ADD READINGS TO HISTORY
+                    self.data[i].append(float(reading))
+                    
+                    # IF HISTORY IS FULL, REMOVE FIRST DATA POINT
+                    if len(self.data[i]) > self.dataPoints:
+                        
+                        self.data[i].pop(0)
 
-            if i <= quantity:
+                    if i <= quantity:
 
-                # TEXT BOX DISPLAY
-                if self.viewType == 0:
-                    self.updateSensorTextBox(i, reading)
-                
-                # GRAPH DISPLAY
-                if self.viewType == 1:
-                    self.updateSensorGraph(i, reading)
+                        # TEXT BOX DISPLAY
+                        if self.viewType == 0:
+                            self.updateSensorTextBox(i, reading)
+                        
+                        # GRAPH DISPLAY
+                        if self.viewType == 1:
+                            self.updateSensorGraph(i, reading)
+                except:
+                    pass
 
     def updateSensorTextBox(self, sensor, reading):
         """
@@ -390,7 +396,12 @@ class SENSORS(QObject):
         try:
             # CREATE ARRAY OF QPOINTS FROM DATA HISTORY
             newData = [QPoint(x, y) for x, y in enumerate(self.data[sensor])]
+
+            # GET SENSOR LABEL
+            label = self.typeOptions[self.selectedTypes[sensor]]
         
+            self.seriesObjects[sensor].chart().setTitle(label + ": " + "{:3.2f}".format(float(reading)))
+            
             self.seriesObjects[sensor].replace(newData)
         except:
             pass

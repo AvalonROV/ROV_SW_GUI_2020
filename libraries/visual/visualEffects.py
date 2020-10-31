@@ -11,25 +11,24 @@ class STYLE():
     theme = True
 
     # STYLESHEETS
-    blueButtonLarge = ""
-    blueButtonSmall = ""
+    normalButton = ""
+    largeButton = ""
     actuatorButton = ""
     orientationButton = ""
-    deleteButton = ""
+    timerStartButton = ""
+    blueButton = ""
+    greenButton = ""
+    redbutton = ""
+    timerLCD = ""
     scrollArea = ""
     comboBox = ""
-    timerLCD = ""
-    timerStartButton = ""
-    programExit = ""
     groupBox = ""
-    greenText = ""
-    redText = ""
-    disabledText = ""
     settingsFrame = ""
     thrusterFrame = ""
     actuatorFrame = ""
     digitalCameraFrame = ""
     keybindingFrame = ""
+    labelOnOff = ""
     infoLabel = ""
 
     widgetHeight = 0
@@ -104,8 +103,14 @@ class STYLE():
 
         NONE
         """
-        normalBorderRadius = self.widgetHeight/2
-        bigBorderRadius = int(normalBorderRadius * 1.5)
+        normalBorderRadius = int(self.widgetHeight/2)
+        bigButtonHeight = int(self.widgetHeight * 1.5)
+        bigBorderRadius = int(bigButtonHeight/2)
+        
+        print("BUTTON HEIGHT: ",self.widgetHeight)
+        print("BUTTON RADIUS: ",normalBorderRadius)
+        print("BIG BUTTON HEIGHT: ",bigButtonHeight)
+        print("BIG BUTTON RADIUS: ",bigBorderRadius)
 
         # DARK THEME
         if theme:
@@ -119,11 +124,11 @@ class STYLE():
                                 "QPushButton:checked {background-color: #1976d2;}"
                                 "QPushButton:checked:hover {background-color: #115293}") % (normalBorderRadius)
 
-            self.largeButton = ("#large-button {background-color: #424242; color: white; border-radius: %d;}" 
+            self.largeButton = ("#large-button {background-color: #424242; color: white; height: %d; border-radius: %d;}" 
                                 "#large-button:hover {background-color: #393939;}"
                                 "#large-button:pressed {background-color: #1976d2;}"
                                 "#large-button:checked {background-color: #1976d2;}"
-                                "#large-button:checked:hover {background-color: #115293}") % (bigBorderRadius)
+                                "#large-button:checked:hover {background-color: #115293}") % (bigButtonHeight, bigBorderRadius)
             
             self.actuatorButton = ("#actuator-button {background-color: #43a047; font-weight: bold; color: white; border-radius: %d}" 
                                     "#actuator-button:hover {background-color: #388e3c}"
