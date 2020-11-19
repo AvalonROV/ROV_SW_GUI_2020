@@ -130,7 +130,7 @@ class STYLE():
                                 "#large-button:checked {background-color: #1976d2;}"
                                 "#large-button:checked:hover {background-color: #115293}") % (bigButtonHeight, bigBorderRadius)
             
-            self.actuatorButton = ("#actuator-button {background-color: #43a047; font-weight: bold; color: white; border-radius: %d}" 
+            self.actuatorButton = ("#actuator-button {background-color: #43a047; font-weight: bold; min-height: 40 ; max-height: 40; color: white; border-radius: %d}" 
                                     "#actuator-button:hover {background-color: #388e3c}"
                                     "#actuator-button:checked {background-color: #c62828;}"
                                     "#actuator-button:checked:hover {background-color: #b71c1c}") % (bigBorderRadius)

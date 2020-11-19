@@ -172,6 +172,7 @@ class ACTUATORS(QObject):
 
         # CREATE WIDGETS ON CONTROL PANEL TAB
         actuatorName = QLabel(labels[0])
+        actuatorName.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
        
         actuatorToggle = QPushButton(labels[1])
         actuatorToggle.setObjectName("actuator-button")
@@ -180,8 +181,8 @@ class ACTUATORS(QObject):
         # ADD TO FORM LAYOUT
         self.controlForm.addRow(actuatorName, actuatorToggle)
 
-        actuatorName.setFixedHeight(int(actuatorName.sizeHint().height() * 1.5))
-        actuatorToggle.setFixedHeight(int(actuatorToggle.sizeHint().height() * 1.5))
+        #actuatorName.setFixedHeight(int(actuatorName.sizeHint().height() * 1.5))
+        #actuatorToggle.setFixedHeight(int(actuatorToggle.sizeHint().height() * 1.5))
 
         # LINK WIDGETS
         actuatorToggle.clicked.connect(lambda state, actuator = nextActuator: self.toggleActuator(actuator))
